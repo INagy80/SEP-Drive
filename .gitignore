@@ -55,7 +55,7 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+
 .DS_Store
 *.suo
 *.ntvs*
@@ -80,3 +80,43 @@ coverage/
 
 # Ignore compiled environments if applicable
 src/environments/environment*.ts
+
+
+
+#Angular generated .gitignore
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+Thumbs.db
