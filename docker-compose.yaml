@@ -1,0 +1,42 @@
+services:
+  backend:
+    container_name: SEP_backend
+    build: ./backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/SEPDrive
+      SPRING_DATASOURCE_USERNAME: SEPDrive
+      SPRING_DATASOURCE_PASSWORD: SEPDriveC7
+
+  frontend:
+    container_name: SEP_frontend
+    build: ./frontend
+    ports:
+      - "80:80"
+
+
+
+  db:
+    container_name: db
+    image: postgres
+    environment:
+      POSTGRES_USER: SEPDrive
+      POSTGRES_PASSWORD: SEPDriveC7
+      PGDATA: /data/postgres
+    volumes:
+      - db:/data/postgres
+    ports:
+      - "5332:5432"
+    networks:
+      - db
+    restart: unless-stopped
+
+networks:
+  db:
+    driver: bridge
+
+volumes:
+  db:

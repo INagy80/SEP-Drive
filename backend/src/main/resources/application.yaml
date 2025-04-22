@@ -10,7 +10,7 @@ spring:
       password: SEP
 
   datasource:
-    url: jdbc:postgresql://localhost:5332/Dominoes
+    url: jdbc:postgresql://localhost:5332/SEPDrive
     username: SEPDrive
     password: SEPDriveC7
   jpa:
