@@ -85,15 +85,16 @@ src/environments/environment*.ts
 
 #Angular generated .gitignore
 # Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+frontend/Angular/dist
+frontend/Angular/tmp
+frontend/Angular/out-tsc
+frontend/Angular/bazel-out
+frontend/Angular/.angular
 
 # Node
-/node_modules
-npm-debug.log
-yarn-error.log
+frontend/Angular/node_modules
+frontend/Angular/npm-debug.log
+frontend/Angular/yarn-error.log
 
 # IDEs and editors
 .idea/
@@ -119,4 +120,4 @@ testem.log
 /typings
 
 # System files
-Thumbs.db
+frontend/Angular/Thumbs.db

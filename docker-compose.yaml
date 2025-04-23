@@ -13,30 +13,30 @@ services:
 
   frontend:
     container_name: SEP_frontend
-    build: ./frontend
+    build: ./frontend/Angular
     ports:
-      - "80:80"
+      - "8000:80"
 
 
 
   db:
-    container_name: db
+    container_name: SEPdb
     image: postgres
     environment:
       POSTGRES_USER: SEPDrive
       POSTGRES_PASSWORD: SEPDriveC7
       PGDATA: /data/postgres
     volumes:
-      - db:/data/postgres
+      - SEPdb:/data/postgres
     ports:
       - "5332:5432"
     networks:
-      - db
+      - SEPdb
     restart: unless-stopped
 
 networks:
-  db:
+  SEPdb:
     driver: bridge
 
 volumes:
-  db:
+  SEPdb:
