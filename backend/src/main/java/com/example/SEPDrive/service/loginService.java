@@ -20,10 +20,27 @@ public class loginService {
     private  userDAO userDao;
 
     @Autowired
+    private AuthenticationManager authManager;
+
+    @Autowired
+    private JWTService jwtService;
+
+    @Autowired
     private emailSenderService emailSenderService;
 
 
-    public AuthenticatinResponse verify(String s, String password) {
-        return null;
+    public AuthenticatinResponse verify(String userName, String password) {
+        Authentication authentication = authManager.
+                authenticate(new UsernamePasswordAuthenticationToken(userName, password));
+
+        user user = userDao.findByUserName(userName);
+
+        //the 2FA would be implemented later
+//        Integer FA2 = new Random().nextInt(900000) + 100000;
+//        emailSenderService.sendEmail(user.getEmail(), "SEPDrive Verification Code", "Your verification code is: " + FA2);
+
+        var jwtToken = jwtService.generateToken(userName);
+        return AuthenticatinResponse.builder().token(jwtToken).build();
+
     }
 }
