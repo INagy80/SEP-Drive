@@ -2,7 +2,7 @@ package com.example.SEPDrive.service;
 
 import com.example.SEPDrive.exceptions.userNotFoundException;
 import com.example.SEPDrive.model.user;
-import com.example.SEPDrive.model.userPrincipal;
+import com.example.SEPDrive.model.userPrinciple;
 import com.example.SEPDrive.repository.userDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +26,6 @@ public class myUserDetailsService implements UserDetailsService {
            throw new userNotFoundException("User not found");
        }
 
-        return new userPrincipal(user);
+        return new userPrinciple(user);
     }
 }
