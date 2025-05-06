@@ -1,0 +1,19 @@
+<h1>Login</h1>
+
+<form (submit)="onLogin()">
+  <label for="username">Benutzername:</label>
+  <input type="text" id="username" name="username" required>
+
+  <br><br>
+
+  <label for="password">Passwort:</label>
+  <input type="password" id="password" name="password" required>
+
+  <br><br>
+
+  <button type="submit">Einloggen</button>
+</form>
+
+<p>Noch kein Konto?
+  <a href="/register">Zur Registrierung</a>
+</p>

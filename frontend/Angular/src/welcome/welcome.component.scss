@@ -1,0 +1,64 @@
+:host {
+  display: block;
+  background-image: url('/images/welcome.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  color: white;
+  text-align: center;
+  padding-top: 50px;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100vh;
+  padding-left: 5vw;
+  padding-top: 10vh;
+  background-image: url('/images/welcome.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: rgba(255, 255, 255, 0.71);
+  font-family: 'Barlow Condensed', sans-serif;
+
+}
+
+h1 {
+  font-size: 13rem;
+  margin: 0 0 20px 0;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+p {
+  font-size: 3rem;
+  margin: 0 0 5rem 0;
+  text-align: left;
+  max-width: 600px;
+  text-shadow: 1px 1px 4px rgb(0, 0, 0);
+}
+
+a {
+  padding: 1rem 1rem;
+  font-size: 30px;
+  background-color: rgba(229, 110, 83, 0.58);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+a:hover {
+  background-color: rgb(229, 83, 83);
+}
+
