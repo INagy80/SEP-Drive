@@ -1,0 +1,55 @@
+<div class="container">
+  <div class="form-box register">
+    <form action="">
+
+      <meta charset="UTF-8">
+      <h1>Dein Schlüssel zur Mobilität:</h1>
+      <h2>Jetzt kostenlos registrieren</h2>
+
+      <button type="button" (click)="zeigeFeld = false">Kunde</button>
+      <button type="button" (click)="zeigeFeld = true">Fahrer</button>
+
+      <div class="input-box">
+        <input type="text" placeholder="Benutzername" required>
+      </div>
+
+      <div class ="input-box">
+        <input type="text" placeholder="Vorname" required>
+      </div>
+
+      <div class ="input-box">
+        <input type="text" placeholder="Nachname" required>
+      </div>
+
+      <div class ="input-box">
+        <input type="email" placeholder="E-Mail-Adresse" required>
+      </div>
+
+      <div class ="input-box">
+        <input type="date" placeholder="Geburtsdatum" required>
+      </div>
+
+      <div class ="input-box">
+        <input type="password" placeholder="Passwort" required>
+      </div>
+
+      <div class ="input-box">
+        <input type="password" placeholder="Passwort wiederholen" required>
+      </div>
+
+      <div [class.versteckt]="!zeigeFeld">
+        <label for="autoklasse">Wähle eine Autoklasse:</label>
+        <select id="autoklasse" name="autoklasse">
+          <option value="klein">Klein</option>
+          <option value="medium">Medium</option>
+          <option value="deluxe">Deluxe</option>
+        </select>
+      </div>
+
+
+
+      <button type="submit" class="register">Registrieren</button>
+
+    </form>
+  </div>
+</div>

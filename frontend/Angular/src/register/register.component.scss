@@ -1,0 +1,32 @@
+h1,h2 {
+  font-size: 0.7em;
+}
+
+.container {
+  display: flex;
+  justify-content: center;  /* horizontal zentrieren */
+  align-items: center;      /* vertikal zentrieren */
+  height: 100vh; /* 100% der Höhe des Viewports */
+  background: darkgray;
+}
+
+.form-box {
+  background: gray;
+  padding: 80px;
+  border-radius: 10px;
+ box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.input-box {
+  margin-bottom: 16px; /* oder 20px oder dein gewünschter Wert */
+}
+
+button {
+  margin-bottom: 16px;
+}
+
+//versteckt bei Kunde die Autoklasse
+.versteckt {
+  display: none;
+}
+
