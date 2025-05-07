@@ -1,19 +1,34 @@
-<h1>Login</h1>
 
-<form (submit)="onLogin()">
-  <label for="username">Benutzername:</label>
-  <input type="text" id="username" name="username" required>
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<div class="container">
+  <div class="form-box">
+    <form (submit)="onLogin()">
+      <h1>Login</h1>
 
-  <br><br>
+      <div class="input-box">
+        <input type="text" placeholder="Benutzername" required>
+        <i class='bx bxs-user'></i>
+      </div>
 
-  <label for="password">Passwort:</label>
-  <input type="password" id="password" name="password" required>
+      <div class="input-box">
+        <input type="password" placeholder="Passwort" required>
+        <i class='bx bxs-lock-alt'></i>
+      </div>
 
-  <br><br>
+      <div class="forgot">
+        <a href="/forgot-password">Passwort vergessen?</a>
+      </div>
+      <br><br>
 
-  <button type="submit">Einloggen</button>
-</form>
+      <button type="submit" class="bttn">Einloggen</button>
 
-<p>Noch kein Konto?
-  <a href="/register">Zur Registrierung</a>
-</p>
+    </form>
+  </div>
+  <div class="toggle-box">
+    <div class="toggle-panel">
+      <h2> Willkomen!</h2>
+      <p>Noch kein Konto? </p>
+      <button class="bttn-register">Register</button>
+    </div>
+  </div>
+</div>

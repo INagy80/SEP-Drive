@@ -1,0 +1,133 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Barlow Condensed', sans-serif;
+  background-image: url('/images/map.jpeg');
+}
+
+
+.container{
+  position: relative;
+  width: 1000px;
+  height: 600px;
+  background: #ffffff;
+  border-radius: 30px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.55);
+}
+
+.form-box{
+  position: absolute;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: rgb(239, 242, 246);
+  display: flex;
+  align-items: center;
+  text-align: center;
+  z-index: 1;
+}
+
+form{
+  width: 100%;
+}
+
+.container h1{
+  color: #2c2c2c;
+  font-size: 60px;
+  margin: 10px 0;
+}
+
+.input-box{
+  position: relative;
+  margin: 30px 0;
+}
+
+.input-box input{
+  width: 80%;
+  padding: 13px 50px 13px 20px; /*top,right,bottom,left --> damit der text nur in dem box bleibt*/
+  background: rgb(206, 212, 218);
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #4e4e4e;
+  font-weight: 500;
+}
+
+.input-box i{
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(0, 0, 0, 0.52);
+}
+
+.forgot a{
+  font-size:15px;
+  color: rgba(0, 0, 0, 0.81);
+  text-decoration: none;
+}
+
+.bttn{
+  width: 95%;
+  height: 45px;
+  background: #23374f;
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.6);
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.bttn-register{
+  width: 50%;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.69);
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.6);
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+}
+
+
+
+p{
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.toggle-box{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.toggle-panel{
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #152232;
+}
+
+.toggle-panel h2{
+  color: rgba(255, 255, 255, 0.87);
+}
+
+h2{
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 46px;
+}
+
+
