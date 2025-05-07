@@ -4,7 +4,7 @@
   align-items: center;
   min-height: 100vh;
   font-family: 'Barlow Condensed', sans-serif;
-  background-image: url('/images/map.jpeg');
+  background-color: white;
 }
 
 
@@ -12,9 +12,9 @@
   position: relative;
   width: 1000px;
   height: 600px;
-  background: #ffffff;
-  border-radius: 30px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.55);
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 50px;
+  box-shadow: 0 0 30px rgb(27, 34, 44);
 }
 
 .form-box{
@@ -22,7 +22,7 @@
   right: 0;
   width: 50%;
   height: 100%;
-  background: rgb(239, 242, 246);
+  background: rgba(255, 255, 255, 0.88);
   display: flex;
   align-items: center;
   text-align: center;
@@ -119,6 +119,7 @@ p{
   align-items: center;
   color: rgba(255, 255, 255, 0.87);
   background-color: #152232;
+  border-radius: 50px;
 }
 
 .toggle-panel h2{

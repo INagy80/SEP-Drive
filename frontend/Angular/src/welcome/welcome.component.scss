@@ -1,14 +1,4 @@
-:host {
-  display: block;
-  background-image: url('/images/welcome.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  height: 100vh;
-  color: white;
-  text-align: center;
-  padding-top: 50px;
-}
+
 html, body {
   height: 100%;
   margin: 0;
@@ -16,6 +6,7 @@ html, body {
 }
 
 :host {
+  text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -27,7 +18,7 @@ html, body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  color: rgba(255, 255, 255, 0.71);
+  color: rgb(255, 255, 255);
   font-family: 'Barlow Condensed', sans-serif;
 
 }
@@ -49,7 +40,7 @@ p {
 a {
   padding: 1rem 1rem;
   font-size: 30px;
-  background-color: rgba(229, 110, 83, 0.58);
+  background-color: rgba(99, 117, 170, 0.74);
   color: #fff;
   text-decoration: none;
   border-radius: 10px;
@@ -59,6 +50,6 @@ a {
 }
 
 a:hover {
-  background-color: rgb(229, 83, 83);
+  background-color: rgba(99, 117, 170, 0.4);
 }
 
