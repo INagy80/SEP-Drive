@@ -2,12 +2,17 @@
   <div class="form-box register">
     <form action="">
 
-      <meta charset="UTF-8">
       <h1>Dein Schlüssel zur Mobilität:</h1>
       <h2>Jetzt kostenlos registrieren</h2>
 
       <button type="button" (click)="zeigeFeld = false">Kunde</button>
       <button type="button" (click)="zeigeFeld = true">Fahrer</button>
+
+      <div class="input-box">
+        <label for="profilbild">Profilbild (optional):</label>
+        <input type="file" id="profilbild" (change)="onFileSelected($event)">
+      </div>
+
 
       <div class="input-box">
         <input type="text" placeholder="Benutzername" required>
@@ -37,6 +42,7 @@
         <input type="password" placeholder="Passwort wiederholen" required>
       </div>
 
+
       <div [class.versteckt]="!zeigeFeld">
         <label for="autoklasse">Wähle eine Autoklasse:</label>
         <select id="autoklasse" name="autoklasse">
@@ -46,10 +52,8 @@
         </select>
       </div>
 
-
-
-      <button type="submit" class="register">Registrieren</button>
+      <a href="/login">Registrieren</a>
 
     </form>
   </div>
-</div>
+</div>  

@@ -1,32 +1,120 @@
-h1,h2 {
-  font-size: 0.7em;
-}
+// Farben
+$pastellblau: #a3d2fc;
+$hellblau: #e6f4ff;
+$weiß: #ffffff;
+$grau: #7a7a7a;
+$button-blau: #5ab4f8;
+$button-hover: #429de3;
 
 .container {
   display: flex;
-  justify-content: center;  /* horizontal zentrieren */
-  align-items: center;      /* vertikal zentrieren */
-  height: 100vh; /* 100% der Höhe des Viewports */
-  background: darkgray;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, $hellblau, $pastellblau);
+  background-image: url('/assets/car-bg.png'); // optionales Auto-Bild im Hintergrund
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  background-size: 300px;
 }
 
-.form-box {
-  background: gray;
-  padding: 80px;
-  border-radius: 10px;
- box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
+.form-box.register {
+  background-color: $weiß;
+  padding: 3rem 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
 
-.input-box {
-  margin-bottom: 16px; /* oder 20px oder dein gewünschter Wert */
-}
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: $grau;
+    margin-bottom: 0.5rem;
+  }
 
-button {
-  margin-bottom: 16px;
-}
+  h2 {
+    text-align: center;
+    font-size: 1.2rem;
+    color: $grau;
+    margin-bottom: 2rem;
+  }
 
-//versteckt bei Kunde die Autoklasse
-.versteckt {
-  display: none;
-}
+  .input-box {
+    margin-bottom: 1.2rem;
 
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+      color: $grau;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid lighten($pastellblau, 20%);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      background-color: $hellblau;
+      color: #333;
+
+      &:focus {
+        outline: none;
+        border-color: $button-blau;
+        background-color: #fff;
+      }
+    }
+  }
+
+  button {
+    width: 48%;
+    margin: 0.5rem 1%;
+    padding: 0.7rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: $button-blau;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $button-hover;
+    }
+  }
+
+  .register {
+    width: 100%;
+    background-color: $button-blau;
+    padding: 0.9rem;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+
+    &:hover {
+      background-color: $button-hover;
+    }
+  }
+
+  a.register {
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    background-color: $button-blau;
+    color: white;
+    text-decoration: none;
+    padding: 0.9rem;
+    font-size: 1.1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+
+    &:hover {
+      background-color: $button-hover;
+    }
+  }
+
+  .versteckt {
+    display: none;
+  }
+}
