@@ -2,17 +2,23 @@
   <div class="form-box register">
     <form action="">
 
-      <h1>Dein Schlüssel zur Mobilität:</h1>
-      <h2>Jetzt kostenlos registrieren</h2>
+      <link href = 'https://unpkg.com/boxicons2.1.4/css/boxicons.min.css' rel = 'stylesheet'>
+
+      <h1>Registrierung</h1>
 
       <button type="button" (click)="zeigeFeld = false">Kunde</button>
       <button type="button" (click)="zeigeFeld = true">Fahrer</button>
 
-      <div class="input-box">
-        <label for="profilbild">Profilbild (optional):</label>
-        <input type="file" id="profilbild" (change)="onFileSelected($event)">
+      <div class="profilbild-container">
+        <div class="profilbild-upload">
+          <input type="file" id="profilbild" (change)="onFileSelected($event)" hidden #fileInput>
+          <div class="profilbild-kreis" (click)="fileInput.click()">
+            <img *ngIf="profilbildVorschauUrl" [src]="profilbildVorschauUrl" alt="Profilbild">
+            <i *ngIf="!profilbildVorschauUrl" class="plus-icon">+</i>
+          </div>
+        </div>
+        <span class="profilbild-hinweis">(optional)</span>
       </div>
-
 
       <div class="input-box">
         <input type="text" placeholder="Benutzername" required>
@@ -42,7 +48,6 @@
         <input type="password" placeholder="Passwort wiederholen" required>
       </div>
 
-
       <div [class.versteckt]="!zeigeFeld">
         <label for="autoklasse">Wähle eine Autoklasse:</label>
         <select id="autoklasse" name="autoklasse">
@@ -52,8 +57,9 @@
         </select>
       </div>
 
-      <a href="/login">Registrieren</a>
+      <a href="/login" class="link-button">Registrieren</a>
 
     </form>
   </div>
-</div>  
+</div>
+

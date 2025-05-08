@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {NgIf} from '@angular/common';
+import {NgModel} from "@angular/forms";
 
 @Component({
   selector: 'app-register',
@@ -11,7 +12,13 @@ import {NgIf} from '@angular/common';
 
 })
 export class RegisterComponent {
+
+  passwort: string = '';
+  passwortWiederholen: string = '';
+
   zeigeFeld: boolean = false;
+
+
   profilbildDatei: File | null = null;
 
   profilbildVorschauUrl: string | null = null;
@@ -28,4 +35,15 @@ export class RegisterComponent {
       reader.readAsDataURL(file);
     }
   }
+
+  onSubmit() {
+    if (this.passwort !== this.passwortWiederholen) {
+      alert('Die Passwörter stimmen nicht überein.');
+      return;
+    }
+
+    // Hier: Registrierung fortsetzen
+    console.log('Formular ist gültig!');
+  }
+
 }

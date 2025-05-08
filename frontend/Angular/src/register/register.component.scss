@@ -1,120 +1,156 @@
-// Farben
-$pastellblau: #a3d2fc;
-$hellblau: #e6f4ff;
-$weiß: #ffffff;
-$grau: #7a7a7a;
-$button-blau: #5ab4f8;
-$button-hover: #429de3;
-
-.container {
+:host {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(to bottom right, $hellblau, $pastellblau);
-  background-image: url('/assets/car-bg.png'); // optionales Auto-Bild im Hintergrund
-  background-repeat: no-repeat;
-  background-position: bottom right;
-  background-size: 300px;
+  font-family: 'Barlow Condensed', sans-serif;
+  background-color: white;
+  background-image: url('/images/welcome.png'); // Passe ggf. den Pfad an
+  background-size: cover;
+  background-position: center;
 }
 
-.form-box.register {
-  background-color: $weiß;
-  padding: 3rem 2rem;
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 500px;
+.container {
+  position: relative;
+  width: 1000px;
+  height: 600px;
+  background: #1D2D44 ;
+  border-radius: 50px;
+  display: flex;
+  overflow: hidden;
+}
 
-  h1 {
-    text-align: center;
-    font-size: 1.8rem;
-    color: $grau;
-    margin-bottom: 0.5rem;
+// Linke Seite: Formularbereich
+.form-box {
+  width: 50%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.88);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+form {
+  width: 100%;
+}
+
+//Überschrift : Registrierung
+form h1 {
+  font-size: 25px;
+  color: #1D2D44;
+  margin-bottom: 10px;
+}
+
+.input-box {
+  position: relative;
+  margin: 16px 0;
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: #2c2c2c;
+    margin-bottom: 6px;
   }
+
+  input,
+  select {
+    width: 80%;
+    //padding: 13px 20px;
+    background: rgb(206, 212, 218);
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #4e4e4e;
+    font-weight: 500;
+  }
+
+  select {
+    width: 85%;
+  }
+}
+
+
+.versteckt {
+  display: none;
+}
 
   h2 {
-    text-align: center;
-    font-size: 1.2rem;
-    color: $grau;
-    margin-bottom: 2rem;
+    font-size: 36px;
+    margin-bottom: 10px;
   }
 
-  .input-box {
-    margin-bottom: 1.2rem;
-
-    label {
-      display: block;
-      margin-bottom: 0.4rem;
-      font-weight: 500;
-      color: $grau;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid lighten($pastellblau, 20%);
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      background-color: $hellblau;
-      color: #333;
-
-      &:focus {
-        outline: none;
-        border-color: $button-blau;
-        background-color: #fff;
-      }
-    }
+  p {
+    font-size: 18px;
   }
 
-  button {
-    width: 48%;
-    margin: 0.5rem 1%;
-    padding: 0.7rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 0.5rem;
-    background-color: $button-blau;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  //Profilbild
+.profilbild-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
 
-    &:hover {
-      background-color: $button-hover;
-    }
+.profilbild-upload {
+  display: flex;
+  justify-content: center;
+}
+
+.profilbild-kreis {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #ced4da;
+  border: 2px dashed #999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #b0bec5;
   }
 
-  .register {
+  img {
     width: 100%;
-    background-color: $button-blau;
-    padding: 0.9rem;
-    font-size: 1.1rem;
-    margin-top: 1rem;
-
-    &:hover {
-      background-color: $button-hover;
-    }
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
   }
 
-  a.register {
-    display: inline-block;
-    text-align: center;
-    width: 100%;
-    background-color: $button-blau;
-    color: white;
-    text-decoration: none;
-    padding: 0.9rem;
-    font-size: 1.1rem;
-    border-radius: 0.5rem;
-    margin-top: 1rem;
-
-    &:hover {
-      background-color: $button-hover;
-    }
+  .plus-icon {
+    font-size: 48px;
+    color: #555;
+    user-select: none;
   }
+}
 
-  .versteckt {
-    display: none;
-  }
+.profilbild-hinweis {
+  font-size: 14px;
+  color: #666;
+}
+
+//Link Button : Registrierung
+.link-button {
+  width: 40%;
+  height: 40px;
+  background: #1D2D44;
+  border-radius: 7px;
+  color: white;
+  font-weight: 500;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  line-height: 45px;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+
 }
