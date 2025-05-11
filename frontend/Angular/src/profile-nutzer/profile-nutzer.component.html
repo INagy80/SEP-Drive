@@ -1,0 +1,69 @@
+
+<div class="profile-container">
+  <h1 class="main-heading">Profile</h1>
+  <div class="icon-block">
+    <a routerLink="/search-profile" class="search-button">
+      <span class="pi pi-search"></span>
+    </a>
+  </div>
+
+  <div class="profile-left">
+      <!-- Linke Spalte -->
+    <div class="profile-image-container">
+      <img [src]="userProfile.profilePicture"
+           alt="./images/default-profile.jpg"
+           class="avatar">
+    </div>
+
+  <div class="profile-stats">
+    <div class="stat-item">
+      <i class="pi pi-star-fill" style="color: gold"></i>
+      <div class="stat-content">
+              <span class="stat-value">{{ userProfile.rating }}/5</span>
+              <span class="stat-label">Bewertung</span>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <i class="pi pi-check"style="color: green"></i>
+            <div class="stat-content">
+              <span class="stat-value">{{ userProfile.totalRides }}</span>
+              <span class="stat-label">Fahrten</span>
+            </div>
+          </div>
+
+          <div class="stat-item" *ngIf="userProfile.role === 'Fahrer'">
+            <i class="pi pi-car" style="color: darkred"></i>
+            <div class="stat-content">
+              <span class="stat-value">{{ userProfile.carClass }}</span>
+              <span class="stat-label">Auto-Klasse</span>
+            </div>
+          </div>
+        </div>
+  </div>
+
+      <!-- Rechte Spalte -->
+      <div class="profile-right">
+        <div class="profile-details">
+          <div class="user-header">
+            <h1>{{ userProfile.firstName }} {{ userProfile.lastName }}</h1>
+            <p class="role">{{ userProfile.role }}</p>
+          </div>
+          <div class="detail-group">
+            <h2>Persönliche Informationen</h2>
+            <div class="detail-item">
+              <span class="label">Benutzername:</span>
+              <span class="value">{{ userProfile.username }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">E-Mail:</span>
+              <span class="value">{{ userProfile.email }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Geburtsdatum:</span>
+              <span class="value">{{ userProfile.birthDate | date:'dd.MM.yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
