@@ -5,6 +5,7 @@
   min-height: 100vh;
   font-family: 'Barlow Condensed', sans-serif;
   background-color: white;
+  background-image: url('/images/welcome.png');
 }
 
 
@@ -12,7 +13,7 @@
   position: relative;
   width: 1000px;
   height: 600px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgb(255, 255, 255);
   border-radius: 50px;
   box-shadow: 0 0 30px rgb(27, 34, 44);
 }
@@ -22,7 +23,7 @@
   right: 0;
   width: 50%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgb(255, 255, 255);
   display: flex;
   align-items: center;
   text-align: center;
