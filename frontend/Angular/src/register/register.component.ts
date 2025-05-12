@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, NgModule} from '@angular/core';
 import {NgIf} from '@angular/common';
 import {NgModel} from "@angular/forms";
 
@@ -7,7 +7,8 @@ import {NgModel} from "@angular/forms";
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
   imports : [
-    NgIf
+   // NgIf,
+    //NgModule
   ]
 
 })
