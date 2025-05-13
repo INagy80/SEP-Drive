@@ -2,6 +2,7 @@ package com.example.SEPDrive.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
@@ -55,6 +56,9 @@ public abstract class user {
     @Column(name = "profile_photo")
     private byte[] profilePhoto;
 
+    @Column(name = "TwoFA", length = 6 )
+    private Integer TwoFA;
+
 
     @Min(0)
     @Max(5)
@@ -65,6 +69,11 @@ public abstract class user {
 
 
     private int totalRides;
+
+
+
+    @Column(name = "is_email_verified", nullable = false)
+    private Boolean isemailVerified;
 
 
 
@@ -81,6 +90,8 @@ public abstract class user {
         Rating = 0.0;
         numberOfRates = 0;
         totalRides = 0;
+        isemailVerified= false;
+
     }
 
     public user(String userName, String firstName, String lastName, String email, LocalDate dateOfBirth, String password, byte[] profilePhoto) {
@@ -94,11 +105,28 @@ public abstract class user {
         Rating = 0.0;
         numberOfRates = 0;
         totalRides = 0;
+        isemailVerified= false;
     }
 
 
     //getters and setters
 
+
+    public boolean isIsemailVerified() {
+        return isemailVerified;
+    }
+
+    public void setIsemailVerified(boolean isemailVerified) {
+        this.isemailVerified = isemailVerified;
+    }
+
+    public Integer getTwoFA() {
+        return TwoFA;
+    }
+
+    public void setTwoFA(Integer twoFA) {
+        TwoFA = twoFA;
+    }
 
     public Integer getId() {
         return id;
