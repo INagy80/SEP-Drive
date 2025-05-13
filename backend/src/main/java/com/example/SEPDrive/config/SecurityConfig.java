@@ -3,6 +3,7 @@ package com.example.SEPDrive.config;
 import com.example.SEPDrive.config.filter.JwtFilter;
 import com.example.SEPDrive.service.myUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -27,13 +29,21 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
+    @Autowired
+    @Qualifier("delegatedAuthEntryPoint")
+    private AuthenticationEntryPoint authenticationEntryPoint;
+
+
+
+
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
      return http
 
         .csrf(custmizer -> custmizer.disable())
+             .cors(Customizer.withDefaults())
         .authorizeHttpRequests(requests -> requests.requestMatchers("v1/auth/**").permitAll()
                 .anyRequest().authenticated())
         .httpBasic(Customizer.withDefaults())
@@ -43,6 +53,8 @@ public class SecurityConfig {
              .sessionManagement(session ->
                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
              .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+             .exceptionHandling(exception -> exception
+             .authenticationEntryPoint(authenticationEntryPoint))
              .build();
 
 
