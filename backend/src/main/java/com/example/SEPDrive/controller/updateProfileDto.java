@@ -1,4 +1,4 @@
-package com.example.SEPDrive.Controller;
+package com.example.SEPDrive.controller;
 
 public class updateProfileDto {
     private String firstName;

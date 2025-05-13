@@ -1,4 +1,4 @@
-package com.example.SEPDrive.Controller;
+package com.example.SEPDrive.controller;
 
 import com.example.SEPDrive.model.user;
 import com.example.SEPDrive.service.profileSucheService;
@@ -15,7 +15,7 @@ import java.util.List;
 public class profileSucheController {
 
     @Autowired
-    private final profileSucheService profileSucheService;
+    private  profileSucheService profileSucheService;
 
     @GetMapping("/username")
     public ResponseEntity<List<user>> searchByUsername(@RequestParam String userName) {

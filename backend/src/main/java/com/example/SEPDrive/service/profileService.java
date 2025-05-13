@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.example.SEPDrive.controller.* ;
-import com.example.SEPDrive.Controller.profileResponseDto;
-import com.example.SEPDrive.Controller.updateProfileDto;
+import com.example.SEPDrive.controller.profileResponseDto;
+import com.example.SEPDrive.controller.updateProfileDto;
 import com.example.SEPDrive.exceptions.duplicatResourceException;
 
 @Service

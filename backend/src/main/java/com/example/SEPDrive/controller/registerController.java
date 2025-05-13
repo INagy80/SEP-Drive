@@ -42,10 +42,7 @@ public class registerController {
         return ResponseEntity.ok(registerService.register(user));
     }
 
-    @GetMapping("v1/users")
-    public List<user> getUsers() {
-        return registerService.getAllUsers();
-    }
+
 
 
 }
