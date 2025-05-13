@@ -31,20 +31,23 @@ public class registerService {
 
 
     //@EventListener(ApplicationReadyEvent.class)
-    public AuthenticatinResponse register(user user) {
-        if (userDao.existsUserByEmail(user.getEmail())) {
+    public boolean register(user user) {
+        if (userDao.existsUserByEmail(user.getEmail().toLowerCase())) {
             throw new duplicatResourceException("This email already exists");
         } else if (userDao.existsUserByUserName(user.getUserName())) {
             throw new duplicatResourceException("This username already exists");
 
             //add
         }else{
+
             user.setPassword(encoder.encode(user.getPassword()));
-            Integer FA2 = new Random().nextInt(900000) + 100000;
-            emailSenderService.sendEmail(user.getEmail(), "SEPDrive Verification Code", "Your verification code is: " + FA2);
+            user.setIsemailVerified(false);
+            user.setTwoFA(new Random().nextInt(900000) + 100000);
+            user.setEmail(user.getEmail().toLowerCase());
             userDao.save(user);
-            var jwtToken = jwtService.generateToken(user.getUserName());
-            return AuthenticatinResponse.builder().token(jwtToken).build();
+            emailSenderService.sendEmail(user.getEmail(), "SEPDrive Verification Code",
+                    "Hello "+ user.getFirstName()+" "+user.getLastName()+", \n \n" +"Your verification code is:  " + user.getTwoFA() + ". \n \n \n Best regards,\n SEPDrive ");
+            return true;
 
 
         }
