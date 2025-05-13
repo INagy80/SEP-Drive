@@ -1,12 +1,14 @@
-package com.example.SEPDrive.Service;
+package com.example.SEPDrive.service;
 
-import com.example.SEPDrive.dto.updateProfileDto;
-import com.example.SEPDrive.dto.profileResponseDto;
+
 import com.example.SEPDrive.model.user;
 import com.example.SEPDrive.repository.userDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.example.SEPDrive.controller.* ;
+import com.example.SEPDrive.Controller.profileResponseDto;
+import com.example.SEPDrive.Controller.updateProfileDto;
 import com.example.SEPDrive.exceptions.duplicatResourceException;
 
 @Service
@@ -26,7 +28,7 @@ public class profileService {
                 currentUser.getEmail(),
                 currentUser.getRating(),
                 currentUser.getClass().getSimpleName(),
-                currentUser.isOnline(),
+                true,
                 currentUser.getTotalRides()
         );
     }
@@ -54,7 +56,7 @@ public class profileService {
                 currentUser.getEmail(),
                 currentUser.getRating(),
                 currentUser.getClass().getSimpleName(),
-                currentUser.isOnline(),
+                true,
                 currentUser.getTotalRides()
         );
     }
@@ -74,7 +76,7 @@ public class profileService {
         user currentUser = userDao.findByUserName(currentUserName);
 
         if (userDao.existsUserByUserName(newUserName)) {
-            throw new DuplicatResourceException("Dieser Benutzername ist bereits vergeben.");
+            throw new duplicatResourceException("Dieser Benutzername ist bereits vergeben.");
         }
 
         currentUser.setUserName(newUserName);

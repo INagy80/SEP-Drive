@@ -1,7 +1,5 @@
-package com.example.SEPDrive.Controller;
+package com.example.SEPDrive.controller;
 
-import com.example.SEPDrive.dto.updateProfileDto;
-import com.example.SEPDrive.dto.profileResponseDto;
 import com.example.SEPDrive.service.profileService;
 import com.example.SEPDrive.service.profileSucheService;
 import com.example.SEPDrive.model.user;
@@ -9,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.SEPDrive.Controller.profileResponseDto;
 
 import java.util.List;
 @RestController
@@ -17,18 +16,18 @@ import java.util.List;
 public class profileController {
 
     @Autowired
-    private final profileService profileService;
+    private profileService profileService;
 
     @Autowired
-    private final profileSucheService profileSucheService;
+    private  profileSucheService profileSucheService;
 
     @GetMapping("/me")
-    public ResponseEntity<profileResponseDto> getOwnProfile() {
+    public ResponseEntity<com.example.SEPDrive.Controller.profileResponseDto> getOwnProfile() {
         return ResponseEntity.ok(profileService.getOwnProfile());
     }
 
     @PutMapping("/me")
-    public ResponseEntity<profileResponseDto> updateProfile(@RequestBody updateProfileDto dto) {
+    public ResponseEntity<profileResponseDto> updateProfile(@RequestBody com.example.SEPDrive.Controller.updateProfileDto dto) {
         return ResponseEntity.ok(profileService.updateProfile(dto));
     }
 
@@ -40,7 +39,7 @@ public class profileController {
 
     @GetMapping("/search")
     public ResponseEntity<List<user>> searchUsers(
-            @RequestParam(required = false) String userName,
+            @RequestParam(required = false) String userName
     ) {
         if (userName != null) return ResponseEntity.ok(profileSucheService.searchByUsername(userName));
         return ResponseEntity.badRequest().build();

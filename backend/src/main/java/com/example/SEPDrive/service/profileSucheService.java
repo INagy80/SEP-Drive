@@ -1,4 +1,4 @@
-package com.example.SEPDrive.Service;
+package com.example.SEPDrive.service;
 
 import com.example.SEPDrive.model.user;
 import com.example.SEPDrive.repository.userDAO;
