@@ -1,14 +1,16 @@
 package com.example.SEPDrive.controller;
 
-import com.example.SEPDrive.model.user;
 import com.example.SEPDrive.service.loginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("v1/auth")
 public class loginController {
 
     @Autowired
@@ -17,12 +19,27 @@ public class loginController {
 
     public record loginRequest(String userName, String password){
     }
-
-
-    @PostMapping("v1/auth/login")
-    public ResponseEntity<AuthenticatinResponse> login(@RequestBody loginRequest request ) {
-       return ResponseEntity.ok(loginService.verify(request.userName(), request.password()));
+    public record twoFARequest(String  code,String userName, String password){
     }
+
+
+    @PostMapping("login")
+    public ResponseEntity<Boolean> login(@RequestBody loginRequest request ) {
+        Boolean response = loginService.login(request.userName(), request.password());
+       return ResponseEntity.ok()
+               .body(response);
+    }
+
+    @PostMapping("2fa")
+    public ResponseEntity<AuthenticatinResponse> twoFactorAuthentication(@RequestBody twoFARequest request) {
+        AuthenticatinResponse response = loginService.authenticate(request.code , request.userName, request.password);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, response.getToken())
+                .body(response);
+
+    }
+
+
 
 
 
