@@ -1,1 +1,41 @@
-<p>map works!</p>
+<!-- Header mit Logo und Titel -->
+<div class="header">
+  <img src="/auto_logo.png" alt="Auto Logo" class="logo" />
+  <h1 class="site-title">SEP Drive</h1>
+</div>
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="nav-item">Home</div>
+    <div class="nav-item">Fahranfragen</div>
+    <div class="nav-item">Profil</div>
+    <div class="nav-item">Logout</div>
+  </div>
+
+
+<!-- Map Wrapper -->
+<div class="map-wrapper">
+  <div id="map"></div>
+  <div class="request-panel">
+    <div class="handle"></div>
+
+    <button class="location-btn">📍 Use current location</button>
+
+    <input type="text" placeholder="Search address or POI..." />
+
+    <div class="coords-row">
+      <input type="text" placeholder="Coordinates (lat, lon)" />
+      <select>
+        <option selected disabled>Vehicle class</option>
+        <option value="small">Small</option>
+        <option value="van">Van</option>
+        <option value="luxury">Luxury</option>
+      </select>
+    </div>
+
+    <div class="fare-info">
+      <p>Estimated Fare</p>
+    </div>
+
+    <button class="confirm-btn">Confirm Request</button>
+  </div>
+</div>
