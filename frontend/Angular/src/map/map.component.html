@@ -3,39 +3,91 @@
   <img src="/auto_logo.png" alt="Auto Logo" class="logo" />
   <h1 class="site-title">SEP Drive</h1>
 </div>
-  <!-- Navbar -->
-  <div class="navbar">
-    <div class="nav-item">Home</div>
-    <div class="nav-item">Fahranfragen</div>
-    <div class="nav-item">Profil</div>
-    <div class="nav-item">Logout</div>
-  </div>
 
+<!-- Navbar -->
+<div class="navbar">
+  <div class="nav-item">Startseite</div>
+  <div class="nav-item">Fahranfragen</div>
+  <div class="nav-item">Profil</div>
+  <div class="nav-item">Abmelden</div>
+</div>
 
 <!-- Map Wrapper -->
 <div class="map-wrapper">
   <div id="map"></div>
+
+  <!-- Request Panel -->
   <div class="request-panel">
     <div class="handle"></div>
 
-    <button class="location-btn">📍 Use current location</button>
+    <button class="location-btn">📍 Aktuellen Standort verwenden</button>
 
-    <input type="text" placeholder="Search address or POI..." />
+    <input type="text" placeholder="Adresse oder Ort suchen..." />
 
     <div class="coords-row">
-      <input type="text" placeholder="Coordinates (lat, lon)" />
+      <input type="text" placeholder="Koordinaten (Breite, Länge)" />
       <select>
-        <option selected disabled>Vehicle class</option>
-        <option value="small">Small</option>
-        <option value="van">Van</option>
-        <option value="luxury">Luxury</option>
+        <option selected disabled>Fahrzeugklasse</option>
+        <option value="small">Klein</option>
+        <option value="van">Transporter</option>
+        <option value="luxury">Luxus</option>
       </select>
     </div>
 
     <div class="fare-info">
-      <p>Estimated Fare</p>
+      <p>Geschätzter Fahrpreis</p>
     </div>
 
-    <button class="confirm-btn">Confirm Request</button>
+    <button class="confirm-btn">Anfrage bestätigen</button>
+  </div>
+
+  <!-- Fahranfragen-Übersicht -->
+  <div class="ride-requests-box">
+    <h2>Fahranfragen</h2>
+
+    <div class="active-section">
+      <h3>Aktive Fahranfrage (max. 1)</h3>
+      <div class="ride-entry">
+        <ul>
+          <li>
+            <div class="start-end-box">
+              <p class="start-end-text"><strong>Start:</strong> Essen Hbf</p>
+              <p class="start-end-text"><strong>Ziel:</strong> Duisburg Hbf</p>
+            </div>
+          </li>
+        </ul>
+        <div class="delete-section">
+          <input type="checkbox" id="delete-active" />
+          <label for="delete-active">Anfrage löschen</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="inactive-section">
+      <h3>Inaktive Fahranfragen</h3>
+      <ul>
+        <li>
+          <div class="start-end-box">
+            <p class="start-end-text"><strong>Start:</strong> Herne Hbf</p>
+            <p class="start-end-text"><strong>Ziel:</strong> Düsseldorf Hbf</p>
+          </div>
+        </li>
+        <li>
+          <div class="start-end-box">
+            <p class="start-end-text"><strong>Start:</strong> Essen Hbf</p>
+            <p class="start-end-text"><strong>Ziel:</strong> Bochum Hbf</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Aktive Fahranfrage (Beispiel) -->
+  <div class="active-request">
+    <h2>Aktive Fahranfrage</h2>
+    <p><strong>Start:</strong> Essen</p>
+    <p><strong>Ziel:</strong> Duisburg</p>
+    <p><strong>Fahrzeugklasse:</strong> Klein</p>
+    <button class="delete-request-btn">Anfrage löschen</button>
   </div>
 </div>
