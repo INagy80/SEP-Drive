@@ -15,7 +15,7 @@ import java.util.List;
 public class profileSucheController {
 
     @Autowired
-    private final profileSucheService profileSucheService;
+    private  profileSucheService profileSucheService;
 
     @GetMapping("/username")
     public ResponseEntity<List<user>> searchByUsername(@RequestParam String userName) {
