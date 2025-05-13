@@ -1,0 +1,28 @@
+<div class="map-container">
+  <!-- Karte -->
+  <div id="map" style="height: 600px;"></div>
+
+  <!-- Button für die aktuelle Position -->
+  <button (click)="useCurrentPosition()">Aktuelle Position als Start verwenden</button>
+
+  <!-- Eingabefelder für Startadresse, Zieladresse und Zwischenstopps -->
+  <div class="controls">
+    <div class="control-group">
+      <label for="startAddress">Startadresse:</label>
+      <input type="text" id="startAddress" [(ngModel)]="startAddress" placeholder="Startadresse eingeben" />
+    </div>
+
+    <div class="control-group">
+      <label for="zielAddress">Zieladresse:</label>
+      <input type="text" id="zielAddress" [(ngModel)]="zielAddress" placeholder="Zieladresse eingeben" />
+    </div>
+
+    <div class="control-group">
+      <label for="zwischenstopps">Zwischenstopps:</label>
+      <textarea id="zwischenstopps" [(ngModel)]="zwischenstoppsText" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile)"></textarea>
+    </div>
+
+    <!-- Button zum Routen anzeigen -->
+    <button (click)="updateRoute()">Route anzeigen</button>
+  </div>
+</div>

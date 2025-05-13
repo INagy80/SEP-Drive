@@ -1,9 +1,65 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {ApplicationConfig, importProvidersFrom, provideZoneChangeDetection} from '@angular/core';
 import { provideRouter } from '@angular/router';
 
-import { routes } from './app.routes';
+
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
+import { routes } from  './app.routes';
+import { FormsModule } from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import { AvatarModule } from 'primeng/avatar';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
+import { MenuModule } from 'primeng/menu';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SidebarModule } from 'primeng/sidebar';
+import {HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient, withFetch} from '@angular/common/http';
+import { MessageModule } from 'primeng/message';
+import { HttpInterceptorService } from './services/interceptor/http-interceptor.service';
+import { CardModule } from 'primeng/card';
+import { BadgeModule } from 'primeng/badge';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import {ConfirmationService, MessageService} from "primeng/api";
+import {GoogleMapsModule} from '@angular/google-maps';
+
+
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideClientHydration(withEventReplay())]
+  providers: [
+    importProvidersFrom(
+      BrowserAnimationsModule,
+      FormsModule,
+      HttpClientModule,
+
+      // Prime modules
+      InputTextModule,
+      AvatarModule,
+      ButtonModule,
+      RippleModule,
+      MenuModule,
+      SidebarModule,
+      MessageModule,
+      CardModule,
+      BadgeModule,
+      ToastModule,
+      ConfirmDialogModule,
+      GoogleMapsModule
+    ),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpInterceptorService,
+      multi: true
+    },
+    provideHttpClient(
+      withFetch() // Configures HttpClient to use fetch API
+    ),
+
+    MessageService,
+    ConfirmationService,
+
+
+
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideClientHydration(withEventReplay())]
 };

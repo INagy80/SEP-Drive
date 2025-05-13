@@ -1,0 +1,82 @@
+/* map.component.scss */
+
+/* Container für die Karte und Steuerungselemente */
+.map-container {
+  height: 100vh;      /* Setzt die Höhe des Containers auf 100% des Viewports */
+  width: 100%;        /* Setzt die Breite auf 100% */
+  display: flex;
+  flex-direction: column; /* Stellt sicher, dass die Karte und die Steuerelemente untereinander sind */
+  justify-content: center; /* Zentriert die Karte und die Steuerelemente vertikal */
+  align-items: center;     /* Zentriert die Karte und die Steuerelemente horizontal */
+}
+
+/* Stil für die Karte */
+#map {
+  width: 100%;              /* Setzt die Breite der Karte auf 100% */
+  aspect-ratio: 1 / 1;      /* Erzwingt eine quadratische Form */
+  max-width: 600px;         /* Setzt eine optionale Maximalbreite für die Karte */
+  margin: auto;             /* Zentriert die Karte horizontal */
+  border: 1px solid #ccc;  /* Fügt einen Rand um die Karte hinzu */
+}
+
+/* Steuerungselemente für die Eingabe von Start, Ziel und Zwischenstopps */
+.controls {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column; /* Stellt sicher, dass die Eingabefelder untereinander angeordnet sind */
+  gap: 1rem;              /* Setzt einen Abstand zwischen den Eingabefeldern */
+  width: 100%;
+  max-width: 600px;        /* Setzt eine Maximalbreite für die Eingabefelder */
+}
+
+/* Stil für jede Eingabekomponente */
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Abstand zwischen Label und Eingabefeld */
+}
+
+label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333; /* Setzt die Schriftfarbe des Labels */
+}
+
+input, textarea {
+  width: 100%;               /* Setzt die Breite der Eingabefelder auf 100% */
+  padding: 8px;              /* Fügt Padding innerhalb der Felder hinzu */
+  font-size: 14px;           /* Setzt die Schriftgröße */
+  margin-top: 5px;           /* Fügt einen Abstand oben hinzu */
+  border: 1px solid #ccc;    /* Rand für Eingabefelder */
+  border-radius: 4px;        /* Abgerundete Ecken für die Eingabefelder */
+}
+
+textarea {
+  resize: vertical;          /* Erlaubt vertikales Resizing des Textarea-Feldes */
+  min-height: 100px;          /* Mindesthöhe für das Textarea-Feld */
+}
+
+/* Stil für die Buttons */
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #0056b3; /* Dunklerer Farbton, wenn der Button hover ist */
+}
+
+button:focus {
+  outline: none;  /* Entfernt den Fokusrahmen bei Klick */
+}
+
+/* Zusätzliche Steuerungselemente (z.B. die Buttons) zentrieren */
+button, .controls {
+  display: flex;
+  justify-content: center;
+}
