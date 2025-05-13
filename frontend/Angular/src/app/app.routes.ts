@@ -17,6 +17,7 @@ export const routes: Routes = [
   {path: 'auth/2FA',  component: TwoFAComponent ,  },
 
   {path: 'register',  component: RegisterComponent , },
+  {path: 'search-profile',  component: SearchProfileComponent ,  },
 
 
 

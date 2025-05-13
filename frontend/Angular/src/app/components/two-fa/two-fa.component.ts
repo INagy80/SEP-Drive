@@ -71,7 +71,7 @@ export class TwoFAComponent {
               next: (authenticationResponse) => {
                   localStorage.setItem('user', JSON.stringify(authenticationResponse));
                   localStorage.removeItem('login');
-                  this.router.navigate(['home']);
+                  this.router.navigate(['map']);
               },
               error: (err) => {
                   if (err.error.statusCode === 401 || err.error.statusCode === 403 || err.error.statusCode === 500) {
