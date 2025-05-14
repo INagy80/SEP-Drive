@@ -6,7 +6,8 @@ export const environment = {
     fahrerregisterUrl: 'v1/auth/register/fahrer',
     riderequestUrl: 'v1/rideRequest',
     userUrl: 'v1/user',
-    TwoFAUrl: 'v1/auth/2fa'
+    TwoFAUrl: 'v1/auth/2fa',
+    rideRequestUrl: 'v1/rideRequest'
   }
 
 };

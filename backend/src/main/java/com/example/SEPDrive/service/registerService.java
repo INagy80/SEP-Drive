@@ -16,6 +16,7 @@ import java.util.Random;
 @Service
 public class registerService {
 
+
     @Autowired
     private  userDAO userDao;
 
@@ -29,6 +30,9 @@ public class registerService {
 
 
 
+    public List<user>  getAllUsers(){
+        return userDao.findAll();
+    }
 
     //@EventListener(ApplicationReadyEvent.class)
     public boolean register(user user) {

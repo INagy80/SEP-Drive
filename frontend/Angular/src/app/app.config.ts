@@ -22,6 +22,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import {ConfirmationService, MessageService} from "primeng/api";
 import {GoogleMapsModule} from '@angular/google-maps';
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 
 export const appConfig: ApplicationConfig = {
@@ -43,7 +44,10 @@ export const appConfig: ApplicationConfig = {
       BadgeModule,
       ToastModule,
       ConfirmDialogModule,
-      GoogleMapsModule
+      GoogleMapsModule,
+      BrowserAnimationsModule,
+      MatSidenavModule,
+
     ),
     {
       provide: HTTP_INTERCEPTORS,

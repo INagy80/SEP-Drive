@@ -40,13 +40,13 @@ public class rideRequest {
     private LocalDateTime updatedAt;
 
 
-    @ManyToOne(cascade = CascadeType.DETACH)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "start_address_id")
     private adress startAddress;
 
 
 
-    @ManyToOne(cascade = CascadeType.DETACH)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "dest_address_id")
     private adress destAddress;
 
@@ -64,6 +64,13 @@ public class rideRequest {
     private Double drivererRating;
 
 
+
+
+
+
+
+
+
     // Constructors
     public rideRequest() {}
 
@@ -76,6 +83,9 @@ public class rideRequest {
         this.destAddress = destAddress;
         this.drivererRating = drivererRating;
         this.customerRating = customerRating;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.status = RequestStatus.Active;
     }
 
     public rideRequest(Kunde customer, carClass carClass, adress startAddress, adress destAddress) {
@@ -86,9 +96,21 @@ public class rideRequest {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.status = RequestStatus.Active;
+        this.customerRating = 0.0;
+        this.drivererRating = 0.0;
     }
 
 
+
+
+
+    public carClass getCarClass() {
+        return carClass;
+    }
+
+    public void setCarClass(carClass carClass) {
+        this.carClass = carClass;
+    }
 
     // Getters and Setters
     public Integer getId() {

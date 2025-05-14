@@ -1,28 +1,246 @@
-<div class="map-container">
-  <!-- Karte -->
-  <div id="map" style="height: 600px;"></div>
+<!-- Header mit Logo und Titel -->
 
-  <!-- Button für die aktuelle Position -->
-  <button (click)="useCurrentPosition()">Aktuelle Position als Start verwenden</button>
+<p-sidebar
+  [(visible)]="visible"
+  [position]="'left'"
+  [transitionOptions]="'300ms cubic-bezier(0, 0, 0.2, 1)'"
+  styleClass="custom-sidebar"
+>
 
-  <!-- Eingabefelder für Startadresse, Zieladresse und Zwischenstopps -->
-  <div class="controls">
-    <div class="control-group">
-      <label for="startAddress">Startadresse:</label>
-      <input type="text" id="startAddress" [(ngModel)]="startAddress" placeholder="Startadresse eingeben" />
+<!--  <div class="flex justify-content-center align-items-baseline flex-wrap gap-5 mt-4">-->
+  <!--    <ride-request-card-->
+  <!--          *ngFor="let ride of rideRequests; let index = index"-->
+  <!--          [rideRequest]="ride"-->
+  <!--          [rideIndex]="index"-->
+  <!--          (delete)="deleteCustomer($event)"-->
+  <!--          (update)="updateCustomer($event)"-->
+  <!--    ></ride-request-card>-->
+  <!--  </div>-->
+
+    <div class="ride-requests">
+
+      <!-- Active Section -->
+      <section class="section section--active">
+        <h2 class="section__title">Aktive Fahrtanfrage</h2>
+
+        <ng-container *ngIf="activeRequest; else noActiveTpl">
+          <div class="ride-card ride-card--active">
+          <span class="status-pill status-pill--active">
+            {{ activeRequest.status }}
+          </span>
+
+            <div class="ride-card__header">
+              <h3 class="ride-card__driver">{{ activeRequest.driverUserName }}</h3>
+            </div>
+
+            <div class="ride-card__body">
+              <p><strong>Fahrzeugklasse:</strong> {{ activeRequest.carClass }}</p>
+              <p><strong>Von:</strong> {{ activeRequest.startAddress }}</p>
+              <p><strong>Nach:</strong> {{ activeRequest.destinationAddress }}</p>
+            </div>
+
+            <div class="ride-card__timestamps">
+              <span>Erstellt: {{ activeRequest.createdAt | date:'short' }}</span>
+              <span>Aktualisiert: {{ activeRequest.updatedAt | date:'short' }}</span>
+            </div>
+
+            <div class="ride-card__ratings">
+              <div class="rating">
+                <span class="rating__label">Kunde:</span>
+                <ng-container *ngFor="let star of [1,2,3,4,5]">
+                  <span class="star" [class.filled]="star <= activeRequest.customerRating">★</span>
+                </ng-container>
+              </div>
+              <div class="rating">
+                <span class="rating__label">Fahrer:</span>
+                <ng-container *ngFor="let star of [1,2,3,4,5]">
+                  <span class="star" [class.filled]="star <= activeRequest.driverRating">★</span>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #noActiveTpl>
+          <p class="no-active">Du hast derzeit keine aktiven Fahrtanfragen.</p>
+        </ng-template>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- History Section -->
+      <section class="section section--history" *ngIf="historyRequests.length">
+        <h2 class="section__title">Verlauf</h2>
+        <div class="history-list">
+          <div *ngFor="let req of historyRequests" class="ride-card ride-card--history">
+          <span
+            class="status-pill"
+            [ngClass]="{
+              'status-pill--completed': req.status === 'Completed',
+              'status-pill--cancelled': req.status === 'Cancelled',
+              'status-pill--pending'  : req.status === 'Pending',
+              'status-pill--default'  : req.status !== 'Completed' && req.status !== 'Cancelled' && req.status !== 'Pending'
+            }"
+          >
+            {{ req.status }}
+          </span>
+
+            <div class="ride-card__header">
+              <h3 class="ride-card__driver">{{ req.driverUserName }}</h3>
+            </div>
+
+            <div class="ride-card__body">
+              <p><strong>Fahrzeugklasse:</strong> {{ req.carClass }}</p>
+              <p><strong>Von:</strong> {{ req.startAddress }}</p>
+              <p><strong>Nach:</strong> {{ req.destinationAddress }}</p>
+            </div>
+
+            <div class="ride-card__timestamps">
+              <span>Erstellt: {{ req.createdAt | date:'short' }}</span>
+              <span>Aktualisiert: {{ req.updatedAt | date:'short' }}</span>
+            </div>
+
+            <div class="ride-card__ratings">
+              <div class="rating">
+                <span class="rating__label">Kunde:</span>
+                <ng-container *ngFor="let star of [1,2,3,4,5]">
+                  <span class="star" [class.filled]="star <= req.customerRating">★</span>
+                </ng-container>
+              </div>
+              <div class="rating">
+                <span class="rating__label">Fahrer:</span>
+                <ng-container *ngFor="let star of [1,2,3,4,5]">
+                  <span class="star" [class.filled]="star <= req.driverRating">★</span>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <div class="control-group">
-      <label for="zielAddress">Zieladresse:</label>
-      <input type="text" id="zielAddress" [(ngModel)]="zielAddress" placeholder="Zieladresse eingeben" />
+
+
+
+</p-sidebar>
+
+<div class="header">
+  <img src="/assets/images/auto_logo.jpg" alt="Auto Logo" class="logo" />
+  <h1 class="site-title">SEP Drive</h1>
+</div>
+
+<!-- Navbar -->
+<div class="navbar">
+
+  <p-button (click)="startseite()" class="nav-item">Startseite</p-button>
+  <p-button (click)="findAllrideResponse()" class="nav-item">Fahranfragen</p-button>
+  <p-button (click)="profile()" class="nav-item">Profile</p-button>
+  <p-button (click)="logout()" class="nav-item">Abmelden</p-button>
+</div>
+
+<!-- Map Wrapper -->
+<div class="map-wrapper">
+  <div id="map"></div>
+
+  <!-- Request Panel -->
+  <div class="request-panel">
+    <div class="handle"></div>
+
+
+    <button class="location-btn" (click)="setCurrentlocation()">📍 Aktuellen Standort verwenden</button>
+    <div class="controls">
+      <div class="control-group">
+        <label for="startAddress">Startadresse:</label>
+        <input type="text" id="startAddress" [(ngModel)]="startAddress" placeholder="Startadresse eingeben" />
+      </div>
+
+      <div class="control-group">
+        <label for="zielAddress">Zieladresse:</label>
+        <input type="text" id="zielAddress" [(ngModel)]="zielAddress" placeholder="Zieladresse eingeben" />
+      </div>
+
+      <div class="control-group">
+        <label for="zwischenstopps">Zwischenstopps:</label>
+        <textarea id="zwischenstopps" [(ngModel)]="zwischenstoppsText" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile)"></textarea>
+      </div>
+
+
     </div>
 
-    <div class="control-group">
-      <label for="zwischenstopps">Zwischenstopps:</label>
-      <textarea id="zwischenstopps" [(ngModel)]="zwischenstoppsText" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile)"></textarea>
+
+
+
+    <div class="coords-row">
+      <select [(ngModel)]="selectedCarClass" name="vehicleClass" (ngModelChange)="onCarClassChange($event)">
+        <option selected disabled>Fahrzeugklasse</option>
+        <option value="klein"  >klein</option>
+        <option value="Medium" >Medium</option>
+        <option value="Deluxe" >Deluxe</option>
+      </select>
     </div>
 
+    <div class="fare-info">
+      <p>Geschätzter Fahrpreis</p>
+    </div>
     <!-- Button zum Routen anzeigen -->
     <button (click)="updateRoute()">Route anzeigen</button>
+
+
+    <button (click)="createRideRequest()" class="confirm-btn" >Anfrage bestätigen</button>
   </div>
+
+
+
+
+<!--  &lt;!&ndash; Fahranfragen-Übersicht &ndash;&gt;-->
+<!--  <div class="ride-requests-box">-->
+<!--    <h2>Fahranfragen</h2>-->
+
+<!--    <div class="active-section">-->
+<!--      <h3>Aktive Fahranfrage (max. 1)</h3>-->
+<!--      <div class="ride-entry">-->
+<!--        <ul>-->
+<!--          <li>-->
+<!--            <div class="start-end-box">-->
+<!--              <p class="start-end-text"><strong>Start:</strong> Essen Hbf</p>-->
+<!--              <p class="start-end-text"><strong>Ziel:</strong> Duisburg Hbf</p>-->
+<!--            </div>-->
+<!--          </li>-->
+<!--        </ul>-->
+<!--        <div class="delete-section">-->
+<!--          <input type="checkbox" id="delete-active" />-->
+<!--          <label for="delete-active">Anfrage löschen</label>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+<!--    <div class="inactive-section">-->
+<!--      <h3>Inaktive Fahranfragen</h3>-->
+<!--      <ul>-->
+<!--        <li>-->
+<!--          <div class="start-end-box">-->
+<!--            <p class="start-end-text"><strong>Start:</strong> Herne Hbf</p>-->
+<!--            <p class="start-end-text"><strong>Ziel:</strong> Düsseldorf Hbf</p>-->
+<!--          </div>-->
+<!--        </li>-->
+<!--        <li>-->
+<!--          <div class="start-end-box">-->
+<!--            <p class="start-end-text"><strong>Start:</strong> Essen Hbf</p>-->
+<!--            <p class="start-end-text"><strong>Ziel:</strong> Bochum Hbf</p>-->
+<!--          </div>-->
+<!--        </li>-->
+<!--      </ul>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--  &lt;!&ndash; Aktive Fahranfrage (Beispiel) &ndash;&gt;-->
+<!--  <div class="active-request">-->
+<!--    <h2>Aktive Fahranfrage</h2>-->
+<!--    <p><strong>Start:</strong> Essen</p>-->
+<!--    <p><strong>Ziel:</strong> Duisburg</p>-->
+<!--    <p><strong>Fahrzeugklasse:</strong> Klein</p>-->
+<!--    <button class="delete-request-btn">Anfrage löschen</button>-->
+<!--  </div>-->
 </div>
+
+

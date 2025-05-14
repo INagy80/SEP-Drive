@@ -7,9 +7,7 @@ import {RegisterService} from "../../services/Register/register.service";
 import {AuthenticationRequest} from "../../models/authentication-request";
 import {fahrerDto} from "../../models/fahrerDTO";
 import {Message} from "primeng/message";
-import {Button, ButtonDirective} from "primeng/button";
-import {Password, PasswordDirective} from "primeng/password";
-import {resolve} from "node:path";
+
 
 @Component({
   selector: 'app-register',
@@ -18,12 +16,8 @@ import {resolve} from "node:path";
   imports: [
     NgIf,
     Message,
-    ButtonDirective,
-    FormsModule,
-    PasswordDirective,
-    Password,
-    Button,
-    NgStyle,
+
+    FormsModule
 
   ]
 

@@ -7,8 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.example.SEPDrive.controller.* ;
-import com.example.SEPDrive.Controller.profileResponseDto;
-import com.example.SEPDrive.Controller.updateProfileDto;
+import com.example.SEPDrive.controller.updateProfileDto;
 import com.example.SEPDrive.exceptions.duplicatResourceException;
 
 @Service
@@ -17,11 +16,11 @@ public class profileService {
     @Autowired
     private userDAO userDao;
 
-    public profileResponseDto getOwnProfile() {
+    public com.example.SEPDrive.Controller.profileResponseDto getOwnProfile() {
         String username = getCurrentUsername();
         user currentUser = userDao.findByUserName(username);
 
-        return new profileResponseDto(
+        return new com.example.SEPDrive.Controller.profileResponseDto(
                 currentUser.getUserName(),
                 currentUser.getFirstName(),
                 currentUser.getLastName(),
@@ -33,7 +32,7 @@ public class profileService {
         );
     }
 
-    public profileResponseDto updateProfile(updateProfileDto dto) {
+    public com.example.SEPDrive.Controller.profileResponseDto updateProfile(updateProfileDto dto) {
         String username = getCurrentUsername();
         user currentUser = userDao.findByUserName(username);
 
@@ -49,7 +48,7 @@ public class profileService {
 
         userDao.save(currentUser);
 
-        return new profileResponseDto(
+        return new com.example.SEPDrive.Controller.profileResponseDto(
                 currentUser.getUserName(),
                 currentUser.getFirstName(),
                 currentUser.getLastName(),

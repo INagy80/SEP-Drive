@@ -35,7 +35,7 @@ export class AccessGuardService implements CanActivate{
         }
       }
     }}
-    this.router.navigate(['login']);
+    this.router.navigate(['/welcome']);
     return false;
   }
 }
