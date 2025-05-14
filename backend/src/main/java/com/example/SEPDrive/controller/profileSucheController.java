@@ -1,4 +1,4 @@
-package com.example.SEPDrive.Controller;
+package com.example.SEPDrive.controller;
 
 import com.example.SEPDrive.model.user;
 import com.example.SEPDrive.service.profileSucheService;

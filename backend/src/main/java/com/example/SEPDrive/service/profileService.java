@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.SEPDrive.controller.* ;
 import com.example.SEPDrive.controller.updateProfileDto;
 import com.example.SEPDrive.exceptions.duplicatResourceException;
+import com.example.SEPDrive.controller.profileResponseDto;
 
 @Service
 public class profileService {
@@ -16,11 +17,11 @@ public class profileService {
     @Autowired
     private userDAO userDao;
 
-    public com.example.SEPDrive.Controller.profileResponseDto getOwnProfile() {
+    public profileResponseDto getOwnProfile() {
         String username = getCurrentUsername();
         user currentUser = userDao.findByUserName(username);
 
-        return new com.example.SEPDrive.Controller.profileResponseDto(
+        return new profileResponseDto(
                 currentUser.getUserName(),
                 currentUser.getFirstName(),
                 currentUser.getLastName(),
@@ -32,7 +33,7 @@ public class profileService {
         );
     }
 
-    public com.example.SEPDrive.Controller.profileResponseDto updateProfile(updateProfileDto dto) {
+    public profileResponseDto updateProfile(updateProfileDto dto) {
         String username = getCurrentUsername();
         user currentUser = userDao.findByUserName(username);
 
@@ -48,7 +49,7 @@ public class profileService {
 
         userDao.save(currentUser);
 
-        return new com.example.SEPDrive.Controller.profileResponseDto(
+        return new profileResponseDto(
                 currentUser.getUserName(),
                 currentUser.getFirstName(),
                 currentUser.getLastName(),

@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.example.SEPDrive.Controller.profileResponseDto;
+import com.example.SEPDrive.controller.profileResponseDto;
+import com.example.SEPDrive.controller.updateProfileDto;
 
 import java.util.List;
 @RestController
@@ -22,12 +23,12 @@ public class profileController {
     private  profileSucheService profileSucheService;
 
     @GetMapping("/me")
-    public ResponseEntity<com.example.SEPDrive.Controller.profileResponseDto> getOwnProfile() {
+    public ResponseEntity<com.example.SEPDrive.controller.profileResponseDto> getOwnProfile() {
         return ResponseEntity.ok(profileService.getOwnProfile());
     }
 
     @PutMapping("/me")
-    public ResponseEntity<profileResponseDto> updateProfile(@RequestBody com.example.SEPDrive.Controller.updateProfileDto dto) {
+    public ResponseEntity<profileResponseDto> updateProfile(@RequestBody updateProfileDto dto) {
         return ResponseEntity.ok(profileService.updateProfile(dto));
     }
 
