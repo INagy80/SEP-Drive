@@ -37,7 +37,6 @@ export class ProfileNutzerComponent implements OnInit {
     totalRides: 0
   };
 
-  isImageLoading: boolean = false;
 
   constructor() { }
 
@@ -48,7 +47,6 @@ export class ProfileNutzerComponent implements OnInit {
 
 
   private loadUserProfile(): void {
-    // TODO: Implement API call to get user profile
     // This is mock data for demonstration
     this.userProfile = {
       username: 'anynoym_benutzer123',

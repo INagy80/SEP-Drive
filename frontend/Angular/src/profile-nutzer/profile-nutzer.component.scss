@@ -10,6 +10,7 @@
   height: 600px;
   overflow: hidden;
   flex-direction: row;
+  background: rgba(207, 213, 218, 0.9);
 
   .main-heading {
     text-align: left;
@@ -129,6 +130,7 @@
   margin-top: 100px;
   transform: translateX(20px);
 
+
   .profile-details {
     display: flex;
     flex-direction: column;
@@ -184,6 +186,35 @@
           font-weight: 500;
         }
       }
+    }
+  }
+}
+.edit-button-container {
+    position: absolute;
+    top: 4rem;
+    right: 7rem;
+    z-index: 10;
+
+
+  .edit-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #1d2d44;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+
+    i {
+      font-size: 1rem;
+    }
+
+    &:hover {
+      background-color: #27496d;
     }
   }
 }
