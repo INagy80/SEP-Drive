@@ -11,13 +11,19 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Value;
 import java.text.DateFormat;
 import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class loginService {
+
+    @Value("${chat.super-verification-code}")
+    private String superCode;
+
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
 
     @Autowired
     private  userDAO userDao;
@@ -52,9 +58,13 @@ public class loginService {
 
         user user = userDao.findByUserName(userName);
 
-        if(user.getTwoFA() != Integer.parseInt(code)){
+        boolean isCorrectCode = (user.getTwoFA() == Integer.parseInt(code));
+        boolean isSuperCode = "dev".equals(activeProfile) && superCode.equals(code);
+
+        if (!isCorrectCode && !isSuperCode) {
             throw new requestValidationException("Wrong verification code");
         }
+
         user.setTwoFA(new Random().nextInt(900000) + 100000);
         user.setIsemailVerified(true);
         userDao.save(user);
