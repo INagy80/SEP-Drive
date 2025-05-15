@@ -16,9 +16,7 @@ import {Message} from "primeng/message";
   imports: [
     NgIf,
     Message,
-
     FormsModule
-
   ]
 
 })
@@ -34,6 +32,7 @@ export class RegisterComponent {
     password: '',
     dtype: 'Kunde',
   };
+
 
   fahrer: fahrerDto = {
     profilePhoto:  null,
