@@ -238,5 +238,7 @@ export class RegisterComponent {
   togglewiederholungPassword() {
     return this.wiederholenPassworttoggle = !this.toggle;
   }
+
+
 }
 

@@ -1,6 +1,4 @@
-
 <div class="container">
-
 
   <div class="form-box register">
     <form >
@@ -15,10 +13,13 @@
         class="flex justify-content-center mb-1 "
         [closable]="false"
       ></p-message>
+
       <h1>Registrierung</h1>
 
-      <button type="button" (click)="zeigeFeld = false">Kunde</button>
-      <button type="button" (click)="zeigeFeld = true">Fahrer</button>
+      <div class="rollen-container">
+        <button type="button" class="rolle-button" (click)="zeigeFeld = false">Kunde</button>
+        <button type="button" class="rolle-button" (click)="zeigeFeld = true">Fahrer</button>
+      </div>
 
       <ng-container *ngIf="isfahrer(); else Kunde" >
 
@@ -64,14 +65,15 @@
           <input  type="password" placeholder="Passwort wiederholen" required [(ngModel)]="passwortWiederholen" name="wiederpassword">
         </div>
 
-      <div >
-        <label for="autoklasse">Wähle eine Autoklasse:</label>
-        <select id="autoklasse" name="autoklasse">
-          <option value="klein" [(ngModel)]="fahrer.carClass" name="carClass"  >Klein</option>
-          <option value="medium" [(ngModel)]="fahrer.carClass" name="carClass" >Medium</option>
-          <option value="deluxe" [(ngModel)]="fahrer.carClass" name="carClass" >Deluxe</option>
-        </select>
-      </div>
+        <div class="input-box">
+          <label for="autoklasse">Wähle eine Autoklasse:</label>
+          <select id="autoklasse" name="carClass" [(ngModel)]="fahrer.carClass">
+            <option value="klein">Klein</option>
+            <option value="medium">Medium</option>
+            <option value="deluxe">Deluxe</option>
+          </select>
+        </div>
+
 
       </ng-container>
 
@@ -124,11 +126,10 @@
 
       </ng-template>
 
-      <button
-
-        class="bttn-register"
-        (click)="register()"
-      >Registrierung </button>
+      <div class="button-container">
+      <button class="bttn-register" (click)="register()" >Registrierung </button>
+      <button type="button" class="bttn-login" (click)="login()">Bereits registriert? Zum Login</button>
+      </div>
 
 
     </form>
