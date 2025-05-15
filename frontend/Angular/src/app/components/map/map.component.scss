@@ -13,11 +13,12 @@ $white:       #ffffff;
 
 /* Global styles.scss */
 
-.p-sidebar.custom-sidebar {
+.sidebar.custom-sidebar {
   padding: 1rem;
 
   .ride-requests {
     .divider {
+      background-color: red;
       width: 0;
       border-left: 2px solid #d1d5db;
       height: 1rem;
@@ -26,7 +27,7 @@ $white:       #ffffff;
 
     .section {
       &__title {
-        font-size: 1.25rem;
+        font-size: 200px;
         font-weight: 600;
         margin-bottom: 0.5rem;
       }
@@ -34,53 +35,19 @@ $white:       #ffffff;
         margin-bottom: 1rem;
       }
       &--history {
+        background-color: red;
         margin-top: 1rem;
       }
     }
 
     .ride-card {
       position: relative;
-      background: #fff;
+      background-color: #fff;
       border: 2px solid #d1d5db;
       border-radius: 0.5rem;
       padding: 1rem;
       margin-bottom: 1rem;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
-      &--active {
-        border-color: #10b981; /* green */
-      }
-      &--history {
-        border-color: #d1d5db; /* gray */
-      }
-
-      &__header {
-        margin-bottom: 0.75rem;
-        .ride-card__driver {
-          font-size: 1.125rem;
-          font-weight: 500;
-        }
-      }
-
-      &__body {
-        font-size: 0.875rem;
-        color: #6b7280; /* gray */
-        line-height: 1.4;
-      }
-
-      &__timestamps {
-        margin-top: 0.75rem;
-        font-size: 0.75rem;
-        color: #9ca3af; /* light gray */
-        display: flex;
-        justify-content: space-between;
-      }
-
-      &__ratings {
-        display: flex;
-        gap: 1.5rem;
-        margin-top: 1rem;
-      }
     } /* .ride-card */
 
     .status-pill {
@@ -155,14 +122,16 @@ html, body {
 }
 
 ::ng-deep .custom-sidebar {
-  width: 33vw !important;
-  height: 100% !important;
-  background-color: white !important;
+  align-items: center;
+  width: 30vw !important;
+  height: 80% !important;
+  border-radius: 20px;
+  background-color: #ffffff !important;
   opacity: 1 !important;
-  //margin-top: 170px !important;
-
-
+  font-size: 1rem !important;
+  margin-top: 168px !important;
 }
+
 
 /* Stil für die Karte */
 #map {
@@ -319,7 +288,7 @@ html, body {
   left: 0;
   width: 85%;
   max-width: 360px;
-  background: white;
+  background: #d72424;
   padding: 1.2rem;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -445,3 +414,55 @@ button, .controls {
   display: flex;
   justify-content: center;
 }
+
+
+.Ride-request h2{
+  font-size: 50px;
+}
+
+.ride-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.address-box {
+  background-color: #e0e0e0; /* hellgrau */
+  padding: 10px 14px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.address-text {
+  margin: 4px 0 0 0;
+  color: #222;
+  font-weight: 500;
+}
+
+.address-line {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Abstand zwischen "Von:"/“Nach:” und der Box */
+}
+
+.delete-button {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background-color: #23374f; /* Rot */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #2e4b6c; /* Dunkleres Rot beim Hover */
+}
+
+
+

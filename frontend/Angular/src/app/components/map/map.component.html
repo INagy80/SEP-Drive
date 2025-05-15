@@ -20,8 +20,8 @@
     <div class="ride-requests">
 
       <!-- Active Section -->
-      <section class="section section--active">
-        <h2 class="section__title">Aktive Fahrtanfrage</h2>
+      <div class="Ride-request">
+        <h2>Aktive Fahrtanfrage</h2>
 
         <ng-container *ngIf="activeRequest; else noActiveTpl">
           <div class="ride-card ride-card--active">
@@ -33,16 +33,32 @@
               <h3 class="ride-card__driver">{{ activeRequest.driverUserName }}</h3>
             </div>
 
-            <div class="ride-card__body">
+            <div class="ride-info">
               <p><strong>Fahrzeugklasse:</strong> {{ activeRequest.carClass }}</p>
-              <p><strong>Von:</strong> {{ activeRequest.startAddress }}</p>
-              <p><strong>Nach:</strong> {{ activeRequest.destinationAddress }}</p>
-            </div>
 
+              <div class="address-line">
+                <p><strong>Von:</strong></p>
+                <div class="address-box">
+                  <p class="address-text">{{ activeRequest.startAddress }}</p>
+                </div>
+              </div>
+
+              <div class="address-line">
+                <p><strong>Nach:</strong></p>
+                <div class="address-box">
+                  <p class="address-text">{{ activeRequest.destinationAddress }}</p>
+                </div>
+              </div>
+            </div>
+            <br><br>
             <div class="ride-card__timestamps">
               <span>Erstellt: {{ activeRequest.createdAt | date:'short' }}</span>
+              <br><br>
               <span>Aktualisiert: {{ activeRequest.updatedAt | date:'short' }}</span>
             </div>
+
+
+            <br><br>
 
             <div class="ride-card__ratings">
               <div class="rating">
@@ -58,13 +74,15 @@
                 </ng-container>
               </div>
             </div>
+            <br><br>
+            <button class="delete-button">Löschen</button>
           </div>
         </ng-container>
 
         <ng-template #noActiveTpl>
           <p class="no-active">Du hast derzeit keine aktiven Fahrtanfragen.</p>
         </ng-template>
-      </section>
+      </div>
 
       <div class="divider"></div>
 
