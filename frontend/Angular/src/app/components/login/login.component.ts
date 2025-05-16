@@ -67,5 +67,11 @@ export class LoginComponent {
           });
   }
 
+  showPassword: boolean = false;
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
+
 
 }

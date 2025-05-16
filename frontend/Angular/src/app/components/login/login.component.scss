@@ -3,12 +3,12 @@
 
 
 :host {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+  display: block;
   font-family: 'Barlow Condensed', sans-serif;
-  background-color: white;
+  background-image: url('/assets/images/welcome.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 100%;
 }
 
 error-message-custom {
@@ -18,30 +18,22 @@ error-message-custom {
   margin-bottom: 16px; /* Add some space below the message */
 }
 
-.container{
-
-  position: relative;
+.container {
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 1000px;
-  height: 600px;
   background: rgba(255, 255, 255, 0.88);
   border-radius: 50px;
   box-shadow: 0 0 30px rgb(27, 34, 44);
-}
-
-.form-box{
-  position: absolute;
-  right: 0;
-  width: 50%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.88);
-  display: flex;
-  align-items: center;
+  left: 100px;
+  width: 45%;
+  height: 90%;
   text-align: center;
   z-index: 1;
+  margin-top: 43px;
 }
+
 
 form{
   width: 100%;
@@ -57,32 +49,13 @@ form{
   position: relative;
   margin: 30px 0;
 }
-::ng-deep .p-message.p-message {
-  color: white;
-  font-size: 16px;
-  margin-top: 5px;
-  background-color: red;
-  padding: 10px;
-}
-::ng-deep .p-password.p-password {
-  width: 85%;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  color: #4e4e4e;
-  font-weight: 500;
-  padding: 13px 20px 13px 20px;
-  background: rgb(206, 212, 218);
-  color: rgba(0, 0, 0, 0.52);
-  toggle-group: none;
 
-}
 
 .input-box input{
   width: 85%;
   padding: 13px 50px 13px 20px; /*top,right,bottom,left --> damit der text nur in dem box bleibt*/
   background: rgb(206, 212, 218);
-  border-radius: 8px;
+  border-radius: 20px;
   border: none;
   outline: none;
   font-size: 16px;
@@ -92,7 +65,7 @@ form{
 
 .input-box i{
   position: absolute;
-  right: 50px;
+  right: 60px;
   top: 50%;
   transform: translateY(-50%);
   color: rgba(0, 0, 0, 0.52);
@@ -104,54 +77,57 @@ form{
   text-decoration: none;
 }
 
-.bttn ::ng-deep .bttn {
-  width: 99%;
+.bttn-login {
+  width: 85%;
   height: 45px;
   background: #23374f;
-  border-radius: 8px;
+  border-radius: 20px;
   box-shadow: rgba(0, 0, 0, 0.6);
   border: none;
   outline: none;
   font-size: 16px;
-  color: #031377;
+  color: rgba(255, 255, 255, 0.88);
   font-weight: 500;
 }
-.bttn:hover{
-  width: 99%;
+
+.bttn-login:hover {
+  width: 85%;
   height: 45px;
-  background: #00162c;
-  border-radius: 8px;
+  border-radius: 20px;
   box-shadow: rgba(0, 0, 0, 0.6);
   border: none;
   outline: none;
   font-size: 16px;
   color: #ffffff;
   font-weight: 500;
+  background: #2e4b6c;
 }
+
+
 
 .bttn-register{
   width: 50%;
   height: 45px;
-  background: rgba(255, 255, 255, 0.69);
-  border-radius: 8px;
+  background: rgb(35, 55, 79);
+  border-radius: 20px;
   box-shadow: rgba(0, 0, 0, 0.6);
   border: none;
   outline: none;
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.85);
+  color: rgba(255, 255, 255, 0.88);
   font-weight: 500;
 }
 
 .bttn-register:hover{
   width: 50%;
   height: 45px;
-  background: rgba(156, 154, 154, 0.69);
-  border-radius: 8px;
+  background: rgb(46, 75, 108);
+  border-radius: 20px;
   box-shadow: rgba(0, 0, 0, 0.6);
   border: none;
   outline: none;
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.85);
+  color: rgba(255, 255, 255, 0.88);
   font-weight: 500;
 }
 
