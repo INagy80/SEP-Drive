@@ -1,0 +1,88 @@
+:host{
+  text-align: center;
+  align-items: center;
+  font-family: 'Barlow Condensed', sans-serif;
+
+}
+
+::ng-deep .p-message.p-message {
+  color: white;
+  font-size: 16px;
+  margin-top: 5px;
+  background-color: red;
+  padding: 10px;
+}
+
+
+.container{
+  margin-top: 40px;
+  background-color: rgba(255, 255, 255, 0.88);
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.illustration img {
+  margin-top: 100px;
+  width: 260px;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 0px;
+}
+
+.illustration{
+  background-color: #23374f;
+  height: 250px;
+}
+
+.code-input input {
+  color: #2c2c2c;
+  margin-right: 20px;
+  width: 70px;
+  height: 100px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #eee;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 30px;
+  text-align: center;
+}
+
+h1{
+  font-size: 40px;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+.bttn{
+  margin-top: 10px;
+  align-items: center;
+  width: 20%;
+  height: 60px;
+  background: #23374f;
+  border-radius: 30px;
+  box-shadow: rgba(0, 0, 0, 0.6);
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.bttn:hover{
+  margin-top: 10px;
+  align-items: center;
+  width: 20%;
+  height: 60px;
+  background: #182942;
+  border-radius: 30px;
+  box-shadow: rgba(0, 0, 0, 0.6);
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+

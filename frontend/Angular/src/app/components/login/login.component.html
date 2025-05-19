@@ -1,0 +1,59 @@
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<div class="container ">
+  <form >
+    <h1>Login</h1>
+    <p-message
+      *ngIf="errorMsg"
+      severity="error"
+      [text]="errorMsg"
+      styleClass="mb-2 w-full"
+      class="mb-2"
+      [closable]="false"
+
+    ></p-message>
+
+    <div class="input-box">
+      <input
+        [(ngModel)]="authenticationRequest.userName"
+        name="userName"
+        [pAutoFocus]="true"
+        type="text" placeholder="Benutzername" required>
+      <i class='bx bxs-user'></i>
+    </div>
+
+    <div class="input-box">
+      <input
+        [type]="showPassword ? 'text' : 'password'"
+        placeholder="Passwort"
+        required
+        name="password"
+        [(ngModel)]="authenticationRequest.password"
+      >
+      <i class='bx'
+         [class.bxs-show]="showPassword"
+         [class.bxs-hide]="!showPassword"
+         (click)="togglePassword()">
+      </i>
+    </div>
+
+    <div class="forgot">
+      <a href="/Password-reset">Passwort vergessen?</a>
+    </div>
+    <br><br>
+
+    <button
+      class="bttn-login"
+      (click)="Login()"
+    >Einloggen </button>
+
+    <p>oder</p>
+
+    <button
+      class="bttn-register"
+      (click)="register()"
+    >Register</button>
+
+  </form>
+
+</div>
+
