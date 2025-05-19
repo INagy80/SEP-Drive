@@ -1,0 +1,229 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Barlow Condensed', sans-serif;
+  background-color: white;
+  background-image: url('/assets/images/welcome.png'); // Passe ggf. den Pfad an
+  background-size: cover;
+  background-position: center;
+}
+
+.container {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 50px;
+  box-shadow: 0 0 30px rgb(27, 34, 44);
+  left: 100px;
+  width: 45%;
+  height: 90%;
+  text-align: center;
+  z-index: 1;
+  margin-top: 43px;
+}
+
+
+
+//Überschrift : Registrierung
+form h1 {
+  font-size: 25px;
+  color: #1D2D44;
+  margin-bottom: 10px;
+}
+
+.input-box {
+  position: relative;
+  margin: 8px 0;
+
+  label {
+    display: block;
+    font-size: 8px;
+    color: #2c2c2c;
+    margin-bottom: 10px;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 8px 15px;
+    background: rgb(206, 212, 218);
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #4e4e4e;
+    font-weight: 500;
+  }
+
+  select {
+    width: 100%;
+  }
+}
+
+
+::ng-deep .p-password {
+  width: 85%;
+  height: 45px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #4e4e4e;
+  font-weight: 500;
+  padding: 13px 20px 13px 20px;
+  background: rgb(206, 212, 218);
+  color: rgba(0, 0, 0, 0.52);
+  toggle-group: none;
+}
+
+
+
+.versteckt {
+  display: none;
+}
+
+
+
+//Alles was zu Profilbild gehört
+.profilbild-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.profilbild-upload {
+  display: flex;
+  justify-content: center;
+}
+
+.profilbild-kreis {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #ced4da;
+  border: 2px dashed #999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #b0bec5;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .plus-icon {
+    font-size: 48px;
+    color: #555;
+    user-select: none;
+  }
+}
+
+.profilbild-hinweis {
+  font-size: 14px;
+  color: #666;
+}
+//
+
+
+
+//Rollen Button von Fahrer und Kunde
+.rolle-button {
+  min-width: 100px; // gleiche Mindestbreite für beide Buttons
+  padding: 10px 20px;
+  background-color: #1D2D44;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.rolle-button:hover {
+  background-color: #3e5a80;
+}
+
+.rollen-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+//
+
+
+//Errors
+::ng-deep .p-message {
+  color:  #dc2828;
+  font-size: 16px;
+  margin-top: 5px;
+  background-color: #fef3f3;
+  padding: 10px;
+  border-color: white;
+}
+
+error-message-custom {
+  color: #ff0000; /* Set the text color explicitly to red */
+  font-weight: bold; /* Make it stand out with bold text */
+  text-align: center; /* Optionally align it to the center */
+  margin-bottom: 16px; /* Add some space below the message */
+}
+
+
+error-message-custom::ng-deep .p-message {
+  color: #ff0000; /* Set the text color explicitly to red */
+  font-weight: bold; /* Make it stand out with bold text */
+  text-align: center; /* Optionally align it to the center */
+  margin-bottom: 16px; /* Add some space below the message */
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px; // Abstand zwischen den Buttons
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.bttn-register,
+.bttn-login {
+  width: 45%;
+  height: 45px;
+  background: rgb(35, 55, 79);
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  white-space: normal; // damit Zeilenumbruch bei "Zum Login"
+  padding: 8px;
+}
+
+.bttn-register:hover,
+.bttn-login:hover {
+  background: rgb(46, 75, 108);
+}
