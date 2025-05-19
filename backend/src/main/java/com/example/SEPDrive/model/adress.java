@@ -12,16 +12,16 @@ public class adress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     //Attributes
-    private String houseNumber;
+    private String houseNumberAndStreet;
 
-    private String street;
 
-    private String zip;
+
 
     private String city;
 
     private String state;
 
+    private String zip;
 
     private String country;
 
@@ -34,23 +34,23 @@ public class adress {
 
 
     //constructor
-    public adress( String street, String houseNumber,String zip, String city, String state,  String country) {
-        this.houseNumber = houseNumber;
-        this.street = street;
+    public adress(  String houseNumber, String city, String state, String zip, String country) {
+        this.houseNumberAndStreet = houseNumber;
+
         this.city = city;
         this.state = state;
         this.zip = zip;
         this.country = country;
     }
 
-    public adress(BigDecimal lng, BigDecimal lat) {
+    public adress(BigDecimal lat, BigDecimal lng) {
         Lng = lng;
         Lat = lat;
     }
 
-    public adress(String houseNumber, String street, String zip, String city, String country) {
-        this.houseNumber = houseNumber;
-        this.street = street;
+    public adress(String houseNumber, String city, String zip, String country) {
+        this.houseNumberAndStreet = houseNumber;
+
         this.zip = zip;
         this.city = city;
         this.country = country;
@@ -63,20 +63,13 @@ public class adress {
 
     //Getters and Setters
 
-    public String getHouseNumber() {
-        return houseNumber;
+
+    public String getHouseNumberAndStreet() {
+        return houseNumberAndStreet;
     }
 
-    public void setHouseNumber(String houseNumber) {
-        this.houseNumber = houseNumber;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
+    public void setHouseNumberAndStreet(String houseNumberAndStreet) {
+        this.houseNumberAndStreet = houseNumberAndStreet;
     }
 
     public String getCity() {
@@ -137,14 +130,14 @@ public class adress {
 
     @Override
     public int hashCode() {
-        return Objects.hash(houseNumber, street, city, state, zip, country);
+        return Objects.hash(houseNumberAndStreet, city, state, zip, country);
     }
 
     @Override
     public String toString() {
         return "address{" +
-                "houseNumber='" + houseNumber + '\'' +
-                ", street='" + street + '\'' +
+                "houseNumber='" + houseNumberAndStreet + '\'' +
+
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", zip='" + zip + '\'' +

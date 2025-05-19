@@ -44,8 +44,12 @@ public class Fahrer extends user{
 
     }
 
+    public carClass getCarClass() {
+        return carClass;
+    }
 
-
-
+    public void setCarClass(carClass carClass) {
+        this.carClass = carClass;
+    }
 }
 

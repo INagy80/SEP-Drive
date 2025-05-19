@@ -1,0 +1,44 @@
+
+
+
+<div class="illustration">
+  <p-message
+    *ngIf="errorMsg"
+    severity="error"
+    [text]="errorMsg"
+    styleClass="mb-2 w-full"
+    class="mb-2"
+    [closable]="false"
+
+  ></p-message>
+  <img
+
+          src="assets/images/TwoFA.jpg"
+
+
+  />
+</div>
+
+<div class="container">
+  <h1>Zwei-Faktor-Authentifizierung</h1>
+  <p>Bitte gib den Bestätigungscode ein, den wir dir gesendet haben:</p>
+
+  <form class="code-input" required>
+  <input [(ngModel)]="a" (input)="updateFacode()" name="a" type="text" maxlength="1">
+  <input [(ngModel)]="b" (input)="updateFacode()" name="b" type="text" maxlength="1">
+  <input [(ngModel)]="c" (input)="updateFacode()" name="c" type="text" maxlength="1">
+  <input [(ngModel)]="d" (input)="updateFacode()" name="d" type="text" maxlength="1">
+  <input [(ngModel)]="e" (input)="updateFacode()" name="e" type="text" maxlength="1">
+  <input [(ngModel)]="f" (input)="updateFacode()" name="f" type="text" maxlength="1">
+</form>
+  <br><br>
+  <button
+    (click)="verify()"
+    pButton class="bttn"
+    type="submit"
+  >Bestätigen</button>
+</div>
+
+<br><br>
+
+

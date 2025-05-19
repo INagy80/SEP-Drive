@@ -1,0 +1,57 @@
+
+<div class="header">
+  <img src="/assets/images/auto_logo.jpg" alt="Auto Logo" class="logo" />
+  <h1 class="site-title">SEP Drive</h1>
+</div>
+
+<!-- Navbar -->
+<div class="navbar">
+
+  <p-button (click)="startseite()" class="nav-item">Startseite</p-button>
+  <p-button (click)="Profile()" class="nav-item">Profile</p-button>
+  <p-button (click)="logout()" class="nav-item">Abmelden</p-button>
+</div>
+
+<head>
+  <meta charset="UTF-8">
+  <title>search profile</title>
+  <link rel="stylesheet" href="/search-profile.component.scss">
+</head>
+
+
+<div class="form-box-search">
+  <div class="search-container">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Search..."
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+      >
+      <button class="search-button" (click)="onSearch()">
+        <i class="fas fa-search"></i>
+        search
+      </button>
+    </div>
+
+    <div class="custom-card" *ngFor="let customer of drivers; let index = index" >
+     <app-customer-card
+      [customer]="customer"
+      [images]="Images"
+      [customerIndex]="index"
+      (delete)="deleteCustomer($event)"
+      (update)="updateCustomer($event)"
+     ></app-customer-card>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+

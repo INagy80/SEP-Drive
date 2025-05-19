@@ -1,0 +1,69 @@
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+:host {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100vh;
+  padding-left: 5vw;
+  padding-top: 10vh;
+  background-image: url('/assets/images/welcome.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: rgb(255, 255, 255);
+  font-family: 'Barlow Condensed', sans-serif;
+
+}
+
+h1 {
+  font-size: 13rem;
+  margin: 0 0 20px 0;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+p {
+  font-size: 3rem;
+  margin: 0 0 5rem 0;
+  text-align: left;
+  max-width: 600px;
+  text-shadow: 1px 1px 4px rgb(0, 0, 0);
+}
+
+a {
+  padding: 1rem 1rem;
+  font-size: 30px;
+  background-color: rgba(99, 117, 170, 0.74);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+a:hover {
+  background-color: rgba(99, 117, 170, 0.4);
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: url('/assets/images/welcome.png') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+.content {
+  text-align: center;
+  color: white; /* Adjust contrast for better text visibility */
+  padding: 20px;
+}
+

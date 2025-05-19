@@ -19,7 +19,7 @@ public class rideRequest {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
-    private Kunde customer;
+    private user customer;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "Driver_id")
@@ -40,15 +40,16 @@ public class rideRequest {
     private LocalDateTime updatedAt;
 
 
-    @ManyToOne(cascade = CascadeType.DETACH)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "start_address_id")
     private adress startAddress;
 
 
 
-    @ManyToOne(cascade = CascadeType.DETACH)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "dest_address_id")
     private adress destAddress;
+
 
 
 
@@ -64,10 +65,17 @@ public class rideRequest {
     private Double drivererRating;
 
 
+
+
+
+
+
+
+
     // Constructors
     public rideRequest() {}
 
-    public rideRequest(Kunde customer,Fahrer Driver, carClass carClass, adress startAddress,
+    public rideRequest(user customer,Fahrer Driver, carClass carClass, adress startAddress,
                        adress destAddress,Double drivererRating,Double customerRating) {
         this.customer = customer;
         this.Driver = Driver;
@@ -76,9 +84,12 @@ public class rideRequest {
         this.destAddress = destAddress;
         this.drivererRating = drivererRating;
         this.customerRating = customerRating;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.status = RequestStatus.Active;
     }
 
-    public rideRequest(Kunde customer, carClass carClass, adress startAddress, adress destAddress) {
+    public rideRequest(user customer, carClass carClass, adress startAddress, adress destAddress) {
         this.customer = customer;
         this.carClass = carClass;
         this.startAddress = startAddress;
@@ -86,9 +97,21 @@ public class rideRequest {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.status = RequestStatus.Active;
+        this.customerRating = 0.0;
+        this.drivererRating = 0.0;
     }
 
 
+
+
+
+    public carClass getCarClass() {
+        return carClass;
+    }
+
+    public void setCarClass(carClass carClass) {
+        this.carClass = carClass;
+    }
 
     // Getters and Setters
     public Integer getId() {
@@ -99,11 +122,11 @@ public class rideRequest {
         this.id = id;
     }
 
-    public Kunde getCustomer() {
+    public user getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Kunde customer) {
+    public void setCustomer(user customer) {
         this.customer = customer;
     }
 

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import java.text.DateFormat;
@@ -36,6 +37,8 @@ public class loginService {
 
     @Autowired
     private emailSenderService emailSenderService;
+
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
 
     public boolean login(String userName, String password ){
@@ -92,5 +95,23 @@ public class loginService {
     }
 
 
+    public Boolean resetpassword(String email) {
+        if (userDao.existsUserByEmail(email.toLowerCase())) {
+            user user = userDao.findByEmail(email.toLowerCase());
+            String passwordpool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!?";
+            String password = "";
+            for (int i = 0; i < 10; i++) {
+                password += passwordpool.charAt(new Random().nextInt(passwordpool.length())) ;
 
+            }
+            user.setPassword(encoder.encode(password));
+            userDao.save(user);
+            emailSenderService.sendEmail(user.getEmail(), "SEPDrive reset passsword",
+                    "Hello "+ user.getFirstName()+" "+user.getLastName()+", \n \n" +"Your new password is:  " + password + "   \n \n \n Best regards,\n SEPDrive ");
+            return true;
+        } else {
+            return false;
+        }
+
+    }
 }

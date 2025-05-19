@@ -1,0 +1,139 @@
+
+<div class="container">
+
+
+  <div class="form-box register">
+    <form >
+
+<!--      <link href = 'https://unpkg.com/boxicons2.1.4/css/boxicons.min.css' rel = 'stylesheet'>-->
+
+      <p-message
+        severity="error"
+        icon="pi pi-times-circle"
+        *ngIf="errorMsg"
+        [text]="errorMsg"
+        class="flex justify-content-center mb-1 "
+        [closable]="false"
+      ></p-message>
+      <h1>Registrierung</h1>
+
+      <div class="rollen-container">
+        <button type="button" class="rolle-button" (click)="zeigeFeld = false">Kunde</button>
+        <button type="button" class="rolle-button" (click)="zeigeFeld = true">Fahrer</button>
+      </div>
+
+      <ng-container *ngIf="isfahrer(); else Kunde" >
+
+      <div class="profilbild-container">
+        <div class="profilbild-upload">
+          <input type="file" id="profilbild" (change)="onFileSelected($event)" hidden #fileInput>
+          <div class="profilbild-kreis" (click)="fileInput.click()">
+            <img *ngIf="profilbildVorschauUrl" [src]="profilbildVorschauUrl" alt="Profilbild">
+            <i *ngIf="!profilbildVorschauUrl" class="plus-icon">+</i>
+          </div>
+        </div>
+        <span class="profilbild-hinweis">(optional)</span>
+      </div>
+
+      <div class="input-box">
+        <input type="text" placeholder="Benutzername" required [(ngModel)]="fahrer.userName" name="userName">
+      </div>
+
+      <div class ="input-box">
+        <input type="text" placeholder="Vorname" required [(ngModel)]="fahrer.firstName" name="firstName">
+      </div>
+
+      <div class ="input-box">
+        <input type="text" placeholder="Nachname" required [(ngModel)]="fahrer.lastName" name="lastName">
+      </div>
+
+      <div class ="input-box">
+        <input type="email" placeholder="E-Mail-Adresse" required [(ngModel)]="fahrer.email" name="email">
+      </div>
+
+      <div class ="input-box">
+        <input type="date" placeholder="Geburtsdatum" required [(ngModel)]="fahrer.dateOfBirth" name="dateOfBirth">
+      </div>
+
+<!--        <p-button  (click)="togglePassword()" class=" .ptd"  > {{ toggle ? 'Hide' : 'Show' }}</p-button>-->
+        <div class ="input-box " >
+          <input type="password"  placeholder="Passwort" required [(ngModel)]="fahrer.password" name="password" >
+        </div>
+
+
+
+
+<!--        <p-button  (click)="togglewiederholungPassword()" class=" .ptd"  >{{ wiederholenPassworttoggle ? 'Hide' : 'Show' }}</p-button>-->
+        <div class ="input-box " >
+          <input  type="password" placeholder="Passwort wiederholen" required [(ngModel)]="passwortWiederholen" name="wiederpassword">
+        </div>
+
+        <div class="input-box">
+          <label for="autoklasse">Wähle eine Autoklasse:</label>
+          <select id="autoklasse" name="carClass" [(ngModel)]="fahrer.carClass">
+            <option value="klein">Klein</option>
+            <option value="Medium">Medium</option>
+            <option value="Deluxe">Deluxe</option>
+          </select>
+        </div>
+
+      </ng-container>
+
+      <ng-template #Kunde>
+        <div class="profilbild-container">
+          <div class="profilbild-upload">
+            <input type="file" id="profilbild" (change)="onFileSelected($event)" hidden #fileInput>
+            <div class="profilbild-kreis" (click)="fileInput.click()">
+              <img *ngIf="profilbildVorschauUrl" [src]="profilbildVorschauUrl" alt="Profilbild">
+              <i *ngIf="!profilbildVorschauUrl" class="plus-icon">+</i>
+            </div>
+          </div>
+          <span class="profilbild-hinweis">(optional)</span>
+        </div>
+
+        <div class="input-box">
+          <input type="text" placeholder="Benutzername" required [(ngModel)]="kunde.userName" name="userName">
+        </div>
+
+        <div class ="input-box">
+          <input type="text" placeholder="Vorname" required [(ngModel)]="kunde.firstName" name="firstName">
+        </div>
+
+        <div class ="input-box">
+          <input type="text" placeholder="Nachname" required [(ngModel)]="kunde.lastName" name="lastName" >
+        </div>
+
+        <div class ="input-box">
+          <input type="email" placeholder="E-Mail-Adresse" required [(ngModel)]="kunde.email" name="email">
+        </div>
+
+        <div class ="input-box">
+          <input type="date" placeholder="Geburtsdatum" required [(ngModel)]="kunde.dateOfBirth" name="dateOfBirth">
+        </div>
+
+
+
+<!--        <p-button  (click)="togglePassword()" class=" .ptd"  > {{ toggle ? 'Hide' : 'Show' }}</p-button>-->
+         <div class ="input-box " >
+           <input type="password"  placeholder="Passwort" required [(ngModel)]="kunde.password" name="password" >
+         </div>
+
+
+
+
+<!--        <p-button  (click)="togglewiederholungPassword()" class=" .ptd"  >{{ wiederholenPassworttoggle ? 'Hide' : 'Show' }}</p-button>-->
+        <div class ="input-box " >
+          <input  type="password" placeholder="Passwort wiederholen" required [(ngModel)]="passwortWiederholen" name="wiederpassword">
+        </div>
+
+      </ng-template>
+
+      <div class="button-container">
+      <button class="bttn-register" (click)="register()" >Registrierung </button>
+      <button type="button" class="bttn-login" (click)="login()">Bereits registriert? Zum Login</button>
+      </div>
+
+
+    </form>
+  </div>
+</div>

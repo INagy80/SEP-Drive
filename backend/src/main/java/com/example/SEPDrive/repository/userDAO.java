@@ -1,5 +1,6 @@
 package com.example.SEPDrive.repository;
 
+import com.example.SEPDrive.model.Fahrer;
 import com.example.SEPDrive.model.user;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,6 +23,17 @@ public interface userDAO extends JpaRepository<user, Integer> {
     user findByEmail(String email);
     user findUserById(Integer userId);
 
+    @Query(value = "SELECT * FROM users WHERE users.username LIKE CONCAT(:name, '%')   ", nativeQuery = true)
+    List<user> search(@Param("name") String username);
 
+    @Query(value = "UPDATE users SET profile_photo = :photo WHERE username = :name" ,nativeQuery = true)
+    void photo(@Param("photo") byte[] bytes, @Param("name") String username);
+
+//    @Query(value = "select * from users", nativeQuery = true)
+//    public List<user> getallusers();
+
+
+//    @Query(value = "INSERT INTO users VALUES (U.username )" ,nativeQuery = true)
+//   public user save(@Param("U") user user);
 
 }

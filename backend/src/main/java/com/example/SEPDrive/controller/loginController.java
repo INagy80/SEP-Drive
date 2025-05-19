@@ -3,6 +3,7 @@ package com.example.SEPDrive.controller;
 import com.example.SEPDrive.service.loginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,11 @@ public class loginController {
                 .header(HttpHeaders.AUTHORIZATION, response.getToken())
                 .body(response);
 
+    }
+
+    @PostMapping("login/resetPassword")
+    public ResponseEntity<Boolean> resetPassword(@RequestBody String email){
+        return new ResponseEntity<>(loginService.resetpassword(email), HttpStatus.OK);
     }
 
 

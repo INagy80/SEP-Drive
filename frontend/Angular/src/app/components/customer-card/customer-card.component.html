@@ -1,0 +1,43 @@
+<p-card [style]="{width: '316px'}" styleClass="p-card-shadow text-center">
+  <ng-template pTemplate="header">
+    <div>
+      <img class="border-round-top cover   w-full"
+           height="120"
+           alt="Card"
+           [src]="customer?.role === 'Fahrer' ? '/assets/images/welcome.png' : '/assets/images/customer-background.png'"
+      >
+    </div>
+    <div class="flex justify-content-center" style="margin-top: -50px">
+      <img
+        class="customer-avatar"
+        [src]="images[customerIndex]"
+      >
+    </div>
+  </ng-template>
+  <ng-template pTemplate="content">
+    <p-badge
+      [value]="'' + (customerIndex + 1)"
+    ></p-badge>
+    <a [routerLink]="['/search-profile/', customer?.userName]"
+       rel="noopener noreferrer">
+     <h2>{{customer?.userName}}</h2>
+    </a>
+
+    <p class="text-gray-600">{{customer?.email}}</p>
+    <p class="text-gray-600">{{customer?.dateOfBirth}} | {{customer?.carClass}}</p>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      label="Follow "
+      class="p-button-secondary p-button-outlined p-button-rounded"
+      (click)="onUpdate()"
+    ></button>
+    <button
+      pButton
+      label="Contact"
+      class="p-button-danger p-button-outlined p-button-rounded ml-3"
+      (click)="onDelete()"
+    ></button>
+  </ng-template>
+</p-card>

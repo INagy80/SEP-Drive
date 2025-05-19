@@ -7,17 +7,18 @@ import com.example.SEPDrive.service.registerService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("v1/auth")
 public class registerController {
 
     @Autowired
@@ -27,17 +28,14 @@ public class registerController {
 
 
 
-    @PostMapping(
-            "v1/auth/register/kunde"
-    )
+    @PostMapping("/register/kunde")
     public ResponseEntity<Boolean> registerKunde(@RequestBody Kunde user) {
        return ResponseEntity.ok(registerService.register(user));
     }
 
-    @PostMapping(
-             "v1/auth/register/fahrer"
-    )
 
+
+    @PostMapping("/register/fahrer")
     public  ResponseEntity<Boolean> registerFahrer(@RequestBody Fahrer user) {
         return ResponseEntity.ok(registerService.register(user));
     }
@@ -45,4 +43,45 @@ public class registerController {
 
 
 
+
+
+
+    @PostMapping(
+            path     = "/register/kundeWithImage",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<?>  addKundeWithImage(@RequestPart("kunde") Kunde kunde, @RequestPart("image") MultipartFile image, @RequestPart("filename") String filename){
+        try{
+            boolean ok = registerService.addWithImage(kunde, image,filename);
+            return new ResponseEntity<>(ok, HttpStatus.CREATED);
+
+        }catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+
+    @PostMapping(
+            path     = "/register/fahrerWithImage",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<?>  addfahrerWithImage(@RequestPart("fahrer") Fahrer fahrer, @RequestPart("image") MultipartFile image, @RequestPart("filename") String filename){
+        try{
+            boolean ok = registerService.addWithImage(fahrer, image,filename);
+            return new ResponseEntity<>(ok, HttpStatus.CREATED);
+
+        }catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+
+
+
+    @GetMapping("/users")
+    public List<user> getUsers() {
+        return registerService.getAllUsers();
+    }
 }
