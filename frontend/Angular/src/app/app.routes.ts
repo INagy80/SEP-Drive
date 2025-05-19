@@ -33,11 +33,7 @@ export const routes: Routes = [
 
   {path: 'search-profile',    component: SearchProfileComponent , canActivate: [AccessGuardService]},
 
-  {path: 'search-profile/:userName',
-    component: OthersProfileComponent ,
-    canActivate: [AccessGuardService],
-  children: [
-    { path: '',    component: OthersProfileComponent }]},
+  {path: 'search-profile/:userName', component: OthersProfileComponent , canActivate: [AccessGuardService],},
 
 
 

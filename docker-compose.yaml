@@ -11,15 +11,18 @@ services:
       SPRING_DATASOURCE_USERNAME: SEPDrive
       SPRING_DATASOURCE_PASSWORD: SEPDriveC7
 
+    networks:
+      - SEPdb
 
 
   frontend:
     container_name: SEP_frontend
     build: ./frontend/Angular
     ports:
-      - "8000:80"
+      - "4200:80"
 
-
+    networks:
+      - SEPdb
 
 
   db:
