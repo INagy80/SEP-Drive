@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import {CustomerCardDTO} from '../../models/customerCardDTO';
 import {Badge} from 'primeng/badge';
 import {ButtonDirective} from 'primeng/button';
 import {Card} from 'primeng/card';

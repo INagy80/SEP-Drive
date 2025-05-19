@@ -3,7 +3,6 @@ import {environment} from '../../../eviroments/environment';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {map, Observable} from 'rxjs';
 import {ProfileDTO} from '../../models/profileDTO';
-import {CustomerCardDTO} from '../../models/customerCardDTO';
 
 @Injectable({
   providedIn: 'root'
