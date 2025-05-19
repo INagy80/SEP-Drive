@@ -1,0 +1,83 @@
+<div class="header">
+  <img src="/assets/images/auto_logo.jpg" alt="Auto Logo" class="logo" />
+  <h1 class="site-title">SEP Drive</h1>
+</div>
+
+<!-- Navbar -->
+<div class="navbar">
+
+  <p-button (click)="startseite()" class="nav-item">Startseite</p-button>
+  <p-button (click)="editProfile()" class="nav-item">edit your Profile</p-button>
+  <p-button (click)="logout()" class="nav-item">Abmelden</p-button>
+</div>
+
+<div class="profile-container">
+  <h1 class="main-heading">Profile</h1>
+  <div class="icon-block">
+    <a routerLink="/search-profile" class="search-button">
+      <span class="pi pi-search"></span>
+    </a>
+  </div>
+
+  <div class="profile-left">
+    <!-- Linke Spalte -->
+    <div class="profile-image-container">
+      <img  [src]="photoUrl"   alt="profile picture"
+            loading="lazy"
+            decoding="async"
+           class="avatar"/>
+    </div>
+
+    <div class="profile-stats">
+      <div class="stat-item">
+        <i class="pi pi-star-fill" style="color: gold"></i>
+        <div class="stat-content">
+          <span class="stat-value">{{ profileDTO.rating }}/5</span>
+          <span class="stat-label">Bewertung</span>
+        </div>
+      </div>
+
+      <div class="stat-item">
+        <i class="pi pi-check"style="color: green"></i>
+        <div class="stat-content">
+          <span class="stat-value">{{ profileDTO.totalRides }}</span>
+          <span class="stat-label">Fahrten</span>
+        </div>
+      </div>
+
+      <div class="stat-item" *ngIf="profileDTO.role === 'Fahrer'">
+        <i class="pi pi-car" style="color: darkred"></i>
+        <div class="stat-content">
+          <span class="stat-value">{{ profileDTO.carClass }}</span>
+          <span class="stat-label">Auto-Klasse</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rechte Spalte -->
+  <div class="profile-right">
+    <div class="profile-details">
+      <div class="user-header">
+        <h1>{{ profileDTO.firstName }} {{ profileDTO.lastName }}</h1>
+        <p class="role">{{ profileDTO.role }}</p>
+      </div>
+      <div class="detail-group">
+        <h2>Persönliche Informationen</h2>
+        <div class="detail-item">
+          <span class="label">Benutzername:</span>
+          <span class="value">{{ profileDTO.userName }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">E-Mail:</span>
+          <span class="value">{{ profileDTO.email }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Geburtsdatum:</span>
+          <span class="value">{{ profileDTO.dateOfBirth | date:'dd.MM.yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
