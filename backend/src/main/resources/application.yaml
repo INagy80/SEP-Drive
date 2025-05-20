@@ -11,6 +11,7 @@ cors:
 
 spring:
   security:
+
     user:
       name: SEP
       password: SEP
@@ -22,6 +23,7 @@ spring:
     password: SEPDriveC7
 
   jpa:
+    open-in-view: true
     hibernate:
       ddl-auto: update
 
@@ -48,3 +50,10 @@ spring:
 
   main:
     web-application-type: servlet
+
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 20MB

@@ -3,6 +3,9 @@ package com.example.SEPDrive.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
@@ -52,9 +55,12 @@ public abstract class user {
 
 
     @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "profile_photo")
+    @Basic(fetch = FetchType.EAGER)
+    @Column(name = "profile_photo", columnDefinition = "BYTEA")
+    @JdbcTypeCode(SqlTypes.BINARY)
     private byte[] profilePhoto;
+
+    private String imageName;
 
     @Column(name = "TwoFA", length = 6 )
     private Integer TwoFA;
@@ -111,6 +117,14 @@ public abstract class user {
 
     //getters and setters
 
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
 
     public boolean isIsemailVerified() {
         return isemailVerified;

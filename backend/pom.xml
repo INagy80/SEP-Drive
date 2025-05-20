@@ -158,6 +158,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.graphhopper</groupId>
+			<artifactId>graphhopper-core</artifactId>
+			<version>9.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -170,6 +176,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
