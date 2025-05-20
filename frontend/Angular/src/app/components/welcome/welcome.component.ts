@@ -1,45 +1,46 @@
-import {Component, OnInit} from '@angular/core';
-import {AuthenticationRequest} from '../../models/authentication-request';
-import {AuthenticationResponse} from '../../models/authentication-response';
-import { JwtHelperService } from '@auth0/angular-jwt';
-import {Router, RouterLink} from '@angular/router';
-import {NgIf} from '@angular/common';
+import { Component } from '@angular/core';            // Import für Angular-Komponente
+import { AuthenticationResponse } from '../../models/authentication-response'; // Modell für Authentifizierungsantwort
+import { JwtHelperService } from '@auth0/angular-jwt'; // Service zur JWT-Token-Analyse
+import { Router, RouterLink } from '@angular/router'; // Router und Link für Navigation
+import { NgIf } from '@angular/common';                 // Für bedingte Anzeige im Template
 
 @Component({
-  selector: 'app-welcome',
+  selector: 'app-welcome',                            // HTML-Tag der Komponente
   imports: [
-    RouterLink,
-    NgIf
+    RouterLink,                                      // Import RouterLink für Template
+    NgIf                                             // Import NgIf für *ngIf Direktive
   ],
-  templateUrl: './welcome.component.html',
-  styleUrl: './welcome.component.scss'
+  templateUrl: './welcome.component.html',            // Verknüpfung mit HTML-Template
+  styleUrl: './welcome.component.scss'                 // Verknüpfung mit CSS-Styling
 })
 export class WelcomeComponent {
-  isLoggedIn: boolean = this.loging() ;
+  // Variable, die prüft ob der User eingeloggt ist
+  isLoggedIn: boolean = this.loging();
 
   constructor(
-    private router: Router,
+    private router: Router,                            // Router zum Navigieren
   ) { }
 
-  loging() : boolean {
+  // Methode zur Prüfung, ob Nutzer eingeloggt ist
+  loging(): boolean {
+    console.log('login');                              // Ausgabe in Konsole (Debugging)
 
-    console.log('login');
+    // Token aus localStorage holen (falls vorhanden)
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+      const authResponse: AuthenticationResponse = JSON.parse(storedUser);  // JSON zu Objekt
       const token = authResponse.token;
+
       if (token) {
-        const jwtHelper = new JwtHelperService();
-        const isTokenNonExpired = !jwtHelper.isTokenExpired(token);
+        const jwtHelper = new JwtHelperService();     // JWT-Hilfe für Token-Prüfung
+        const isTokenNonExpired = !jwtHelper.isTokenExpired(token); // Prüfen ob Token abgelaufen
+
         if (isTokenNonExpired) {
-          return  false;
+          return false;   // User ist eingeloggt (Token ist gültig), daher false für "nicht ausgeloggt"
         }
       }
     }
 
-   return  true;
+    return true;        // Wenn kein Token oder abgelaufen -> User ist ausgeloggt (true)
   }
-
-
-
 }
