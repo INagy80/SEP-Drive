@@ -5,9 +5,7 @@ import {AuthenticationService} from "../../services/authentication/authenticatio
 import {FormsModule} from "@angular/forms";
 import {Message} from "primeng/message";
 import {NgIf} from "@angular/common";
-import {ButtonDirective} from "primeng/button";
 import { ButtonModule } from 'primeng/button';
-import {Password, PasswordDirective} from "primeng/password";
 import {AutoFocus} from 'primeng/autofocus';
 
 
@@ -20,9 +18,7 @@ import {AutoFocus} from 'primeng/autofocus';
     FormsModule,
     Message,
     NgIf,
-    ButtonDirective,
     ButtonModule,
-    Password,
     AutoFocus,
 
   ],
