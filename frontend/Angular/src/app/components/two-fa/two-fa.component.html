@@ -24,13 +24,13 @@
   <p>Bitte gib den Bestätigungscode ein, den wir dir gesendet haben:</p>
 
   <form class="code-input" required>
-  <input [(ngModel)]="a" (input)="updateFacode()" name="a" type="text" maxlength="1">
-  <input [(ngModel)]="b" (input)="updateFacode()" name="b" type="text" maxlength="1">
-  <input [(ngModel)]="c" (input)="updateFacode()" name="c" type="text" maxlength="1">
-  <input [(ngModel)]="d" (input)="updateFacode()" name="d" type="text" maxlength="1">
-  <input [(ngModel)]="e" (input)="updateFacode()" name="e" type="text" maxlength="1">
-  <input [(ngModel)]="f" (input)="updateFacode()" name="f" type="text" maxlength="1">
-</form>
+    <input [(ngModel)]="a" (input)="updateFacode(); moveFocus($event, bInput)" name="a" type="text" maxlength="1">
+    <input #bInput [(ngModel)]="b" (input)="updateFacode(); moveFocus($event, cInput)" name="b" type="text" maxlength="1">
+    <input #cInput [(ngModel)]="c" (input)="updateFacode(); moveFocus($event, dInput)" name="c" type="text" maxlength="1">
+    <input #dInput [(ngModel)]="d" (input)="updateFacode(); moveFocus($event, eInput)" name="d" type="text" maxlength="1">
+    <input #eInput [(ngModel)]="e" (input)="updateFacode(); moveFocus($event, fInput)" name="e" type="text" maxlength="1">
+    <input #fInput [(ngModel)]="f" (input)="updateFacode()" name="f" type="text" maxlength="1">
+  </form>
   <br><br>
   <button
     (click)="verify()"
