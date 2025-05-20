@@ -18,7 +18,7 @@
     <p-badge
       [value]="'' + (customerIndex + 1)"
     ></p-badge>
-    <a [routerLink]="['/search-profile/', customer?.userName]"
+    <a (click)="otherProfileClicked(customer?.userName)"
        rel="noopener noreferrer">
      <h2>{{customer?.userName}}</h2>
     </a>

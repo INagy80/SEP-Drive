@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {AuthenticationRequest} from "../../models/authentication-request";
 import {AuthenticationService} from "../../services/authentication/authentication.service";
 import {FormsModule} from "@angular/forms";
@@ -20,6 +20,7 @@ import {AutoFocus} from 'primeng/autofocus';
     NgIf,
     ButtonModule,
     AutoFocus,
+    RouterLink,
 
   ],
   styleUrls: ['./login.component.scss']
@@ -41,9 +42,7 @@ export class LoginComponent {
       private router: Router
   ) {}
 
-  register() {
-    this.router.navigate(['register']);
-  }
+
 
 
   Login() {
@@ -67,6 +66,13 @@ export class LoginComponent {
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
+  }
+
+
+  register() {
+    this.router.navigateByUrl('/register');
+
+
   }
 
 

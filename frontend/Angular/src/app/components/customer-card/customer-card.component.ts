@@ -5,7 +5,8 @@ import {Card} from 'primeng/card';
 import {PrimeTemplate} from 'primeng/api';
 import {ProfileService} from '../../services/profile/profile.service';
 import {ProfileDTO} from '../../models/profileDTO';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
+import {stat} from 'node:fs';
 
 @Component({
   selector: 'app-customer-card',
@@ -29,6 +30,8 @@ export class CustomerCardComponent {
   customerIndex = 0;
 
 
+  constructor(private router: Router) {
+  }
 
   @Output()
   delete: EventEmitter<ProfileDTO> = new EventEmitter<ProfileDTO>();
@@ -47,5 +50,11 @@ export class CustomerCardComponent {
     if (this.customer) {
       this.update.emit(this.customer);
     }
+  }
+
+  otherProfileClicked(userName: string | undefined) {
+    localStorage.setItem('otherProfile', userName || '');
+    this.router.navigate(['search-profile/others']);
+
   }
 }

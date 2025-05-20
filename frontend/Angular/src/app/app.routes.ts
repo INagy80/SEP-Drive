@@ -14,11 +14,14 @@ import {OthersProfileComponent} from './components/others-profile/others-profile
 
 export const routes: Routes = [
   {path: '',           redirectTo: 'welcom', pathMatch: 'full'},
+  {path: 'register/?userName=&password=', redirectTo: 'register', pathMatch: 'full'},
+  {path: 'register',  component: RegisterComponent , },
+
+
   {path: 'login',     component: LoginComponent, },
 
   {path: 'welcome',   component: WelcomeComponent, },
 
-  {path: 'register',  component: RegisterComponent , },
 
   {path: 'Password-reset', component: ForgotPasswordComponent ,  },
 
@@ -33,11 +36,8 @@ export const routes: Routes = [
 
   {path: 'search-profile',    component: SearchProfileComponent , canActivate: [AccessGuardService]},
 
-  {path: 'search-profile/:userName',
-    component: OthersProfileComponent ,
-    canActivate: [AccessGuardService],
-  children: [
-    { path: '',    component: OthersProfileComponent }]},
+  {path: 'search-profile/others',    component: OthersProfileComponent , canActivate: [AccessGuardService]},
+
 
 
 

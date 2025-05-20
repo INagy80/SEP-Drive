@@ -373,7 +373,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         curr.addTo(this.map).bindPopup('Aktuelle Position');
         this.routeMarkers.push(curr);
       },
-      err => alert('Fehler beim Abrufen der Position: ' + err.message)
+      err =>{
+       alert('Fehler beim Abrufen der Position: ' + err.message)
+       window.location.reload();
+      }
     );
   }
 
@@ -392,7 +395,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         }).catch(err => console.error('Reverse geocode failed', err));
         this.routeMarkers.push(curr);
       },
-      err => alert('Fehler beim Abrufen der Position: ' + err.message)
+      err => {
+        alert('Fehler beim Abrufen der Position: ' + err.message)
+        window.location.reload();
+      }
     );
 
   }
@@ -512,6 +518,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.drawRoute(coords, labels);
     }).catch(error => {
       alert('Fehler bei der Geokodierung: ' + error.message);
+      window.location.reload();
     });
 
 

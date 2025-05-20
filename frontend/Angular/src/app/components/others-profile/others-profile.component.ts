@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
 import {DatePipe, NgIf} from '@angular/common';
 import {Router, RouterLink, ActivatedRoute} from '@angular/router';
@@ -17,7 +17,7 @@ import {ProfileDTO} from '../../models/profileDTO';
   templateUrl: './others-profile.component.html',
   styleUrl: './others-profile.component.scss'
 })
-export class OthersProfileComponent {
+export class OthersProfileComponent implements OnInit {
 
   profileDTO : ProfileDTO = {
     firstName: '',
@@ -47,11 +47,9 @@ export class OthersProfileComponent {
   { }
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.userName = params['userName'];
-      this.loadUserProfile();
-      this.loadmyPhoto();
-    });
+    this.userName = localStorage.getItem('otherProfile') ?? '';
+    this.loadUserProfile();
+    this.loadmyPhoto();
   }
 
 
