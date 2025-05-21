@@ -36,7 +36,6 @@ public class adress {
     //constructor
     public adress(  String houseNumber, String city, String state, String zip, String country) {
         this.houseNumberAndStreet = houseNumber;
-
         this.city = city;
         this.state = state;
         this.zip = zip;

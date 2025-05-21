@@ -54,7 +54,7 @@ public class rideRequestService {
 
     public rideRequest create(rideRequestDTO rideRequestdto) {
 
-        user customer = httpInterpreter.Interpreter();
+        user customer =  userDAO.findUserById(httpInterpreter.Interpreter().getId());
         if(customer == null) {
             throw new resourceNotFoundException("User not found");
         }
@@ -80,7 +80,8 @@ public class rideRequestService {
         startadress.setCity(parts[parts.length - 4]);
 
         String[] parts2 = rideRequestdto.destinationaddress().split("\\s*,\\s*");
-        destadress.setHouseNumberAndStreet(parts[0]+", "+parts[1]);
+        //the address failiar was in here instaed of calling the parts2[0] and parts2[1]. I have called parts[0] and parts[1]
+        destadress.setHouseNumberAndStreet(parts2[0]+", "+parts2[1]);
         destadress.setCountry(parts2[parts2.length - 1]);
         destadress.setZip(parts2[parts2.length - 2]);
         destadress.setState(parts2[parts2.length - 3]);
