@@ -94,6 +94,7 @@ public class rideRequestService {
         adressDAO.save(destadress);
 
         rideRequest rideRequest = new rideRequest(customer , rideRequestdto.carClass(), startadress, destadress);
+        rideRequest.calculateDistance(startadress,destadress);
         //rideRequest.setGpxRoute(generateCarRouteGpx(startadress.getLat(),startadress.getLng(),destadress.getLat(),startadress.getLng()).toString().getBytes(StandardCharsets.UTF_8));
 
 

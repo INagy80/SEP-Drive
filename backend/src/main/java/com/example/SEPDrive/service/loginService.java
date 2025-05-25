@@ -42,6 +42,7 @@ public class loginService {
 
 
     public boolean login(String userName, String password ){
+
         Authentication authentication = authManager.
                 authenticate(new UsernamePasswordAuthenticationToken(userName, password));
 

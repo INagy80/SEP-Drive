@@ -194,7 +194,7 @@
 
       <div class="control-group">
         <label for="zwischenstopps">Zwischenstopps:</label>
-        <textarea id="zwischenstopps" [(ngModel)]="zwischenstoppsText" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile)"></textarea>
+        <textarea id="zwischenstopps" [(ngModel)]="zwischenstoppsText" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile und mit Komma getrennt)"></textarea>
       </div>
 
 
@@ -213,10 +213,12 @@
     </div>
 
     <div class="fare-info">
-      <p>Geschätzter Fahrpreis</p>
+      <p ><strong>Geschätzter Distanz:</strong>  {{routeDistanceKm.toFixed(2)}} km </p>
+      <p ><strong>Geschätzte Fahrzeit:</strong>  {{routeDurationMin.toFixed(2)}} min</p>
+      <p ><strong>Geschätzter Fahrpreis:</strong>  {{routePriceInEuro.toFixed(2)}} € </p>
     </div>
     <!-- Button zum Routen anzeigen -->
-    <button  (click)="updateRoute(); updateconfirm()">Route anzeigen</button>
+    <button  (click)="updateRoute()">Route anzeigen</button>
 
 
     <button (click)="createRideRequest()" class="confirm-btn" >Anfrage bestätigen</button>

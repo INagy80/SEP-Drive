@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Min;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import io.jenetics.jpx.Length;
+import io.jenetics.jpx.WayPoint;
 
 
 @Entity
@@ -66,6 +68,10 @@ public class rideRequest {
 
 
 
+    private double distance;
+
+
+
 
 
 
@@ -101,9 +107,29 @@ public class rideRequest {
         this.drivererRating = 0.0;
     }
 
+    public double calculateDistance(adress startAddress, adress destAddress) {
+        double startlat = startAddress.getLat().doubleValue();
+        double startlong = startAddress.getLng().doubleValue();
+        double destlat = destAddress.getLat().doubleValue();
+        double destlong = destAddress.getLng().doubleValue();
+
+        WayPoint start = WayPoint.of(startlat, startlong );
+        WayPoint dest = WayPoint.of(destlat, destlong );
+
+        this.distance = start.distance(dest).to(Length.Unit.KILOMETER);
+
+        return this.distance;
+
+    }
 
 
+    public double getDistance() {
+        return distance;
+    }
 
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
 
     public carClass getCarClass() {
         return carClass;
