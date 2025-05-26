@@ -8,4 +8,11 @@ export interface rideResponse {
   customerRating: number;
   driverRating: number;
   status: 'Active' | 'Rejected' | 'Completed' | 'Cancelled' | 'Pending';
+  id: number;
+  driverFullName: string;
+  customerFullName: string;
+  customerUserName: string;
+  distance: number;
+  duration: number;
+  price: number;
 }

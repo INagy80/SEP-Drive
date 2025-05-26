@@ -16,7 +16,7 @@
     <div class="ride-requests">
 
       <!-- Active Section -->
-        <h1 class="mb-8 ml-0">Aktive Fahrtanfrage</h1>
+        <h1 class="mb-8 ml-0">Aktive Fahrtanfrage:</h1>
       <mat-divider [vertical]="true" class="custom-mat-divider"></mat-divider>
       <div class=" boarder">
 
@@ -28,11 +28,17 @@
             <button class="delete-button" (click)="statusdelete()">Löschen</button>
 
             <div class="ride-card__header">
-              <h3 class="ride-card__driver">{{ activeRequest.driverUserName }}</h3>
+
+              <p style="font-size: 1.3rem"  class="mt-4"><strong class="ml-1">Ride Request Id:  &nbsp; &nbsp;  &nbsp; {{activeRequest.id}} </strong>    </p>
+              <p style="font-size: 1.2rem"  class="mt-4"><strong class="ml-1">Driver:      </strong>  &nbsp; &nbsp;{{activeRequest.driverFullName !== ' ' ? '  '+activeRequest.driverFullName+' ' : ' ' }}  {{ activeRequest.driverUserName !== ' ' ? '   ('+activeRequest.driverUserName+') ': ' there is no driver'}}   </p>
+              <p style="font-size: 1.2rem" ><strong class="ml-1">Customer:      </strong>   &nbsp; &nbsp; {{'   '+activeRequest.customerFullName}}  {{'   ('+activeRequest.customerUserName + ') '}}</p>
+
+
+
             </div>
 
             <div class="ride-info">
-              <p style="font-size: 1.5rem" ><strong class="ml-1">Fahrzeugklasse:      </strong> {{ activeRequest.carClass }}</p>
+              <p style="font-size: 1.5rem" ><strong class="ml-1">Fahrzeugklasse: </strong> &nbsp; &nbsp; {{ activeRequest.carClass }} </p>
 
               <div class="address-line">
                 <p><strong>Von:</strong></p>
@@ -50,27 +56,37 @@
             </div>
             <br><br>
             <div class="ride-card__timestamps">
-              <span class="pr-3" style="font-size: 1rem" >Erstellt: {{ activeRequest.createdAt | date:'short' }}</span>
+              <span class="pr-3" style="font-size: 1rem" >Erstellt: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{ activeRequest.createdAt | date:'short' }}</span>
               <br><br>
-              <span class="pr-3 " style="font-size: 1rem">Aktualisiert: {{ activeRequest.updatedAt | date:'short' }}</span>
+              <span class="pr-3 " style="font-size: 1rem">Aktualisiert:  &nbsp; &nbsp;{{ activeRequest.updatedAt | date:'short' }}</span>
+              <br><br>
+              <span class="pr-3" style="font-size: 1rem" >Distance: &nbsp; &nbsp;  &nbsp; &nbsp;{{ '  '+activeRequest.distance + '  km' }}</span>
+              <br><br>
+              <span class="pr-3 " style="font-size: 1rem">Duration:  &nbsp; &nbsp; &nbsp;  &nbsp;{{ '  '+activeRequest.duration + '  min' }}</span>
+              <br><br>
+              <span class="pr-3 " style="font-size: 1rem">Price: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {{ '  '+activeRequest.price + '  €' }}</span>
+
+
             </div>
 
 
             <br><br>
 
             <div class="ride-card__ratings">
-              <div class="rating">
+              <div class="rating flex flex-row">
                 <span class="rating__label mr-3">Kunde:</span>
-                <ng-container *ngFor="let star of [1,2,3,4,5]">
-                  <span class="star ml-1" [class.filled]="star <= activeRequest.customerRating">★</span>
-                </ng-container>
+                  <div class="star">
+                    <p-rating class="p-1" [(ngModel)]="activeRequest.customerRating" [readonly]="true" />
+                  </div>
+                <span class="rating__label mr-3">({{activeRequest.customerRating}})</span>
               </div>
-              <div class="rating">
+              <div class="rating flex flex-row">
                 <span class="rating__label mr-3">Fahrer:</span>
-                <ng-container *ngFor="let star of [1,2,3,4,5]">
-                  <span class="star ml-1" [class.filled]="star <= activeRequest.driverRating">★</span>
+                <div class="star">
+                  <p-rating class="p-1" [(ngModel)]="activeRequest.driverRating" [readonly]="true" />
+                </div>
+                <span class="rating__label mr-3">({{activeRequest.driverRating}})</span>
 
-                </ng-container>
               </div>
             </div>
             <br><br>
@@ -88,7 +104,71 @@
 
       <!-- History Section -->
       <section class="section section--history" *ngIf="historyRequests.length">
-        <h2 class="section__title mb-8">Verlauf</h2>
+        <h2 class="section__title mb-8">Verlauf:</h2>
+
+        <div class="order flex flex-row ">
+        <div class="coords-row ascending">
+          <span>Ascending  </span>
+          <select [(ngModel)]="ascendingitem" name="ascendingitem" (ngModelChange)="onAscendingitemChange($event)">
+            <option selected disabled>Ascending</option>
+            <option value="no"  ></option>
+            <option value="Id"  >Id</option>
+            <option value="Status" >Status</option>
+            <option value="DFN" >DriverFullName</option>
+            <option value="DUN" >DriverUserName</option>
+            <option value="CFN" >customerFullName</option>
+            <option value="CUN" >customerUserName</option>
+            <option value="CC" >car class</option>
+            <option value="SA" >start Address</option>
+            <option value="DA" >Destnation Address</option>
+            <option value="CD" >Creating Date</option>
+            <option value="UD" >updating Date</option>
+            <option value="km" >Distance</option>
+            <option value="min" >Duration</option>
+            <option value="€" >Price</option>
+            <option value="DR" >Driver rate</option>
+            <option value="CR" >customer rate</option>
+
+
+          </select>
+        </div>
+
+        <div class="coords-row descending">
+          <span class="descending-text">Descending </span>
+
+          <select [(ngModel)]="descendingitem" name="descendingitem" (ngModelChange)="ondescendingitemChange($event)">
+            <option selected disabled>Descending</option>
+            <option value="no"  ></option>
+            <option value="Id"  >Id</option>
+            <option value="Status" >Status</option>
+            <option value="DFN" >DriverFullName</option>
+            <option value="DUN" >DriverUserName</option>
+            <option value="CFN" >customerFullName</option>
+            <option value="CUN" >customerUserName</option>
+            <option value="CC" >car class</option>
+            <option value="SA" >start Address</option>
+            <option value="DA" >Destnation Address</option>
+            <option value="CD" >Creating Date</option>
+            <option value="UD" >updating Date</option>
+            <option value="km" >Distance</option>
+            <option value="min" >Duration</option>
+            <option value="€" >Price</option>
+            <option value="DR" >Driver rate</option>
+            <option value="CR" >customer rate</option>
+
+
+          </select>
+        </div>
+
+          <div class="coords-row search flex flex-row">
+            <input type="text" id="search" [(ngModel)]="search" placeholder="search by name " />
+          </div>
+
+        </div>
+
+        <mat-divider [vertical]="true" class="custom-mat-divider"></mat-divider>
+        <div class="divider"></div>
+
         <div class="history-list">
           <div *ngFor="let req of historyRequests" class="ride-card ride-card--history">
           <button
@@ -104,11 +184,13 @@
           </button>
 
             <div class="ride-card__header">
-              <h3 class="ride-card__driver">{{ req.driverUserName }}</h3>
+              <p style="font-size: 1.3rem"  class="mt-4"><strong class="ml-1">Ride Request Id:  &nbsp; &nbsp;  &nbsp; {{req.id}} </strong>    </p>
+              <p style="font-size: 1.2rem"  class="mt-4"><strong class="ml-1">Driver:      </strong>  &nbsp; &nbsp;{{req.driverFullName !== ' ' ? '  '+req.driverFullName+' ' : ' ' }}  {{ req.driverUserName !== ' ' ? '   ('+req.driverUserName+') ': ' there is no driver'}}   </p>
+              <p style="font-size: 1.2rem" ><strong class="ml-1">Customer:      </strong>   &nbsp; &nbsp; {{'   '+req.customerFullName}}  {{'   ('+req.customerUserName + ') '}}</p>
             </div>
 
             <div class="ride-card__body mb-4">
-              <p style="font-size: 1.5rem" ><strong class="ml-1 ">Fahrzeugklasse:</strong> {{ req.carClass }}</p>
+              <p style="font-size: 1.5rem" ><strong class="ml-1 ">Fahrzeugklasse: </strong>  &nbsp; &nbsp;  {{ req.carClass }}</p>
               <div class="address-line mb-2">
                 <p><strong>Von:</strong></p>
                 <div class="address-box">
@@ -125,25 +207,34 @@
             </div>
 
             <div class="ride-card__timestamps">
-              <span class="pr-3" style="font-size: 1rem">Erstellt: {{ req.createdAt | date:'short' }}</span>
+              <span class="pr-3" style="font-size: 1rem" >Erstellt: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{ req.createdAt | date:'short' }}</span>
               <br><br>
-              <span class="pr-3" style="font-size: 1rem" >Aktualisiert: {{ req.updatedAt | date:'short' }}</span>
+              <span class="pr-3 " style="font-size: 1rem">Aktualisiert:  &nbsp; &nbsp;{{ req.updatedAt | date:'short' }}</span>
+              <br><br>
+              <span class="pr-3" style="font-size: 1rem" >Distance: &nbsp; &nbsp;  &nbsp; &nbsp;{{ '  '+req.distance + '  km' }}</span>
+              <br><br>
+              <span class="pr-3 " style="font-size: 1rem">Duration:  &nbsp; &nbsp; &nbsp;  &nbsp;{{ '  '+req.duration + '  min' }}</span>
+              <br><br>
+              <span class="pr-3 " style="font-size: 1rem">Price: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {{ '  '+req.price + '  €' }}</span>
+
+
             </div>
 
             <br><br>
             <div class="ride-card__ratings">
-              <div class="rating">
+              <div class="rating flex flex-row">
                 <span class="rating__label mr-3">Kunde:</span>
-                <ng-container *ngFor="let star of [1,2,3,4,5]">
-                  <span class="star ml-1" [class.filled]="star <= req.customerRating">★</span>
-                </ng-container>
+                <div class="star">
+                  <p-rating class="p-1" [(ngModel)]="req.customerRating" [readonly]="true" />
+                </div>
+                <span class="rating__label mr-3">({{req.customerRating}})</span>
               </div>
-              <div class="rating mb-4">
+              <div class="rating mb-4 flex flex-row">
                 <span class="rating__label mr-3">Fahrer:</span>
-                <ng-container *ngFor="let star of [1,2,3,4,5]">
-                  <span class="star ml-1" [class.filled]="star <= req.driverRating">★</span>
-
-                </ng-container>
+                <div class="star">
+                  <p-rating class="p-1" [(ngModel)]="req.driverRating" [readonly]="true" />
+                </div>
+                <span class="rating__label mr-3">({{req.driverRating}})</span>
               </div>
             </div>
             <div class="divider"></div>
@@ -194,7 +285,7 @@
 
       <div class="control-group">
         <label for="zwischenstopps">Zwischenstopps:</label>
-        <textarea id="zwischenstopps" [(ngModel)]="zwischenstoppsText" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile)"></textarea>
+        <textarea id="zwischenstopps" [(ngModel)]="zwischenstoppsText" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile und mit Komma getrennt)"></textarea>
       </div>
 
 
@@ -213,10 +304,12 @@
     </div>
 
     <div class="fare-info">
-      <p>Geschätzter Fahrpreis</p>
+      <p ><strong>Geschätzter Distanz:</strong>  {{routeDistanceKm.toFixed(2)}} km </p>
+      <p ><strong>Geschätzte Fahrzeit:</strong>  {{routeDurationMin.toFixed(2)}} min</p>
+      <p ><strong>Geschätzter Fahrpreis:</strong>  {{routePriceInEuro.toFixed(2)}} € </p>
     </div>
     <!-- Button zum Routen anzeigen -->
-    <button  (click)="updateRoute(); updateconfirm()">Route anzeigen</button>
+    <button  (click)="updateRoute()">Route anzeigen</button>
 
 
     <button (click)="createRideRequest()" class="confirm-btn" >Anfrage bestätigen</button>

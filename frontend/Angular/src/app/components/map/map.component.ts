@@ -14,6 +14,7 @@ import {Button} from 'primeng/button';
 import {Router} from "@angular/router";
 import {Drawer} from 'primeng/drawer';
 import {MatDivider} from '@angular/material/divider';
+import {Rating} from 'primeng/rating';
 
 
 @Component({
@@ -21,17 +22,26 @@ import {MatDivider} from '@angular/material/divider';
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
-  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider]
+  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider, Rating]
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private L!: typeof Leaflet;
   private map!: Leaflet.Map;
 
-  private pickupMarker?: Leaflet.Marker;
-  private destMarker?: Leaflet.CircleMarker;
+  private pickupMarker?: any;
+  private pickupCircle?: any;
+  private destMarker?: any;
+  private destCircle?: any;
   private routeControl?: any;
   private routingControl: Leaflet.Routing.Control | null = null;
   private routeMarkers: Leaflet.Layer[] = [];
+
+
+
+
+
+
+
 
 
   startAddress =  '';
@@ -43,10 +53,18 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private errorMsg: string = '';
   private message: string = '';
   gpxfile: File | null = null;
+  routeDistanceKm : number = 0;
+  routeDurationMin : number = 0;
+  routePriceInEuro: number = 0;
+
 
 
   rideRequests: Array<rideRequestDTO> = [];
   rideResponses : Array<rideResponse> = [];
+
+  ascendingitem: any;
+  descendingitem: any;
+  search: any;
 
 
   constructor(
@@ -59,7 +77,20 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   onCarClassChange(newClass: string) {
     this.selectedCarClass = newClass;
+    switch (newClass) {
+      case 'klein':
+        this.routePriceInEuro = this.routeDistanceKm * 1.0;
+        break;
+      case 'Medium':
+        this.routePriceInEuro = this.routeDistanceKm * 2.0;
+        break;
+      case 'Deluxe':
+        this.routePriceInEuro = this.routeDistanceKm * 10.0;
+    }
+
   }
+
+
 
 
   isvisible(){
@@ -152,37 +183,55 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private onMapClick(e: Leaflet.LeafletMouseEvent): void {
     if (!this.pickupMarker) {
       // First click: set pickup
-      this.pickupMarker = this.L.marker(e.latlng, { draggable: true })
+       const pickupicon = this.L.icon({
+        iconUrl: 'assets/leaflet/marker-icon-2x.png',  // Use your own path here
+        iconSize: [25, 41],                      // Default Leaflet size
+        iconAnchor: [12, 41],                    // Point of the icon which will correspond to marker's location
+        popupAnchor: [0, -41]                    // Point from which the popup should open
+      });
+
+      this.pickupMarker = this.L.marker(e.latlng, {
+        draggable: false,
+        icon: pickupicon,
+      })
         .addTo(this.map)
         .bindPopup('Pickup')
         .openPopup();
 
-      this.pickupMarker.on('dragend', () => {
-        const latlng = this.pickupMarker!.getLatLng();
-        this.reverseGeocode(latlng)
-          .then(address => {
-            this.startAddress = address;   // or this.zielAddress, etc.
-            // marker.bindPopup(address).openPopup();
-          })
-          .catch(err => console.error('Reverse geocode failed', err));
-      });
+      this.pickupCircle= this.L.circleMarker(e.latlng, {
+        radius: 15,
+        color: 'blue',
+        fillColor: 'lightblue',
+        fillOpacity: 0.4,
+        weight: 2
+      }).addTo(this.map);
+
+
         this.calculateRoute();
     } else {
       // Set or reset destination
-      if (this.destMarker) this.destMarker.remove();
-      this.destMarker = this.L.circleMarker(e.latlng, { radius: 10, color: 'red', fillColor: 'red', fillOpacity: 1 })
+      if (this.destMarker) {
+        return;
+      }
+
+       const zielicon = this.L.icon({
+        iconUrl: 'assets/leaflet/marker-icon-red.png',  // Use your own path here
+        iconSize: [25, 41],                      // Default Leaflet size
+        iconAnchor: [12, 41],                    // Point of the icon which will correspond to marker's location
+        popupAnchor: [0, -41]                    // Point from which the popup should open
+      });
+
+      this.destMarker = this.L.marker(e.latlng, {
+        icon: zielicon,
+        draggable: false,
+      })
         .addTo(this.map)
         .bindPopup('Ziel')
         .openPopup();
 
-      this.destMarker.on('dragend', () => {
-        const latlng = this.destMarker!.getLatLng();
-        this.reverseGeocode(latlng).then(address => {
-          this.zielAddress = address;
-        }).catch(err => console.error('Reverse geocode failed', err));
+      this.destCircle = this.L.circleMarker(e.latlng, { radius: 15, color: 'red', fillColor: 'lightred', fillOpacity: 0.4, weight: 2 })
+        .addTo(this.map)
 
-        this.calculateRoute();
-      });
       this.calculateRoute();
     }
   }
@@ -197,20 +246,41 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       router: Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
       lineOptions: { styles: [{ weight: 4 }] },
       show: true,
-      addWaypoints: true
+      addWaypoints: true,
+      showAlternatives: true,
+      createMarker: () => null,
+      altLineOptions: {
+        styles: [{ color: 'lightblue', opacity: 0.5, weight: 4 }]
+      },
+
     }).addTo(this.map);
 
     this.routeControl.on('routesfound', (e: any) => {
       const route = e.routes[0];
-      const coords = route.coordinates.map((c: any) => [c.lng, c.lat]);
 
-      const geojson = { type: 'Feature', geometry: { type: 'LineString', coordinates: coords }, properties: { name: 'Car route' } };
+      const distanceInKm = (route.summary.totalDistance || route.summary.distance) / 1000; // meters → km
+      const durationInMin = (route.summary.totalTime || route.summary.duration) / 60; // seconds → minutes
+      console.log(`Route distance: ${distanceInKm.toFixed(2)} km`);
+      console.log(`Estimated duration: ${durationInMin.toFixed(2)} minutes`);
+
+      this.routeDistanceKm = distanceInKm;
+      this.routeDurationMin = durationInMin;
+
+      // 🟢 2. Generate GPX file
+      const coords = route.coordinates.map((c: any) => [c.lng, c.lat]);
+      const geojson = {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: coords
+        },
+        properties: { name: 'Car route' }
+      };
+
       const gpx = togpx(geojson);
       const blob = new Blob([gpx], { type: 'application/gpx+xml' });
       const gpxFile = new File([blob], 'route.gpx', { type: 'application/gpx+xml' });
       this.gpxfile = gpxFile;
-
-      // this.downloadGpx(gpx);
     });
   }
 
@@ -219,28 +289,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
    createRideRequest(): void {
 
-    this.updateRoute()
-
-     this.geocodeAddress(this.startAddress).then(coord => {
-       if (this.pickupMarker) {
-         this.map.removeLayer(this.pickupMarker);
-       }
-       this.pickupMarker = this.L.marker(coord, { draggable: true }).addTo(this.map).bindPopup('Pickup');
-
-     })
-     this.geocodeAddress(this.zielAddress).then(coord => {
-       if (this.destMarker) {
-         this.map.removeLayer(this.destMarker);
-       }
-       this.destMarker = this.L.circleMarker(coord, { radius: 10, color: 'red', fillColor: 'red', fillOpacity: 1 })
-         .addTo(this.map)
-         .bindPopup('Ziel');
-     })
-
-     if (!this.pickupMarker || !this.destMarker) {
-       alert('Bitte setzen Sie Start- und Zielmarker, bevor Sie eine Fahrt anfordern.');
-       return;
-     }
+    this.updateRoute().then(() => {
 
      const startLatLng: LatLng = {
        lat: this.pickupMarker.getLatLng().lat,
@@ -251,12 +300,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
        lng: this.destMarker.getLatLng().lng
      };
 
-
-
-
-
-     // 3) Build the DTO
+     //  Build the DTO
      const requestDto: rideRequestDTO = {
+       distance: parseFloat(this.routeDistanceKm.toFixed(2)),
+       duration: parseFloat(this.routeDurationMin.toFixed(2)),
+       price: parseFloat(this.routePriceInEuro.toFixed(2)),
        start: startLatLng,
        startaddress: this.startAddress,
        destination: destLatLng,
@@ -267,7 +315,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
-       // 4) Call the service
+       // Call the service
      if (this.selectedCarClass === '') {
        this.errorMsg = 'Bitte wählen Sie eine Auto Klasse aus.';
        alert(this.errorMsg);
@@ -300,15 +348,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
              }
            });
 
+    }).catch(err => {
+      console.error('Failed to update route:', err);
+      alert('Fehler beim Aktualisieren der Route. Bitte erst auf "Route anzeigen" klicken und dann erneut versuchen.');
+    })
+
      }
-
-
-
-
-
-
-
-
 
 
 
@@ -318,48 +363,69 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.routeMarkers = [];
   }
 
-  private downloadGpx(gpx: string): void {
-    const blob = new Blob([gpx], { type: 'application/gpx+xml' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'route.gpx';
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }
 
   private drawRoute(coordinates: Leaflet.LatLng[], labels: string[]): void {
-    if (this.routingControl) this.map.removeControl(this.routingControl);
+    // 1) Remove any existing routing control
+    if (this.routingControl) {
+      this.map.removeControl(this.routingControl);
+      this.routingControl = undefined!;
+    }
+
+    // 2) Clear only the *route* markers (your Zwischenstopp pins),
+    //    not the pickup/dest markers or circles
     this.clearRouteMarkers();
 
-    // Draw only intermediate and current position markers
-    coordinates.forEach((point, i) => {
+    // 3) Add custom markers for *only* the Zwischenstopps
+    coordinates.forEach((pt, i) => {
       const label = labels[i];
-      let markerLayer: Leaflet.Layer | null = null;
       if (label.startsWith('Zwischenstopp')) {
-        markerLayer = this.L.circleMarker(point, { radius: 10, color: 'green', fillColor: 'green', fillOpacity: 1 });
-      } else if (label === 'Aktuelle Position') {
-        markerLayer = this.L.circleMarker(point, { radius: 10, color: 'blue', fillColor: 'blue', fillOpacity: 0.5 });
-      }
-      if (markerLayer) {
-        markerLayer.addTo(this.map).bindPopup(label);
-        this.routeMarkers.push(markerLayer);
+        const zwischenicon = this.L.icon({
+          iconUrl:   'assets/leaflet/marker-icon-green.png',
+          iconSize:  [25, 41],
+          iconAnchor:[12, 41],
+          popupAnchor:[0, -41]
+        });
+
+        const m = this.L
+          .marker(pt, { icon: zwischenicon, keyboard: false })
+          .addTo(this.map)
+          .bindPopup(label);
+
+        this.routeMarkers.push(m);
       }
     });
 
-    const Routing = (this.L as any).Routing;
-    const osrmRouter = Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' });
+    // 4) Re-draw the route line without adding any extra markers
+    const Routing   = (this.L as any).Routing;
+    const osrmRouter = Routing.osrmv1({
+      serviceUrl: 'https://router.project-osrm.org/route/v1'
+    });
+
     this.routingControl = Routing.control({
-      waypoints: coordinates,
-      routeWhileDragging: false,
-      addWaypoints: false,
-      draggableWaypoints: false,
-      fitSelectedRoutes: true,
-      lineOptions: { styles: [{ color: 'blue', weight: 5, opacity: 0.7 }] },
-      createMarker: (_i: number, wp: Leaflet.Routing.Waypoint) => this.L.marker(wp.latLng),
+      waypoints:           coordinates,
+      routeWhileDragging:  false,
+      addWaypoints:        false,
+      draggableWaypoints:  false,
+      fitSelectedRoutes:   true,
+      show: true,
+      showAlternatives: true,
+      altLineOptions: {
+        styles: [{ color: 'rgba(51,49,49,0.69)', opacity: 0.8, weight: 5 }]
+      },
+      lineOptions:         { styles: [{ color: 'blue', weight: 5, opacity: 0.7 }] },
+
+      // 🚫 disable all built-in markers:
+      createMarker: () => null,
+
       router: osrmRouter
-    }).addTo(this.map);
+    })
+      .addTo(this.map);
+
+    this.calculateRoute();
+
+
   }
+
 
   useCurrentPosition(): void {
     if (!navigator.geolocation) { alert('Geolocation wird von deinem Browser nicht unterstützt.'); return; }
@@ -371,7 +437,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.clearRouteMarkers();
         const curr = this.L.circleMarker(coord, { radius: 10, color: 'blue', fillColor: 'blue', fillOpacity: 0.5 });
         curr.addTo(this.map).bindPopup('Aktuelle Position');
-        this.routeMarkers.push(curr);
+        //this.routeMarkers.push(curr);
       },
       err =>{
        alert('Fehler beim Abrufen der Position: ' + err.message)
@@ -389,11 +455,32 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.clearRouteMarkers();
         const curr = this.L.circleMarker(coord, { radius: 10, color: 'blue', fillColor: 'blue', fillOpacity: 0.5 });
         curr.addTo(this.map).bindPopup('Aktuelle Position');
-        this.pickupMarker = this.L.marker(coord, { draggable: true }).addTo(this.map).bindPopup('Pickup');
+        const pickupicon = this.L.icon({
+          iconUrl: 'assets/leaflet/marker-icon-2x.png',  // Use your own path here
+          iconSize: [25, 41],                      // Default Leaflet size
+          iconAnchor: [12, 41],                    // Point of the icon which will correspond to marker's location
+          popupAnchor: [0, -41]                    // Point from which the popup should open
+        });
+
+        this.pickupMarker = this.L.marker(coord, {
+          draggable: false,
+          icon: pickupicon,
+        })
+          .addTo(this.map)
+          .bindPopup('Pickup')
+          .openPopup();
+
+        this.pickupCircle= this.L.circleMarker(coord, {
+          radius: 15,
+          color: 'blue',
+          fillColor: 'lightblue',
+          fillOpacity: 0.4,
+          weight: 2
+        }).addTo(this.map);
         this.reverseGeocode(coord).then(address => {
           this.startAddress = address;
         }).catch(err => console.error('Reverse geocode failed', err));
-        this.routeMarkers.push(curr);
+        //this.routeMarkers.push(curr);
       },
       err => {
         alert('Fehler beim Abrufen der Position: ' + err.message)
@@ -403,130 +490,145 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   }
 
-  updateRoute(): void {
-
-
+  async updateRoute(): Promise<void> {
+    // 1) clear any old route lines / circles your clearRouteMarkers may not handle
     this.clearRouteMarkers();
 
-
-
-
-
-
-    interface Pending { isMarker: boolean; marker?: Leaflet.LatLng; address?: string; label: string; }
-    const pending: Pending[] = [];
-
-
-
-    // Start point: marker or address
-
-    this.geocodeAddress(this.startAddress).then(coord => {
-      if (this.pickupMarker) {
-        this.map.removeLayer(this.pickupMarker);
-      }
-      this.pickupMarker = this.L.marker(coord, { draggable: true }).addTo(this.map).bindPopup('Pickup');
-
-    })
-    this.geocodeAddress(this.zielAddress).then(coord => {
-      if (this.destMarker) {
-        this.map.removeLayer(this.destMarker);
-      }
-      this.destMarker = this.L.circleMarker(coord, { radius: 10, color: 'red', fillColor: 'red', fillOpacity: 1 })
-        .addTo(this.map)
-        .bindPopup('Ziel');
-    })
-
-
-
-
-    if (this.pickupMarker) {
-      pending.push({ isMarker: true, marker: this.pickupMarker.getLatLng(), label: 'Start' });
-    } else if (this.startAddress) {
-      pending.push({ isMarker: false, address: this.startAddress, label: 'Start' });
+    // 2) validation: need at least one of (pickupMarker ↔ startAddress)
+    //    and one of (destMarker ↔ zielAddress)
+    const hasStart = !!this.pickupMarker || !!this.startAddress;
+    const hasEnd   = !!this.destMarker   || !!this.zielAddress;
+    if (!hasStart || !hasEnd) {
+      alert('Bitte setzen Sie Start- und Zielpunkt (Marker oder Adresse) bevor Sie eine Route anfordern.');
+      return;
     }
 
-    // Zwischenstopps
-    if (this.zwischenstoppsText) {
-      this.zwischenstoppsText.split(',').map(s => s.trim()).filter(s => s).forEach((stop, i) => {
-        pending.push({ isMarker: false, address: stop, label: `Zwischenstopp ${i + 1}` });
+    // small helper to place a non-draggable marker + circle
+    const placeMarker = (
+      coord: Leaflet.LatLng,
+      iconUrl: string,
+      popupText: 'Pickup' | 'Ziel'
+    ) => {
+      const icon = this.L.icon({
+        iconUrl,
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [0, -41]
       });
+
+      // remove old if exists
+      if (popupText === 'Pickup') {
+        this.pickupMarker?.remove();
+        this.pickupCircle?.remove();
+      } else {
+        this.destMarker?.remove();
+        this.destCircle?.remove();
+      }
+
+      // marker
+      const m = this.L.marker(coord, {
+        icon,
+        draggable: false,
+        keyboard: false
+      })
+        .addTo(this.map)
+        .bindPopup(popupText)
+        .openPopup();
+
+      // circle underneath
+      const c = this.L.circleMarker(coord, {
+        radius: 15,
+        color: popupText === 'Pickup' ? 'blue' : 'red',
+        fillColor:  popupText === 'Pickup' ? 'lightblue' : 'lightred',
+        fillOpacity: 0.4,
+        weight: 2
+      }).addTo(this.map);
+
+      // store references
+      if (popupText === 'Pickup') {
+        this.pickupMarker = m;
+        this.pickupCircle = c;
+      } else {
+        this.destMarker = m;
+        this.destCircle = c;
+      }
+    };
+
+    // 3) SYNC START
+    let startCoord: Leaflet.LatLng;
+    if (this.pickupMarker && !this.startAddress) {
+      // user clicked map but left address blank → reverse-geocode marker
+      startCoord = this.pickupMarker.getLatLng();
+      try {
+        this.startAddress = await this.reverseGeocode(startCoord);
+      } catch {
+        this.startAddress = 'unbekannt';
+      }
+    } else {
+      // user typed address → geocode & place marker + circle
+      startCoord = await this.geocodeAddress(this.startAddress!);
+      placeMarker(startCoord, 'assets/leaflet/marker-icon-2x.png', 'Pickup');
+
+      // now reverse-geocode to fill in a full formatted address
+      try {
+        this.startAddress = await this.reverseGeocode(startCoord);
+      } catch {
+        this.startAddress = 'unbekannt';
+      }
     }
 
-    // Destination: marker or address
-    if (this.destMarker) {
-      pending.push({ isMarker: true, marker: this.destMarker.getLatLng(), label: 'Ziel' });
-    } else if (this.zielAddress) {
-      pending.push({ isMarker: false, address: this.zielAddress, label: 'Ziel' });
+    // 4) SYNC DESTINATION
+    let destCoord: Leaflet.LatLng;
+    if (this.destMarker && !this.zielAddress) {
+      destCoord = this.destMarker.getLatLng();
+      try {
+        this.zielAddress = await this.reverseGeocode(destCoord);
+      } catch {
+        this.zielAddress = 'unbekannt';
+      }
+    } else {
+      destCoord = await this.geocodeAddress(this.zielAddress!);
+      placeMarker(destCoord, 'assets/leaflet/marker-icon-red.png', 'Ziel');
+      try {
+        this.zielAddress = await this.reverseGeocode(destCoord);
+      } catch {
+        this.zielAddress = 'unbekannt';
+      }
     }
 
+    // 5) Zwischenstopps
+    interface Way { coord: Leaflet.LatLng; label: string; }
+    const waypoints: Way[] = [
+      { coord: startCoord, label: 'Start' }
+    ];
 
-    const addressPromises = pending.map(item =>
-      item.isMarker ? Promise.resolve(item.marker!) : this.geocodeAddress(item.address!)
+    if (this.zwischenstoppsText) {
+      const stops = this.zwischenstoppsText
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      for (let i = 0; i < stops.length; i++) {
+        try {
+          const c = await this.geocodeAddress(stops[i]);
+          waypoints.push({ coord: c, label: `Zwischenstopp ${i + 1}` });
+        } catch (err) {
+          console.warn(`Zwischenstopp "${stops[i]}" konnte nicht geokodiert werden`, err);
+        }
+      }
+    }
+
+    waypoints.push({ coord: destCoord, label: 'Ziel' });
+
+    this.calculateRoute();
+
+    // 6) Draw the route once
+    this.drawRoute(
+      waypoints.map(w => w.coord),
+      waypoints.map(w => w.label)
     );
-
-    Promise.all(addressPromises).then(latlngs => {
-      // Sync pickupMarker and startAddress
-      const startIdx = pending.findIndex(p => p.label === 'Start');
-      if (startIdx >= 0) {
-        const coord = latlngs[startIdx];
-        if (this.pickupMarker) {
-          this.pickupMarker.setLatLng(coord);
-        } else {
-          this.pickupMarker = this.L.marker(coord, { draggable: true }).addTo(this.map).bindPopup('Pickup');
-          this.pickupMarker.on('dragend', () => {
-            const ll = this.pickupMarker!.getLatLng();
-            this.reverseGeocode(ll).then(address => {
-              this.startAddress = address
-            }).catch(err => this.startAddress = 'unbekannt');
-            this.calculateRoute();
-          });
-        }
-        this.reverseGeocode(coord).then(address => {
-          this.startAddress = address
-        }).catch(err => this.startAddress = 'unbekannt');
-        this.calculateRoute();
-      }
-
-      // Sync destMarker and zielAddress
-      const destIdx = pending.findIndex(p => p.label === 'Ziel');
-      if (destIdx >= 0) {
-        const coord = latlngs[destIdx];
-        if (this.destMarker) {
-          this.destMarker.setLatLng(coord);
-        } else {
-          this.destMarker = this.L.circleMarker(coord, { radius: 10, color: 'red', fillColor: 'red', fillOpacity: 1 })
-            .addTo(this.map)
-            .bindPopup('Ziel');
-          this.destMarker.on('dragend', () => {
-            const ll = this.destMarker!.getLatLng();
-            this.reverseGeocode(ll).then(address => {
-              this.zielAddress = address
-            }).catch(err => this.zielAddress = 'unbekannt');
-            this.calculateRoute();
-          });
-        }
-        this.reverseGeocode(coord).then(address => {
-          this.zielAddress = address
-        }).catch(err => this.zielAddress = 'unbekannt');
-        this.calculateRoute();
-      }
-
-
-      // Draw route with all points
-      const coords = latlngs;
-      const labels = pending.map(p => p.label);
-      this.drawRoute(coords, labels);
-    }).catch(error => {
-      alert('Fehler bei der Geokodierung: ' + error.message);
-      window.location.reload();
-    });
-
-
-
-
-
-
   }
+
 
   private geocodeAddress(address: string): Promise<Leaflet.LatLng> {
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
@@ -552,6 +654,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   protected readonly navigator = navigator;
 
+
+
+
+
   startseite() {
     this.router.navigate(['/home']);
 
@@ -568,7 +674,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   }
 
-    statusdelete() {
+  statusdelete() {
 
 
         this.rideRequestService.deletestatus().subscribe({
@@ -581,19 +687,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             }
         });
 
-    }
-
-  updateconfirm() {
-    setTimeout(() => {
-      console.log('10 seconds have passed!');
-      this.updateRoute();
-    }, 5_000);
   }
 
-  // createRequestconfirm() {
-  //   setTimeout(() => {
-  //     console.log('10 seconds have passed!');
-  //     this.createRideRequest();
-  //   }, 5_000);
-  // }
+
+  onAscendingitemChange($event: any) {
+
+  }
+
+  ondescendingitemChange($event: any) {
+
+  }
 }
