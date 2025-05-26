@@ -12,6 +12,14 @@ public record rideResponseDTO(
         String destinationAddress,
         double  customerRating,
         double driverRating,
-        RequestStatus status
+        RequestStatus status,
+        int id,
+        String driverFullName,
+        String customerFullName,
+        String customerUserName,
+        double distance,
+        double duration,
+        double price
+
 ) {
 }

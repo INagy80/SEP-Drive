@@ -14,6 +14,7 @@ import {Button} from 'primeng/button';
 import {Router} from "@angular/router";
 import {Drawer} from 'primeng/drawer';
 import {MatDivider} from '@angular/material/divider';
+import {Rating} from 'primeng/rating';
 
 
 @Component({
@@ -21,7 +22,7 @@ import {MatDivider} from '@angular/material/divider';
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
-  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider]
+  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider, Rating]
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private L!: typeof Leaflet;
@@ -61,6 +62,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   rideRequests: Array<rideRequestDTO> = [];
   rideResponses : Array<rideResponse> = [];
 
+  ascendingitem: any;
+  descendingitem: any;
+  search: any;
+
 
   constructor(
     private http: HttpClient,
@@ -84,6 +89,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
 
   }
+
+
 
 
   isvisible(){
@@ -243,10 +250,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       showAlternatives: true,
       createMarker: () => null,
       altLineOptions: {
-        styles: [{ color: 'gray', opacity: 0.5, weight: 4 }]
+        styles: [{ color: 'lightblue', opacity: 0.5, weight: 4 }]
       },
 
-    })
+    }).addTo(this.map);
 
     this.routeControl.on('routesfound', (e: any) => {
       const route = e.routes[0];
@@ -295,6 +302,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
      //  Build the DTO
      const requestDto: rideRequestDTO = {
+       distance: parseFloat(this.routeDistanceKm.toFixed(2)),
+       duration: parseFloat(this.routeDurationMin.toFixed(2)),
+       price: parseFloat(this.routePriceInEuro.toFixed(2)),
        start: startLatLng,
        startaddress: this.startAddress,
        destination: destLatLng,
@@ -400,7 +410,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       show: true,
       showAlternatives: true,
       altLineOptions: {
-        styles: [{ color: 'gray', opacity: 0.7, weight: 5 }]
+        styles: [{ color: 'rgba(51,49,49,0.69)', opacity: 0.8, weight: 5 }]
       },
       lineOptions:         { styles: [{ color: 'blue', weight: 5, opacity: 0.7 }] },
 
@@ -411,33 +421,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     })
       .addTo(this.map);
 
-    this.routeControl.on('routesfound', (e: any) => {
-      const route = e.routes[0];
-
-      const distanceInKm = (route.summary.totalDistance || route.summary.distance) / 1000; // meters → km
-      const durationInMin = (route.summary.totalTime || route.summary.duration) / 60; // seconds → minutes
-      console.log(`Route distance: ${distanceInKm.toFixed(2)} km`);
-      console.log(`Estimated duration: ${durationInMin.toFixed(2)} minutes`);
-
-      this.routeDistanceKm = distanceInKm;
-      this.routeDurationMin = durationInMin;
-
-      // 🟢 2. Generate GPX file
-      const coords = route.coordinates.map((c: any) => [c.lng, c.lat]);
-      const geojson = {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: coords
-        },
-        properties: { name: 'Car route' }
-      };
-
-      const gpx = togpx(geojson);
-      const blob = new Blob([gpx], { type: 'application/gpx+xml' });
-      const gpxFile = new File([blob], 'route.gpx', { type: 'application/gpx+xml' });
-      this.gpxfile = gpxFile;
-    });
+    this.calculateRoute();
 
 
   }
@@ -672,6 +656,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
+
+
   startseite() {
     this.router.navigate(['/home']);
 
@@ -704,4 +690,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
+  onAscendingitemChange($event: any) {
+
+  }
+
+  ondescendingitemChange($event: any) {
+
+  }
 }

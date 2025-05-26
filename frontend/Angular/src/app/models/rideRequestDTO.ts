@@ -6,6 +6,9 @@ export interface LatLng {
 
 
 export interface rideRequestDTO {
+  distance: number;
+  duration: number;
+  price: number;
   start: LatLng;
   startaddress: string;
   destination: LatLng;

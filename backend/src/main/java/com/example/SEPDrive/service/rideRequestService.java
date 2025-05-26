@@ -94,7 +94,10 @@ public class rideRequestService {
         adressDAO.save(destadress);
 
         rideRequest rideRequest = new rideRequest(customer , rideRequestdto.carClass(), startadress, destadress);
-        rideRequest.calculateDistance(startadress,destadress);
+        rideRequest.setDistance(rideRequestdto.distance());
+        rideRequest.setDuration(rideRequestdto.duration());
+        rideRequest.setCost(rideRequestdto.price());
+
         //rideRequest.setGpxRoute(generateCarRouteGpx(startadress.getLat(),startadress.getLng(),destadress.getLat(),startadress.getLng()).toString().getBytes(StandardCharsets.UTF_8));
 
 
@@ -107,7 +110,11 @@ public class rideRequestService {
         List<rideRequest> rideRequestList = rideRequestDAO.findByCustomerId(httpInterpreter.Interpreter().getId());
         List<rideRequestDTO> rideRequestDTOList = new ArrayList<>();
         for(rideRequest rideRequest : rideRequestList){
-            rideRequestDTO ride = new rideRequestDTO( new LatLng( rideRequest.getStartAddress().getLat(),
+            rideRequestDTO ride = new rideRequestDTO(
+                    rideRequest.getDistance(),
+                    rideRequest.getDuration(),
+                    rideRequest.getCost(),
+                    new LatLng( rideRequest.getStartAddress().getLat(),
                     rideRequest.getStartAddress().getLng()),
                     rideRequest.getStartAddress().getHouseNumberAndStreet() + " " +
                             rideRequest.getStartAddress().getCity() +  " " +
@@ -132,16 +139,18 @@ public class rideRequestService {
         List<rideRequest> rideRequestList = rideRequestDAO.findByCustomerId(httpInterpreter.Interpreter().getId());
         List<rideResponseDTO> rideResponseDTOS = new ArrayList<>();
         for(rideRequest request : rideRequestList){
-            String name = " ";
-            if(request.getDriver() == null){
-                name = "No driver assigned";
-            }
-            else{
-                name = request.getDriver().getUserName();
+            String driverUserName = " ";
+            String driverfullname = " ";
+            if(request.getDriver() != null){
+
+                driverUserName = request.getDriver().getUserName();
+                driverfullname = request.getDriver().getFirstName()+" "+request.getDriver().getLastName();
             }
 
+
+
             rideResponseDTO response = new rideResponseDTO(
-                    name,
+                    driverUserName,
                     request.getCarClass(),
                     request.getCreatedAt(),
                     request.getUpdatedAt(),
@@ -157,7 +166,14 @@ public class rideRequestService {
                             request.getDestAddress().getCountry(),
                     request.getCustomerRating(),
                     request.getDrivererRating(),
-                    request.getStatus()
+                    request.getStatus(),
+                    request.getId(),
+                    driverfullname,
+                    request.getCustomer().getFirstName()+" "+request.getCustomer().getLastName(),
+                    request.getCustomer().getUserName(),
+                    request.getDistance(),
+                    request.getDuration(),
+                    request.getCost()
             );
 
             rideResponseDTOS.add(response);

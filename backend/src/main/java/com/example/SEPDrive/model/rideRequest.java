@@ -70,6 +70,10 @@ public class rideRequest {
 
     private double distance;
 
+    private double cost;
+
+    private double duration;
+
 
 
 
@@ -122,6 +126,21 @@ public class rideRequest {
 
     }
 
+    public double getCost() {
+        return cost;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
+    }
+
+    public double getDuration() {
+        return duration;
+    }
+
+    public void setDuration(double duration) {
+        this.duration = duration;
+    }
 
     public double getDistance() {
         return distance;

@@ -1,3 +1,5 @@
+@import "primeicons/primeicons.css";
+
 /* Color palette */
 $green:       #10b981;
 $green-light: #d1fae5;
@@ -16,8 +18,8 @@ $white:       #ffffff;
 .active-button{
   background-color: #a1f38a;
   color: #000000;
-  margin-top: 15px;
-  margin-left: 450px;
+  margin-top: 8px;
+  margin-left: 70%;
   position: absolute;
 
 }
@@ -25,8 +27,8 @@ $white:       #ffffff;
 .active-button:hover{
   background-color: #a1f38a;
   color: #000000;
-  margin-top: 15px;
-  margin-left: 450px;
+  margin-top: 8px;
+  margin-left: 70%;
   position: absolute;
 
 }
@@ -116,14 +118,14 @@ $white:       #ffffff;
 
 .status-pill {
   position: absolute;
-  margin-left: 420px;
-  margin-top: 10px;
+  margin-left: 70%;
+  margin-top: 8px;
 }
 
 .status-pill:hover {
   position: absolute;
-  margin-left: 420px;
-  margin-top: 10px;
+  margin-left: 70%;
+  margin-top: 8px;
 }
 
 .active {
@@ -507,8 +509,8 @@ button, .controls {
 
 .delete-button {
   position: absolute;
-  margin-left: 420px;
-  margin-top: 395px;
+  margin-left: 70%;
+  margin-top: 630px;
   padding: 10px 20px;
   background-color: #23374f; /* Rot */
   color: white;
@@ -523,6 +525,29 @@ button, .controls {
 .delete-button:hover {
   background-color: #2e4b6c; /* Dunkleres Rot beim Hover */
 }
+
+.order {
+
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.descending {
+  margin-left: 4%;
+  margin-bottom: 10px;
+}
+
+.ascending {
+  margin-left: 4%;
+  margin-bottom: 10px;
+}
+
+.search{
+  margin-left: 4%;
+  margin-bottom: 10px;
+}
+
+
 
 
 
