@@ -23,7 +23,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import {ConfirmationService, MessageService} from "primeng/api";
 import {GoogleMapsModule} from '@angular/google-maps';
 import {MatSidenavModule} from '@angular/material/sidenav';
-
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -31,6 +31,8 @@ export const appConfig: ApplicationConfig = {
       BrowserAnimationsModule,
       FormsModule,
       HttpClientModule,
+      SocketIoModule.forRoot({ url: 'http://localhost:3000', options: {} }),
+
 
       // Prime modules
       InputTextModule,

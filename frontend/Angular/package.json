@@ -28,10 +28,13 @@
     "leaflet": "^1.9.4",
     "leaflet-control-geocoder": "^3.1.0",
     "leaflet-routing-machine": "^3.2.12",
+    "ngx-socket-io": "^4.8.5",
     "primeflex": "4.0.0",
     "primeicons": "^7.0.0",
     "primeng": "^19.1.2",
     "rxjs": "~7.8.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "togpx": "^0.5.4",
     "tslib": "^2.3.0",
     "zone.js": "^0.15.0"

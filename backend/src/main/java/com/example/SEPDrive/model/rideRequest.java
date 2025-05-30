@@ -7,6 +7,9 @@ import jakarta.validation.constraints.Min;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.jenetics.jpx.Length;
 import io.jenetics.jpx.WayPoint;
 
@@ -45,6 +48,14 @@ public class rideRequest {
     @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "start_address_id")
     private adress startAddress;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name               = "ride_request_stops",
+            joinColumns        = @JoinColumn(name = "ride_request_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private List<adress> zwischenstops = new ArrayList<>();
 
 
 
@@ -124,6 +135,19 @@ public class rideRequest {
 
         return this.distance;
 
+    }
+
+
+
+
+
+
+    public List<adress> getZwischenstops() {
+        return zwischenstops;
+    }
+
+    public void setZwischenstops(List<adress> zwischenstops) {
+        this.zwischenstops = zwischenstops;
     }
 
     public double getCost() {

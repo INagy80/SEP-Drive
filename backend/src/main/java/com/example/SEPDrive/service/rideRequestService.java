@@ -71,6 +71,31 @@ public class rideRequestService {
 
         adress destadress = new adress(rideRequestdto.destination().getLat(), rideRequestdto.destination().getLng());
 
+        List<adress> zwischenstops = new ArrayList<>();
+        for (LatLng a : rideRequestdto.zwischenstops() ){
+            adress temp = new adress(a.getLat(), a.getLng());
+            zwischenstops.add(temp);
+
+
+        }
+
+        int i = 0;
+        for(String s : rideRequestdto.zwischenstopssaddress()){
+
+            adress a = zwischenstops.get(i);
+                String[] zwischenstopsparts  = s.split("\\s*,\\s*");
+                a.setHouseNumberAndStreet(zwischenstopsparts[0]+", "+zwischenstopsparts[1]);
+                a.setCountry(zwischenstopsparts[zwischenstopsparts.length - 1]);
+                a.setZip(zwischenstopsparts[zwischenstopsparts.length - 2]);
+                a.setState(zwischenstopsparts[zwischenstopsparts.length - 3]);
+                a.setCity(zwischenstopsparts[zwischenstopsparts.length - 4]);
+            i ++;
+        }
+
+
+
+
+
 
         String[] parts = rideRequestdto.startaddress().split("\\s*,\\s*");
         startadress.setHouseNumberAndStreet(parts[0]+", "+parts[1]);
@@ -97,6 +122,7 @@ public class rideRequestService {
         rideRequest.setDistance(rideRequestdto.distance());
         rideRequest.setDuration(rideRequestdto.duration());
         rideRequest.setCost(rideRequestdto.price());
+        rideRequest.getZwischenstops().addAll(zwischenstops);
 
         //rideRequest.setGpxRoute(generateCarRouteGpx(startadress.getLat(),startadress.getLng(),destadress.getLat(),startadress.getLng()).toString().getBytes(StandardCharsets.UTF_8));
 
@@ -110,6 +136,18 @@ public class rideRequestService {
         List<rideRequest> rideRequestList = rideRequestDAO.findByCustomerId(httpInterpreter.Interpreter().getId());
         List<rideRequestDTO> rideRequestDTOList = new ArrayList<>();
         for(rideRequest rideRequest : rideRequestList){
+            List<LatLng> zwischenstopsLatLng = new ArrayList<>();
+            List<String> zwischenstopssaddress = new ArrayList<>();
+            for (adress a : rideRequest.getZwischenstops()){
+                zwischenstopsLatLng.add(new LatLng(a.getLat(), a.getLng()));
+                zwischenstopssaddress.add(a.getHouseNumberAndStreet() + " " +
+                        a.getCity() +  " " +
+                        a.getState() + " " +
+                        a.getZip() + " " +
+                        a.getCountry());
+            }
+
+
             rideRequestDTO ride = new rideRequestDTO(
                     rideRequest.getDistance(),
                     rideRequest.getDuration(),
@@ -121,6 +159,10 @@ public class rideRequestService {
                             rideRequest.getStartAddress().getState() + " " +
                             rideRequest.getStartAddress().getZip() + " " +
                             rideRequest.getStartAddress().getCountry(),
+
+                    zwischenstopsLatLng,
+                    zwischenstopssaddress,
+
                     new LatLng(rideRequest.getDestAddress().getLat() , rideRequest.getDestAddress().getLng()),
                     rideRequest.getDestAddress().getHouseNumberAndStreet() + " " +
                             rideRequest.getDestAddress().getCity() + " " +
@@ -147,6 +189,17 @@ public class rideRequestService {
                 driverfullname = request.getDriver().getFirstName()+" "+request.getDriver().getLastName();
             }
 
+            List<LatLng> zwischenstopsLatLng = new ArrayList<>();
+            List<String> zwischenstopssaddress = new ArrayList<>();
+            for(adress a : request.getZwischenstops()){
+                zwischenstopsLatLng.add(new LatLng(a.getLat(), a.getLng()));
+                zwischenstopssaddress.add(a.getHouseNumberAndStreet() + " " +
+                        a.getCity() +  " " +
+                        a.getState() + " " +
+                        a.getZip() + " " +
+                        a.getCountry());
+            }
+
 
 
             rideResponseDTO response = new rideResponseDTO(
@@ -159,11 +212,13 @@ public class rideRequestService {
                             request.getStartAddress().getState() + " " +
                             request.getStartAddress().getZip() + " " +
                             request.getStartAddress().getCountry(),
+                    new LatLng(request.getStartAddress().getLat(),request.getStartAddress().getLng()),
                     request.getDestAddress().getHouseNumberAndStreet() + " " +
                             request.getDestAddress().getCity() + " " +
                             request.getDestAddress().getState() + " " +
                             request.getDestAddress().getZip() + " " +
                             request.getDestAddress().getCountry(),
+                    new LatLng(request.getDestAddress().getLat(),request.getDestAddress().getLng()),
                     request.getCustomerRating(),
                     request.getDrivererRating(),
                     request.getStatus(),
@@ -173,7 +228,9 @@ public class rideRequestService {
                     request.getCustomer().getUserName(),
                     request.getDistance(),
                     request.getDuration(),
-                    request.getCost()
+                    request.getCost(),
+                    zwischenstopsLatLng,
+                    zwischenstopssaddress
             );
 
             rideResponseDTOS.add(response);

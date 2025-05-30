@@ -19,7 +19,7 @@ $white:       #ffffff;
   background-color: #a1f38a;
   color: #000000;
   margin-top: 8px;
-  margin-left: 70%;
+  margin-left: 80%;
   position: absolute;
 
 }
@@ -28,7 +28,7 @@ $white:       #ffffff;
   background-color: #a1f38a;
   color: #000000;
   margin-top: 8px;
-  margin-left: 70%;
+  margin-left: 80%;
   position: absolute;
 
 }
@@ -89,6 +89,7 @@ $white:       #ffffff;
       margin-right: 12px;
       display: flex;
       align-items: center;
+      padding: 0.25rem ;
 
       &__label {
         margin-right: 0.5rem;
@@ -118,13 +119,13 @@ $white:       #ffffff;
 
 .status-pill {
   position: absolute;
-  margin-left: 70%;
+  margin-left: 75%;
   margin-top: 8px;
 }
 
 .status-pill:hover {
   position: absolute;
-  margin-left: 70%;
+  margin-left: 75%;
   margin-top: 8px;
 }
 
@@ -180,7 +181,7 @@ html, body {
 
 ::ng-deep .custom-sidebar {
   align-items: center;
-  width: 46vw !important;
+  width: 800px !important;
   height: 100% !important;
   border-radius: 20px;
   background-color: #ffffff !important;
@@ -188,6 +189,41 @@ html, body {
   font-size: 1rem !important;
   //padding-left: 30px ;
   //margin-top: 168px !important;
+}
+
+
+::ng-deep .simulation-sidebar  {
+  align-items: center;
+  width: calc(100vw - 800px) !important;
+  height: 100% !important;
+  border-radius: 20px;
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  font-size: 1rem !important;
+  //padding-left: 30px ;
+  //margin-top: 168px !important;
+}
+
+.simulation-header{
+  background-color: #ffffff !important;
+  position: absolute;
+  margin-left: 80px;
+  top: 20px;
+  left: 0;
+  padding: 1.6rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  overflow: visible;
+}
+
+
+.map-container{
+  width: calc(100vw - 800px) !important;
+  height: 100vw !important;
 }
 
 
@@ -210,6 +246,9 @@ html, body {
   flex-direction: column;
   overflow: hidden;
 }
+
+
+
 
 .header-container {
   position: fixed;
@@ -508,9 +547,8 @@ button, .controls {
 }
 
 .delete-button {
-  position: absolute;
-  margin-left: 70%;
-  margin-top: 630px;
+  position: relative;
+  margin-left: 80%;
   padding: 10px 20px;
   background-color: #23374f; /* Rot */
   color: white;
@@ -546,6 +584,8 @@ button, .controls {
   margin-left: 4%;
   margin-bottom: 10px;
 }
+
+
 
 
 

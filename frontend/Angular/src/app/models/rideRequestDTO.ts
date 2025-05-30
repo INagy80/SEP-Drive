@@ -11,6 +11,8 @@ export interface rideRequestDTO {
   price: number;
   start: LatLng;
   startaddress: string;
+  zwischenstops: LatLng[];
+  zwischenstopssaddress: string[];
   destination: LatLng;
   destinationaddress: string;
   carClass: 'klein' | 'Medium' | 'Deluxe';
