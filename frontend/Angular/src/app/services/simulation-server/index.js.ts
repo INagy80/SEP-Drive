@@ -1,6 +1,6 @@
 // index.js
 const http = require('http');
-const { Server } = require('socket.io');
+import { Server, Socket } from 'socket.io';
 
 const server = http.createServer();
 const io = new Server(server, {
@@ -8,9 +8,9 @@ const io = new Server(server, {
 });
 
 // In-memory map of ride rooms → simulation state
-const sims = {};
+const sims: Record<string, any> = {};
 
-io.on('connection', socket => {
+io.on('connection', (socket: Socket) => {
   console.log('Client connected:', socket.id);
 
   // 1) Join a room: driver and customer will both call this

@@ -7,7 +7,6 @@ import togpx from 'togpx';
 import {LatLng, rideRequestDTO} from '../../models/rideRequestDTO';
 import {RideRequestService} from '../../services/rideRequest/ride-request.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import {Sidebar} from 'primeng/sidebar';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import {rideResponse} from '../../models/rideResponse';
 import {Button} from 'primeng/button';
@@ -96,6 +95,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private simulationMarker?: Leaflet.Marker;
 
 
+  private simLayer!: L.LayerGroup;
+
+  /** for one-off non-active “preview” routes */
+  private previewPolyline: L.Polyline    | null = null;
+
   simstartAddress =  '';
   simzielAddress =  '';
   simzwischenstoppsText = '';
@@ -105,6 +109,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   simrouteDistanceKm : number = 0;
   simrouteDurationMin : number = 0;
   simroutePriceInEuro: number = 0;
+  simulationstatus: boolean = false;
 
 
   private simulationData?: {
@@ -171,9 +176,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
-  // ngOnInit(): void {
-  //   this.findAllrideRequests();
-  // }
+
 
   findAllrideResponse(){
     this.isvisible()
@@ -208,67 +211,77 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   async ngAfterViewInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) return;
 
+    // 1) Load Leaflet and LRM
     const leafletModule = await import('leaflet');
     (window as any).L = leafletModule;
     await import('leaflet-routing-machine');
     this.L = leafletModule;
 
+    // 2) Initialize both maps
     this.initMap();
     this.initSimulationMap();
 
-
+    // 3) Center the main map on the user’s current position
     this.useCurrentPosition();
 
-    // RESTORE SIMULATION IF DATA EXISTS
-    const frac = parseFloat(localStorage.getItem('simTravelFrac')  || '0');
-    const path = JSON.parse(localStorage.getItem('simPath')       || 'null');
-    const stops= JSON.parse(localStorage.getItem('simStops')      || 'null');
-    const dur  = parseFloat(localStorage.getItem('simRealDuration') || '0');
 
-    if (path && Array.isArray(path) && dur > 0) {
-      // 1) rebuild simulationData (as before)…
+    // ── RESTORE SIMULATION IF DATA EXISTS ─────────────────
+    const frac = parseFloat(localStorage.getItem('simTravelFrac') || '0');
+    const path = JSON.parse(localStorage.getItem('simPath') || 'null');
+    const stops = JSON.parse(localStorage.getItem('simStops') || 'null');
+    const dur = parseFloat(localStorage.getItem('simRealDuration') || '0');
+
+    if (Array.isArray(path) && dur > 0) {
+      // 1) rebuild segment lengths & total distance
       const segLengths: number[] = [];
       let total = 0;
-      for (let i = 1; i < path.length; i++) {
-        const d = this.simulationmap.distance(path[i-1], path[i]);
+      for (let i = 1; i < (path as any).length; i++) {
+        const prev = (path as any)[i - 1] as Leaflet.LatLng;
+        const curr = (path as any)[i] as Leaflet.LatLng;
+        const d = this.simulationmap.distance(prev, curr);
         segLengths.push(d);
         total += d;
       }
+
+      // 2) repopulate simulationData
       this.simulationData = {
-        path:         path as Leaflet.LatLng[],
+        path: path as Leaflet.LatLng[],
         segLengths,
-        totalLength:  total,
+        totalLength: total,
         realDuration: dur,
-        travelFrac:   frac,
-        lastTimeMs:   performance.now(),
-        stops:        stops as Leaflet.LatLng[]
+        travelFrac: frac,
+        lastTimeMs: performance.now(),
+        stops: stops as Leaflet.LatLng[]
       };
 
-      // 2) draw the blue route polyline again
-      this.L.polyline(
-        this.simulationData.path,
-        { color: 'blue', weight: 5, opacity: 0.7 }
-      ).addTo(this.simulationmap);
+      // 3) redraw the saved blue polyline (always do this now)
+      this.L.polyline(this.simulationData.path, {
+        color: 'blue',
+        weight: 5,
+        opacity: 0.7
+      }).addTo(this.simulationmap);
 
-      // 3) redraw the green Zwischenstopp pins
+      // 4) redraw the saved green Zwischenstopp pins
       const greenIcon = this.L.icon({
-        iconUrl:   'assets/leaflet/marker-icon-green.png',
-        iconSize:  [25, 41],
-        iconAnchor:[12, 41],
-        popupAnchor:[0, -41]
+        iconUrl: 'assets/leaflet/marker-icon-green.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [0, -41]
       });
       for (const stopLL of this.simulationData.stops) {
         this.L.marker(stopLL, { icon: greenIcon, keyboard: false })
           .addTo(this.simulationmap);
       }
 
-      // 4) place the simulation marker at the correct interpolated spot
+      // 5) compute the correct interpolated position for the marker
       const distAlong = total * frac;
       const current = this.interpolatePosition(
         this.simulationData.path,
         segLengths,
         distAlong
       );
+
+      // 6) ALWAYS create & add the simulation marker to the map
       const simIcon = this.L.icon({
         iconUrl: 'assets/leaflet/carmarker.png',
         iconSize: [25, 41],
@@ -278,10 +291,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.simulationMarker = this.L.marker(current, { icon: simIcon })
         .addTo(this.simulationmap);
 
-      // 5) resume the animation
+      // 7) resume the animation loop
       requestAnimationFrame(this.stepSimulation.bind(this));
     }
+
+
   }
+
 
   private interpolatePosition(path: Leaflet.LatLng[], segLens: number[], dist: number): Leaflet.LatLng {
     let acc = 0, idx = 0;
@@ -330,6 +346,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       { subdomains: ['mt0','mt1','mt2','mt3'], attribution: '&copy; Google' }
     ).addTo(this.simulationmap);
 
+    this.simLayer = this.L.layerGroup().addTo(this.simulationmap);
+
     // 3) wire up zoom/drag listeners *on simulationmap*
     this.simulationmap.on('zoom', () => {
       if (this.ignoreNextZoom) {
@@ -345,6 +363,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.autoZoomEnabled = false;
       }
     });
+
   }
 
   onSimulationVisibleChange(opened: boolean) {
@@ -580,8 +599,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
   private clearsimRouteMarkers(): void {
-    this.routeMarkers.forEach(m => this.map.removeLayer(m));
-    this.routeMarkers = [];
+    this.simrouteMarkers.forEach(m => this.simulationmap.removeLayer(m));
+    this.simrouteMarkers = [];
+
   }
 
 
@@ -939,6 +959,18 @@ export class MapComponent implements AfterViewInit, OnDestroy {
                 alert('something went wrong');
             }
         });
+        this.simulationmap.removeLayer(this.simroutingControl)
+        this.clearsimRouteMarkers()
+        this.simulationmap.removeControl(this.simroutingControl);
+        this.simroutingControl = undefined!;
+
+        this.simzwischenstops = [];
+        this.simzwischenstoppsTextArray = [];
+
+        localStorage.removeItem('simPath');
+        localStorage.removeItem('simRealDuration');
+        localStorage.removeItem('simStops');
+        localStorage.removeItem('simTravelFrac');
 
   }
 
@@ -1074,7 +1106,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
-  private drawRouteforsimulation(coordinates: Leaflet.LatLng[], labels: string[]): void {
+  private drawRouteforsimulation(coordinates: Leaflet.LatLng[], labels: string[], isaktive : boolean): void {
 
     console.log('simu');
 
@@ -1121,7 +1153,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       addWaypoints:        false,
       draggableWaypoints:  false,
       fitSelectedRoutes:   true,
-      show: true,
+      show: false,
+
       showAlternatives: true,
       altLineOptions: {
         styles: [{ color: 'rgba(51,49,49,0.69)', opacity: 0.8, weight: 5 }]
@@ -1135,6 +1168,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     })
       .addTo(this.simulationmap);
 
+    const container = this.simroutingControl.getContainer();
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
 
 
     this.simroutingControl.on('routesfound', (e: any) => {
@@ -1148,8 +1185,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       // drop first & last to get only the Zwischenstopps
       const mids = wps.slice(1, -1).map(wp => wp.latLng);
       // start the moving marker
-      this.simulateRoute(coords, duration, mids);
+      if (isaktive) {
+
+        if(!this.simulationData){
+          this.simulateRoute(coords, duration, mids);
+        }
+      }
     });
+
+    // this.simroutingControl.off('routesfound');
 
 
 
@@ -1157,119 +1201,161 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
   private simulateRoute(path: Leaflet.LatLng[], realDurationSec: number, stops: Leaflet.LatLng[]) {
-    // 1) remove old
+    // 1) Remove any existing marker from the map.
+    //    We always remove the old marker instance so we can (re)place it.
     if (this.simulationMarker) {
       this.simulationmap.removeLayer(this.simulationMarker);
     }
 
-    // 2) precompute segment lengths & total
+    // 2) If there is already an in‐progress simulationData for the *same* path, resume it.
+    let isSamePath = false;
+    if (this.simulationData) {
+      // Quick length check:
+      if (this.simulationData.path.length === path.length) {
+        // Compare every LatLng (exact match)
+        isSamePath = path.every((pt, idx) => {
+          const old = this.simulationData!.path[idx];
+          return old.lat === pt.lat && old.lng === pt.lng;
+        });
+      }
+    }
+
+    if (isSamePath) {
+      // --- RESUME existing simulationData ---
+      const data = this.simulationData!;
+      // 2a) Place a new marker instance at the current interpolated position, using travelFrac:
+      const distAlong = data.totalLength * data.travelFrac;
+      const currentLL = this.interpolatePosition(data.path, data.segLengths, distAlong);
+
+      const simIcon = this.L.icon({
+        iconUrl:   'assets/leaflet/carmarker.png',
+        iconSize:  [25, 41],
+        iconAnchor:[12, 41],
+        popupAnchor:[0, -41]
+      });
+      this.simulationMarker = this.L
+        .marker(currentLL, { icon: simIcon })
+        .addTo(this.simulationmap);
+
+      // 2b) Reset lastTimeMs so we don’t get a huge delta next frame
+      data.lastTimeMs = performance.now();
+
+      // 2c) Kick off the loop again (if not paused)
+      if (!this.simulationPaused) {
+        requestAnimationFrame(this.stepSimulation.bind(this));
+      }
+      return;
+    }
+
+    // 3) OTHERWISE: it’s a brand‐new route (or the path changed). Do a fresh setup.
+    //    Precompute segment lengths & total length:
     const segLengths: number[] = [];
     let total = 0;
     for (let i = 1; i < path.length; i++) {
-      const d = this.simulationmap.distance(path[i-1], path[i]);
+      const d = this.simulationmap.distance(path[i - 1], path[i]);
       segLengths.push(d);
       total += d;
     }
-    const simIcon = this.L.icon({
-      iconUrl: 'assets/leaflet/carmarker.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [0, -41]
-    });
 
-    // 3) place the marker
-    this.simulationMarker = this.L.marker(path[0], { icon: simIcon })
+    // 3a) Create & place a new marker at the *start* of the route:
+    const simIcon = this.L.icon({
+      iconUrl:   'assets/leaflet/carmarker.png',
+      iconSize:  [25, 41],
+      iconAnchor:[12, 41],
+      popupAnchor:[0, -41]
+    });
+    this.simulationMarker = this.L
+      .marker(path[0], { icon: simIcon })
       .addTo(this.simulationmap);
 
-    // 4) store state
+    // 3b) Overwrite simulationData with the fresh values:
     this.simulationData = {
       path,
       segLengths,
-      totalLength: total,
+      totalLength:  total,
       realDuration: realDurationSec,
-      travelFrac: 0,
-      lastTimeMs: performance.now(),
-      stops
+      travelFrac:   0,               // start from zero
+      lastTimeMs:   performance.now(),
+      stops:        [...stops]       // copy array
     };
 
-    // 5) kick off the loop
-    requestAnimationFrame(this.stepSimulation.bind(this));
+    // 3c) Kick off the loop if not paused:
+    if (!this.simulationPaused) {
+      requestAnimationFrame(this.stepSimulation.bind(this));
+    }
   }
 
 
 
 
-
   private stepSimulation(nowMs: number) {
+    // ❶ If paused or missing data/marker, bail out.
     if (this.simulationPaused) return;
     if (!this.simulationData || !this.simulationMarker) return;
 
     const data = this.simulationData;
 
-    // 1) compute delta time since last frame
+    // ❷ Compute elapsed time (in seconds) since last frame:
     const dtSec = (nowMs - data.lastTimeMs) / 1000;
     data.lastTimeMs = nowMs;
 
-    // 2) increment travel fraction by (dt / realDuration) scaled by speedFactor
+    // ❸ Advance the “travel fraction” by (dt / realDuration) × speedFactor:
     data.travelFrac = Math.min(
       1,
       data.travelFrac + dtSec * (this.simulationSpeedFactor / data.realDuration)
     );
 
-    // 3) compute target distance along the route
+    // ❹ Determine the total distance along the path to place the marker:
     const targetDist = data.totalLength * data.travelFrac;
 
-    // 4) find which segment we’re on
+    // ❺ Figure out which segment index we’re on:
     let acc = 0, idx = 0;
     while (idx < data.segLengths.length && acc + data.segLengths[idx] < targetDist) {
       acc += data.segLengths[idx++];
     }
 
-    // 5) if at the end, snap and stop
+    // ❻ If we’ve reached the end, snap marker to final point & stop recentering:
     if (idx >= data.segLengths.length) {
-      const last = data.path[data.path.length - 1];
-      this.simulationMarker.setLatLng(last);
-      // center & zoom one final time
-      this.simulationmap.setView(last, this.simulationZoom, { animate: false });
+      const lastLL = data.path[data.path.length - 1];
+      this.simulationMarker.setLatLng(lastLL);
+      if (this.autoZoomEnabled) {
+        this.simulationmap.setView(lastLL, this.simulationZoom, { animate: false });
+      }
       return;
     }
 
-    // 6) interpolate within the segment
+    // ❼ Otherwise, interpolate the exact LatLng within the current segment:
     const fracInSeg = (targetDist - acc) / data.segLengths[idx];
     const p0 = data.path[idx], p1 = data.path[idx + 1];
-    const lat = p0.lat + (p1.lat - p0.lat) * fracInSeg;
-    const lng = p0.lng + (p1.lng - p0.lng) * fracInSeg;
-    const current = new this.L.LatLng(lat, lng);
+    const currentLat = p0.lat + (p1.lat - p0.lat) * fracInSeg;
+    const currentLng = p0.lng + (p1.lng - p0.lng) * fracInSeg;
+    const currentLL  = this.L.latLng(currentLat, currentLng);
 
-    // move marker
-    this.simulationMarker.setLatLng(current);
-
-    // ** center & lock zoom **
+    // ❽ Move the marker & optionally recenter/zoom:
+    this.simulationMarker.setLatLng(currentLL);
     if (this.autoZoomEnabled) {
-      // tell our listener to ignore the next zoomstart
       this.ignoreNextZoom = true;
-      this.simulationmap.setView(current, this.simulationZoom, { animate: false });
+      this.simulationmap.setView(currentLL, this.simulationZoom, { animate: false });
     }
 
-    // 2) SAVE PROGRESS
-    localStorage.setItem('simTravelFrac',    data.travelFrac.toString());
-    localStorage.setItem('simPath',          JSON.stringify(data.path));
-    localStorage.setItem('simStops',         JSON.stringify(data.stops));
-    localStorage.setItem('simRealDuration',  data.realDuration.toString());
+    // ❾ Persist progress to localStorage (so closing/reopening resumes later):
+    localStorage.setItem('simTravelFrac',   data.travelFrac.toString());
+    localStorage.setItem('simPath',         JSON.stringify(data.path));
+    localStorage.setItem('simStops',        JSON.stringify(data.stops));
+    localStorage.setItem('simRealDuration', data.realDuration.toString());
 
-
-    // --- check for arrival at any remaining stop ---
+    // 🔟 Check for arrival at any “Zwischenstopp”:
     const threshold = 100; // meters
     for (const stopLL of data.stops) {
-      if (this.simulationmap.distance(current, stopLL) <= threshold) {
+      if (this.simulationmap.distance(currentLL, stopLL) <= threshold) {
         this.pauseSimulation();
-        // remove that stop so we don't pause there again
-        data.stops = data.stops.filter(s => s !== stopLL);
-        return;  // exit without scheduling next frame
+        // remove arrived stop so we don’t re‐pause on it
+        data.stops = data.stops.filter(s => !(s.lat === stopLL.lat && s.lng === stopLL.lng));
+        return; // do not queue another frame
       }
     }
 
-    // 7) continue animating until travelFrac===1
+    // ⓫ If not at end, queue next animation frame:
     if (data.travelFrac < 1) {
       requestAnimationFrame(this.stepSimulation.bind(this));
     }
@@ -1308,18 +1394,31 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   simulationview(response: rideResponse | undefined){
 
 
+
+
     this.simulationvisible = true;
       console.log(response)
       this.simstartAddress = `${response?.startLatLong?.lat ?? ''} , ${response?.startLatLong?.lng ?? ''}`;
       this.simzielAddress = `${response?.destinationLatLong?.lat ?? ''} , ${response?.destinationLatLong?.lng ?? ''}`
-      this.simzwischenstoppsTextArray = response?.zwischenstposaddress ?? [];
+      this.simzwischenstoppsText = '';
+      for ( var latlng of response?.zwischenstposlatlong ?? [] ){
+        this.simzwischenstoppsText += `${latlng.lat} ${latlng.lng} , `;
+
+      }
       this.simrouteDurationMin = response?.duration ?? 0;
       this.simrouteDistanceKm = response?.distance ?? 0;
       this.simroutePriceInEuro = response?.price ?? 0;
 
-    if (!this.simulationData) {
-      this.updateRouteforsimulation();
+    if (response?.status === 'Active') {
 
+      this.simulationstatus = true;
+
+        this.updateRouteforsimulation(true);
+
+
+    }else {
+      this.simulationstatus = false;
+      this.updateRouteforsimulation(false);
     }
 
     setTimeout(() => this.simulationmap.invalidateSize(), 300);
@@ -1329,9 +1428,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
-  async updateRouteforsimulation(): Promise<void> {
+  async updateRouteforsimulation(isaktive : boolean): Promise<void> {
     // 1) clear any old route lines / circles your clearRouteMarkers may not handle
     this.clearsimRouteMarkers();
+    this.simzwischenstops = [];
+    this.simzwischenstoppsTextArray = [];
 
     // 2) validation: need at least one of (pickupMarker ↔ startAddress)
     //    and one of (destMarker ↔ zielAddress)
@@ -1464,7 +1565,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     // 6) Draw the route once
     this.drawRouteforsimulation(
       waypoints.map(w => w.coord),
-      waypoints.map(w => w.label)
+      waypoints.map(w => w.label),
+      isaktive
     );
   }
 

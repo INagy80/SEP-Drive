@@ -133,9 +133,16 @@ public class rideRequestService {
     }
 
     public List<rideRequestDTO> findAll() {
+        List<rideRequest> allrideRequests = new ArrayList<>();
         List<rideRequest> rideRequestList = rideRequestDAO.findByCustomerId(httpInterpreter.Interpreter().getId());
+        user user = userDAO.findUserById(httpInterpreter.Interpreter().getId());
+        if(user instanceof Fahrer){
+        List<rideRequest> rideRequestListasdriver = rideRequestDAO.findByDriver_Id(httpInterpreter.Interpreter().getId());
+        allrideRequests.addAll(rideRequestListasdriver);
+        }
+        allrideRequests.addAll(rideRequestList);
         List<rideRequestDTO> rideRequestDTOList = new ArrayList<>();
-        for(rideRequest rideRequest : rideRequestList){
+        for(rideRequest rideRequest : allrideRequests){
             List<LatLng> zwischenstopsLatLng = new ArrayList<>();
             List<String> zwischenstopssaddress = new ArrayList<>();
             for (adress a : rideRequest.getZwischenstops()){
@@ -179,8 +186,15 @@ public class rideRequestService {
 
     public List<rideResponseDTO> getAll() {
         List<rideRequest> rideRequestList = rideRequestDAO.findByCustomerId(httpInterpreter.Interpreter().getId());
+        List<rideRequest> allrideRequest = new ArrayList<>();
+        user user = userDAO.findUserById(httpInterpreter.Interpreter().getId());
+        if(user instanceof Fahrer){
+            List<rideRequest> rideRequestListasdriver = rideRequestDAO.findByDriver_Id(httpInterpreter.Interpreter().getId());
+            allrideRequest.addAll(rideRequestListasdriver);
+        }
+        allrideRequest.addAll(rideRequestList);
         List<rideResponseDTO> rideResponseDTOS = new ArrayList<>();
-        for(rideRequest request : rideRequestList){
+        for(rideRequest request : allrideRequest){
             String driverUserName = " ";
             String driverfullname = " ";
             if(request.getDriver() != null){
