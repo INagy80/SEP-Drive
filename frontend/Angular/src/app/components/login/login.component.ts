@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {AuthenticationRequest} from "../../models/authentication-request";
 import {AuthenticationService} from "../../services/authentication/authentication.service";
 import {FormsModule} from "@angular/forms";
 import {Message} from "primeng/message";
 import {NgIf} from "@angular/common";
-import {ButtonDirective} from "primeng/button";
 import { ButtonModule } from 'primeng/button';
-import {Password, PasswordDirective} from "primeng/password";
 import {AutoFocus} from 'primeng/autofocus';
 
 
@@ -20,10 +18,9 @@ import {AutoFocus} from 'primeng/autofocus';
     FormsModule,
     Message,
     NgIf,
-    ButtonDirective,
     ButtonModule,
-    Password,
     AutoFocus,
+    RouterLink,
 
   ],
   styleUrls: ['./login.component.scss']
@@ -45,9 +42,7 @@ export class LoginComponent {
       private router: Router
   ) {}
 
-  register() {
-    this.router.navigate(['register']);
-  }
+
 
 
   Login() {
@@ -65,6 +60,19 @@ export class LoginComponent {
                   }
               }
           });
+  }
+
+  showPassword: boolean = false;
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+
+  register() {
+    this.router.navigateByUrl('/register');
+
+
   }
 
 

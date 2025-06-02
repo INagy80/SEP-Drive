@@ -51,7 +51,11 @@ export class SearchProfileComponent {
           return this.sanitizer.bypassSecurityTrustUrl(url) as string;
         });
       },
-      error: err => console.error(err)
+      error: err =>{
+
+          alert('Please enter a valid username!');
+          console.error(err.message + ' ' + err.status);
+      }
     });
   }
 

@@ -34,6 +34,8 @@
       </button>
     </div>
 
+    <div class="search-results">
+
     <div class="custom-card" *ngFor="let customer of drivers; let index = index" >
      <app-customer-card
       [customer]="customer"
@@ -44,6 +46,7 @@
      ></app-customer-card>
     </div>
 
+    </div>
   </div>
 </div>
 

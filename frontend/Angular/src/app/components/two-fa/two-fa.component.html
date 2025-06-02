@@ -24,12 +24,12 @@
   <p>Bitte gib den Bestätigungscode ein, den wir dir gesendet haben:</p>
 
   <form class="code-input" required>
-  <input [(ngModel)]="a" (input)="updateFacode()" name="a" type="text" maxlength="1">
-  <input [(ngModel)]="b" (input)="updateFacode()" name="b" type="text" maxlength="1">
-  <input [(ngModel)]="c" (input)="updateFacode()" name="c" type="text" maxlength="1">
-  <input [(ngModel)]="d" (input)="updateFacode()" name="d" type="text" maxlength="1">
-  <input [(ngModel)]="e" (input)="updateFacode()" name="e" type="text" maxlength="1">
-  <input [(ngModel)]="f" (input)="updateFacode()" name="f" type="text" maxlength="1">
+  <input #c1  [(ngModel)]="a" (input)="updateFacode()" name="a" type="text" maxlength="1"  appAutoFocusNext [appAutoFocusNext]="c2"                  >
+  <input #c2  [(ngModel)]="b" (input)="updateFacode()" name="b" type="text" maxlength="1"  appAutoFocusNext [appAutoFocusNext]="c3"  [prevInput]="c1">
+  <input #c3  [(ngModel)]="c" (input)="updateFacode()" name="c" type="text" maxlength="1"  appAutoFocusNext [appAutoFocusNext]="c4"  [prevInput]="c2">
+  <input #c4  [(ngModel)]="d" (input)="updateFacode()" name="d" type="text" maxlength="1"  appAutoFocusNext [appAutoFocusNext]="c5"  [prevInput]="c3">
+  <input #c5  [(ngModel)]="e" (input)="updateFacode()" name="e" type="text" maxlength="1"  appAutoFocusNext [appAutoFocusNext]="c6"  [prevInput]="c4">
+  <input #c6  [(ngModel)]="f" (input)="updateFacode()" name="f" type="text" maxlength="1"  appAutoFocusNext                          [prevInput]="c5">
 </form>
   <br><br>
   <button

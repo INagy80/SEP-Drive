@@ -58,6 +58,24 @@ public class profileController {
 
 
 
+    @PutMapping("/me")
+    public ResponseEntity<profileResponseDto> updateProfile(@RequestBody updateProfileDto dto) {
+        return ResponseEntity.ok(profileService.updateProfile(dto));
+    }
+
+    @PutMapping("/me/password")
+    public ResponseEntity<String> updatePassword(@RequestBody String newPassword) {
+        profileService.updatePassword(newPassword);
+        return ResponseEntity.ok("Password updated successfully.");
+    }
+
+
+    @PutMapping("/me/username")
+    public ResponseEntity<String> updateUsername(@RequestBody String newUserName) {
+        profileService.updateUserName(newUserName);
+        return ResponseEntity.ok("Benutzername wurde erfolgreich geändert.");
+    }
+
 
 
 }

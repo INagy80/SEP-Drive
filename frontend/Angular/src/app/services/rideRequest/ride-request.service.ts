@@ -31,4 +31,9 @@ export class RideRequestService {
   getAll() : Observable<rideResponse[]> {
     return this.http.get<rideResponse[]>(`${this.rideRequestUrl}/getAll`);
   }
+
+  deletestatus()  {
+    return this.http.put(`${this.rideRequestUrl}/deletestatus`,{});
+
+  }
 }

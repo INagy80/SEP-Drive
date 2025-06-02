@@ -15,7 +15,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "allowedCommonJsDependencies": [
               "leaflet",
@@ -25,7 +25,7 @@
             ],
             "outputPath": "dist/angular",
             "index": "src/index.html",
-            "browser": "src/main.ts",
+            "main": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -41,25 +41,20 @@
               "node_modules/primeflex/primeflex.css",
               "node_modules/leaflet/dist/leaflet.css"
             ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "scripts": []
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2MB",
-                  "maximumError": "10MB"
+                  "maximumWarning": "4kB",
+                  "maximumError": "5MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2MB",
-                  "maximumError": "8MB"
+                  "maximumWarning": "400kB",
+                  "maximumError": "600kB"
                 }
               ],
               "outputHashing": "all"
@@ -105,7 +100,7 @@
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.scss",
-              "primeflex/primeflex.css",
+              "node_modules/primeflex/primeflex.css",
               "node_modules/leaflet/dist/leaflet.css"
             ],
             "scripts": []

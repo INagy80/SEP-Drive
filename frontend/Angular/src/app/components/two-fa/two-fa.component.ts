@@ -6,17 +6,20 @@ import {Router} from "@angular/router";
 import {TwoFaRequest} from '../../models/two-fa-request';
 import {Message} from 'primeng/message';
 import {NgIf} from '@angular/common';
+import {AutoFocusNextDirective} from '../../services/auto-focus-next.directive';
 
 
 
 
 @Component({
   selector: 'app-two-fa',
+  standalone: true,
   imports: [
     ButtonDirective,
     FormsModule,
     Message,
-    NgIf
+    NgIf,
+    AutoFocusNextDirective
 
 
   ],
@@ -52,6 +55,7 @@ export class TwoFAComponent {
   ) {}
 
   updateFacode(): void {
+
     this.facode = `${this.a}${this.b}${this.c}${this.d}${this.e}${this.f}`;
   }
 

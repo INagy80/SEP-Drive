@@ -29,11 +29,5 @@ public interface userDAO extends JpaRepository<user, Integer> {
     @Query(value = "UPDATE users SET profile_photo = :photo WHERE username = :name" ,nativeQuery = true)
     void photo(@Param("photo") byte[] bytes, @Param("name") String username);
 
-//    @Query(value = "select * from users", nativeQuery = true)
-//    public List<user> getallusers();
-
-
-//    @Query(value = "INSERT INTO users VALUES (U.username )" ,nativeQuery = true)
-//   public user save(@Param("U") user user);
 
 }

@@ -55,6 +55,12 @@ public class rideRequisteController {
     }
 
 
+    @PutMapping("/deletestatus")
+    public void deletestatus(){
+        service.deletestatus();
+    }
+
+
 
 
 }

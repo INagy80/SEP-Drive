@@ -1,74 +1,58 @@
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-<div class="container flex-center ">
-    <div class="form-box flex-center">
-        <form >
-            <h1>Login</h1>
-            <p-message
-                    *ngIf="errorMsg"
-                    severity="error"
-                    [text]="errorMsg"
-                    styleClass="mb-2 w-full"
-                    class="mb-2"
-                    [closable]="false"
+<div class="container ">
+  <form >
+    <h1>Login</h1>
+    <p-message
+      *ngIf="errorMsg"
+      severity="error"
+      [text]="errorMsg"
+      styleClass="mb-2 w-full"
+      class="mb-2"
+      [closable]="false"
 
-            ></p-message>
+    ></p-message>
 
-            <div class="input-box">
-                <input
-                        [(ngModel)]="authenticationRequest.userName"
-                        name="userName"
-                        [pAutoFocus]="true"
-                        type="text" placeholder="     Benutzername" required>
-                <i class='bx bxs-user'></i>
-            </div>
-
-
-
-
-            <div class="input-box ">
-                     <p-password   [(ngModel)]="authenticationRequest.password"
-                              name="password"
-                              [toggleMask]="true"
-                              [pAutoFocus]="true"
-                              placeholder="     Password"
-                              required
-                              promptLabel="Enter the password"
-                              weakLabel="Week"
-                              mediumLabel="Average"
-                              strongLabel="Strong"
-                              autocomplete="off"
-
-
-                />
-
-                <i class='bx bxs-lock-alt'></i>
-            </div>
-
-            <div class="forgot">
-                <a href="/Password-reset">Passwort vergessen?</a>
-            </div>
-            <br><br>
-
-            <button
-                    pButton
-                    class="bttn"
-                    (click)="Login()"
-            >Einloggen </button>
-
-
-
-        </form>
+    <div class="input-box">
+      <input
+        [(ngModel)]="authenticationRequest.userName"
+        name="userName"
+        [pAutoFocus]="true"
+        type="text" placeholder="Benutzername" required>
+      <i class='bx bxs-user'></i>
     </div>
-    <div class="toggle-box">
-        <div class="toggle-panel">
-            <h2> Willkomen!</h2>
-            <p>Noch kein Konto? </p>
-            <button
-                    pButton
-                    class="bttn-register"
-            (click)="register()"
-            >Register</button>
-        </div>
+
+    <div class="input-box">
+      <input
+        [type]="showPassword ? 'text' : 'password'"
+        placeholder="Passwort"
+        required
+        name="password"
+        [(ngModel)]="authenticationRequest.password"
+      >
+      <i class='bx'
+         [class.bxs-show]="showPassword"
+         [class.bxs-hide]="!showPassword"
+         (click)="togglePassword()">
+      </i>
     </div>
+
+    <div class="forgot">
+      <a href="/Password-reset">Passwort vergessen?</a>
+    </div>
+    <br><br>
+
+    <button
+      class="bttn-login"
+      (click)="Login()"
+    >Einloggen </button>
+
+    <p>oder</p>
+
+    <a class="aaa" [routerLink]="['/register']" rel="noopener noreferrer">
+      Registrieren
+    </a>
+
+  </form>
+
 </div>
 

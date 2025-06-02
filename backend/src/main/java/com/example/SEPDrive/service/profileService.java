@@ -62,10 +62,56 @@ public class profileService {
         );
     }
 
+    public profileResponseDto updateProfile(updateProfileDto dto) {
+        String username = getCurrentUsername();
+        user currentUser = userDao.findByUserName(username);
 
+        if (!currentUser.getEmail().equals(dto.getEmail())
+                && userDao.existsUserByEmail(dto.getEmail())) {
+            throw new RuntimeException ("This email is already used by another user.");
+        }
 
+        currentUser.setFirstName(dto.getFirstName());
+        currentUser.setLastName(dto.getLastName());
+        currentUser.setEmail(dto.getEmail());
+        currentUser.setProfilePhoto(dto.getProfilePhoto());
 
+        userDao.save(currentUser);
 
+        return new profileResponseDto(
+                currentUser.getUserName(),
+                currentUser.getFirstName(),
+                currentUser.getLastName(),
+                currentUser.getEmail(),
+                currentUser.getDateOfBirth(),
+                currentUser.getRating(),
+                "Kunde",
+                currentUser.getTotalRides(),
+                currentUser.getProfilePhoto()
+        );
+    }
+
+    public void updatePassword(String newPassword) {
+        String username = getCurrentUsername();
+        user currentUser = userDao.findByUserName(username);
+        currentUser.setPassword(newPassword); // to be encrypted later
+        userDao.save(currentUser);
+    }
+
+    private String getCurrentUsername() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+    public void updateUserName(String newUserName) {
+        String currentUserName = getCurrentUsername();
+        user currentUser = userDao.findByUserName(currentUserName);
+
+        if (userDao.existsUserByUserName(newUserName)) {
+            throw new duplicatResourceException("Dieser Benutzername ist bereits vergeben.");
+        }
+
+        currentUser.setUserName(newUserName);
+        userDao.save(currentUser);
+    }
 
 //    @Transactional
     public byte[] fetchProfilePhoto() {

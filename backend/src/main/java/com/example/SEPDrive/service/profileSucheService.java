@@ -17,11 +17,17 @@ public class profileSucheService {
     @Autowired
     private userDAO userDao;
 
+    @Autowired
+    private HttpInterpreter httpInterpreter;
 
 
 
     public List<profileResponseDto> searchByUsername(String username) {
-        List<user> users = userDao.search(username);
+        if (username == null || username.isEmpty()) {
+            throw new RuntimeException("Please enter a username!");
+        }
+        List<user> users = userDao.search(username).stream().filter(u -> u.getUserName() != httpInterpreter.Interpreter().getUserName() ).toList();
+
         List<profileResponseDto> usersList = new ArrayList<>();
         for (user u : users) {
             if (u instanceof Fahrer) {
@@ -62,7 +68,7 @@ public class profileSucheService {
 
     public List<byte[]> fetchAllProfilesPhoto(String username) {
 
-        List<user> users = userDao.search(username);
+        List<user> users = userDao.search(username).stream().filter(u -> u.getUserName() != httpInterpreter.Interpreter().getUserName() ).toList();
 
         if (users == null || users.isEmpty()) {
             return new ArrayList<>();
