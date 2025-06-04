@@ -4,7 +4,6 @@ export interface LatLng {
 }
 
 
-
 export interface rideRequestDTO {
   distance: number;
   duration: number;
@@ -14,5 +13,6 @@ export interface rideRequestDTO {
   destination: LatLng;
   destinationaddress: string;
   carClass: 'klein' | 'Medium' | 'Deluxe';
+
 
 }

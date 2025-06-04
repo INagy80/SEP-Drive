@@ -1,1 +1,45 @@
-<p>fahranfragen works!</p>
+<div class="header" >
+
+  <div class="logo">
+    <!-- Animate this car icon: -->
+    <span class="car-logo">
+      <!-- Replace with your actual SVG/IMG or icon markup -->
+      <img src="assets/images/auto_logo.jpg" alt="Car Logo" />
+    </span>
+
+    <!-- The app name stays fixed in place: -->
+    <span class="site-title">SEP Drive</span>
+  </div>
+
+  <nav class="navbar">
+    <div class="nav-item">Startseite</div>
+    <div class="nav-item">Profile</div>
+    <div class="nav-item">Abmelden</div>
+  </nav>
+
+</div>
+
+<h2>Verfügbare Fahranfragen</h2>
+
+<table class="fahranfragen-tabelle">
+  <thead>
+  <tr>
+    <th>Fahrt-ID</th>
+    <th>Erstellt am</th>
+    <th>Entfernung</th>
+    <th>Kunde</th>
+    <th>Bewertung</th>
+    <th>Fahrzeugklasse</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let request of fahranfragen">
+    <td class="column-distance">{{ request.distance }} km</td>
+    <td class="column-duration">{{ request.duration }} min</td>
+    <td class="column-price">{{ request.price | currency:'EUR' }}</td>
+    <td class="column-start">{{ request.startaddress }}</td>
+    <td class="column-destination">{{ request.destinationaddress }}</td>
+    <td class="column-carclass">{{ request.carClass }}</td>
+  </tr>
+  </tbody>
+</table>

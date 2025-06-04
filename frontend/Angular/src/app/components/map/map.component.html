@@ -257,7 +257,7 @@
 <div class="navbar">
 
   <p-button (click)="startseite()" class="nav-item">Startseite</p-button>
-  <p-button (click)="findAllrideResponse()" class="nav-item">Fahranfragen</p-button>
+  <button class="nav-item" [routerLink]="['/fahranfragen']">Fahranfragen </button>
   <p-button (click)="profile()" class="nav-item">Profile</p-button>
   <p-button (click)="logout()" class="nav-item">Abmelden</p-button>
 </div>

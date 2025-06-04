@@ -11,7 +11,7 @@ import {Sidebar} from 'primeng/sidebar';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import {rideResponse} from '../../models/rideResponse';
 import {Button} from 'primeng/button';
-import {Router} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {Drawer} from 'primeng/drawer';
 import {MatDivider} from '@angular/material/divider';
 import {Rating} from 'primeng/rating';
@@ -22,7 +22,7 @@ import {Rating} from 'primeng/rating';
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
-  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider, Rating]
+  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider, Rating, RouterLink]
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private L!: typeof Leaflet;
@@ -662,6 +662,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.router.navigate(['/home']);
 
   }
+
 
   profile() {
     this.router.navigate(['/profile']);
