@@ -45,6 +45,7 @@ public class SecurityConfig {
         .csrf(custmizer -> custmizer.disable())
              .cors(Customizer.withDefaults())
         .authorizeHttpRequests(requests -> requests.requestMatchers("/v1/auth/**").permitAll()
+                .requestMatchers("/v1/rideRequest/**").permitAll() //neu von Sara hinzugefügt
                 .anyRequest().authenticated())
         .httpBasic(Customizer.withDefaults())
              .formLogin(Customizer.withDefaults())
