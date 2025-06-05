@@ -62,9 +62,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   rideRequests: Array<rideRequestDTO> = [];
   rideResponses : Array<rideResponse> = [];
 
-  ascendingitem: any;
+  ascendingitem: any;  // ausgewähltes Feld für aufsteigende Sortierung
   descendingitem: any;
-  search: any;
+  search: any;  //Suchbegriff für Fahrer- oder Kundennamen
 
 
   constructor(
@@ -74,6 +74,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     private router: Router,
 
   ) {}
+
+
 
   onCarClassChange(newClass: string) {
     this.selectedCarClass = newClass;
@@ -101,9 +103,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return this.rideResponses.find(r => r.status === 'Active');
   }
 
+  //filtert alle nicht aktive vergangenen Fahrten
   get historyRequests(): rideResponse[] {
     return this.rideResponses.filter(r => r.status !== 'Active');
   }
+
+
 
 
 
@@ -690,11 +695,59 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  onAscendingitemChange($event: any) {
-
+  onAscendingitemChange(value: string): void {
+    this.descendingitem = '';
+    this.sortRequests(value, true);
   }
 
-  ondescendingitemChange($event: any) {
-
+  ondescendingitemChange(value: string): void {
+    this.ascendingitem = '';
+    this.sortRequests(value, false);
   }
+
+  sortRequests(field: string, ascending: boolean): void {
+    this.historyRequests.sort((a, b) => {
+      let valA = this.getFieldValue(a, field);
+      let valB = this.getFieldValue(b, field);
+
+      if (valA == null) valA = '';
+      if (valB == null) valB = '';
+
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+
+      if (valA < valB) return ascending ? -1 : 1;
+      if (valA > valB) return ascending ? 1 : -1;
+      return 0;
+    });
+  }
+
+  getFieldValue(obj: any, field: string): any {
+    switch (field) {
+      case 'Id': return obj.id;
+      case 'Status': return obj.status;
+      case 'DFN': return obj.driverFullName;
+      case 'DUN': return obj.driverUserName;
+      case 'CFN': return obj.customerFullName;
+      case 'CUN': return obj.customerUserName;
+      case 'CC': return obj.carClass;
+      case 'SA': return obj.startAddress;
+      case 'DA': return obj.destinationAddress;
+      case 'CD': return obj.createdAt;
+      case 'UD': return obj.updatedAt;
+      case 'km': return obj.distance;
+      case 'min': return obj.duration;
+      case '€': return obj.price;
+      case 'DR': return obj.driverRating;
+      case 'CR': return obj.customerRating;
+      default: return '';
+    }
+  }
+
+  goToRideHistory(): void {
+    this.router.navigate(['/ride-history']);
+  }
+
+
+
 }

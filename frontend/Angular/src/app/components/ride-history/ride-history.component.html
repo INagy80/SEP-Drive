@@ -1,0 +1,87 @@
+<button
+  class="close-button"
+  (click)="goToStartseite()"
+  title="Zurück zur Startseite">
+  <i class="pi pi-times"></i>
+</button>
+
+<!-- Fahrthistorie als Tabelle -->
+<section class="section section--history" *ngIf="historyRequests.length">
+  <h2 class="section__title mb-8">Verlauf:</h2>
+
+  <!-- Sortier- und Suchoptionen -->
+  <div class="order flex flex-row mb-4">
+    <div class="coords-row ascending mr-4">
+      <span>Ascending</span>
+      <select [(ngModel)]="ascendingitem" (ngModelChange)="onAscendingitemChange($event)">
+        <option selected disabled>Ascending</option>
+        <!-- sort options ... (wie vorher) -->
+      </select>
+    </div>
+
+    <div class="coords-row descending mr-4">
+      <span>Descending</span>
+      <select [(ngModel)]="descendingitem" (ngModelChange)="ondescendingitemChange($event)">
+        <option selected disabled>Descending</option>
+        <!-- sort options ... (wie vorher) -->
+      </select>
+    </div>
+
+    <div class="coords-row search flex flex-row">
+      <input type="text" [(ngModel)]="search" placeholder="Suche nach Name" />
+    </div>
+  </div>
+
+  <!-- Tabelle für Fahrtverlauf -->
+  <div class="table-responsive">
+    <table class="table table-striped">
+
+      <thead>
+      <tr>
+        <th>Fahrt-ID</th>
+        <th>Datum</th>
+        <th>Distanz</th>
+        <th>Dauer</th>
+        <th>Preis</th>
+        <th *ngIf="userRole === 'KUNDE'">Bewertung Fahrer</th>
+        <th *ngIf="userRole === 'FAHRER'">Bewertung Kunde</th>
+        <th *ngIf="userRole === 'KUNDE'">Fahrername</th>
+        <th *ngIf="userRole === 'KUNDE'">Fahrer Benutzername</th>
+        <th *ngIf="userRole === 'FAHRER'">Kundenname</th>
+        <th *ngIf="userRole === 'FAHRER'">Kunden Benutzername</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr *ngFor="let req of historyRequests">
+        <td>{{ req.id }}</td>
+        <td>
+            <span [ngClass]="{
+              'completed': req.status === 'Completed',
+              'cancelled': req.status === 'Cancelled',
+              'pending': req.status === 'Pending'
+            }">{{ req.status }}</span>
+        </td>
+        <td>{{ req.updatedAt | date:'short' }}</td>
+        <td>{{ req.distance }} km</td>
+        <td>{{ req.duration }} min</td>
+        <td>{{ req.price }} €</td>
+        <td>
+          <p-rating [(ngModel)]="req.customerRating" [readonly]="true"></p-rating>
+          ({{ req.customerRating }})
+        </td>
+        <td>
+          <p-rating [(ngModel)]="req.driverRating" [readonly]="true"></p-rating>
+          ({{ req.driverRating }})
+        </td>
+        <td>{{ req.customerFullName }}</td>
+        <td>{{ req.customerUserName }}</td>
+        <td>{{ req.driverUserName }}</td>
+        <td>{{ req.driverFullName }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+

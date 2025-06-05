@@ -11,6 +11,7 @@ import {ForgotPasswordComponent} from './components/forgot-password/forgot-passw
 import {ProfileEditeComponent} from './components/profile-edite/profile-edite.component';
 import {TwoFAAccessGard} from './services/guard/TwoFA-access-gard';
 import {OthersProfileComponent} from './components/others-profile/others-profile.component';
+import { RideHistoryComponent } from './components/ride-history/ride-history.component';
 
 export const routes: Routes = [
   {path: '',           redirectTo: 'welcom', pathMatch: 'full'},
@@ -38,12 +39,7 @@ export const routes: Routes = [
 
   {path: 'search-profile/others',    component: OthersProfileComponent , canActivate: [AccessGuardService]},
 
-
-
-
-
-
-
+  { path: 'ride-history', component: RideHistoryComponent },
 
 
   {path: '**', redirectTo: 'welcome'}

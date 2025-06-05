@@ -17,6 +17,14 @@
 
       <!-- Active Section -->
         <h1 class="mb-8 ml-0">Aktive Fahrtanfrage:</h1>
+      <p-button
+        label="Fahrthistorie"
+        icon="pi pi-history"
+        class="nav-item"
+        (click)="goToRideHistory()">
+      </p-button>
+
+
       <mat-divider [vertical]="true" class="custom-mat-divider"></mat-divider>
       <div class=" boarder">
 
@@ -103,13 +111,16 @@
       <div class="divider"></div>
 
       <!-- History Section -->
-      <section class="section section--history" *ngIf="historyRequests.length">
+      <section class="section section--history" *ngIf="historyRequests.length"> <!-- "*ngIf="historyRequests.length" -> Zeig diesen Bereich ->nur wenn es vergangene Fahrten gibt   -->
         <h2 class="section__title mb-8">Verlauf:</h2>
 
+
+        <!-- Sortierung: Aufsteigend / Absteigend -->
         <div class="order flex flex-row ">
         <div class="coords-row ascending">
           <span>Ascending  </span>
-          <select [(ngModel)]="ascendingitem" name="ascendingitem" (ngModelChange)="onAscendingitemChange($event)">
+          <select [(ngModel)]="ascendingitem" name="ascendingitem" (ngModelChange)="onAscendingitemChange($event)">  <!-- [(ngModel)]="ascendingitem" -> verbindet Dropdown-Menü mit einer Variable namens ascendingitem; Bei Änderung wird onAscendingitemChange() aufgerufen -->
+           <!-- Sortieroptionen:-->
             <option selected disabled>Ascending</option>
             <option value="no"  ></option>
             <option value="Id"  >Id</option>
@@ -160,17 +171,23 @@
           </select>
         </div>
 
+          <!-- Suche nach Name -->
           <div class="coords-row search flex flex-row">
             <input type="text" id="search" [(ngModel)]="search" placeholder="search by name " />
           </div>
 
         </div>
 
+        <!-- enkrechten Strich-->
         <mat-divider [vertical]="true" class="custom-mat-divider"></mat-divider>
         <div class="divider"></div>
 
+
+        <!-- Historie-Einträge -->
         <div class="history-list">
-          <div *ngFor="let req of historyRequests" class="ride-card ride-card--history">
+          <div *ngFor="let req of historyRequests" class="ride-card ride-card--history"> <!-- Gehe durch jede Fahrt (req) in der Liste historyRequests und zeige sie als Karte an-->
+
+            <!--farbigen Button für Fahrt Status-->
           <button
             class="status-pill"
             [ngClass]="{
@@ -180,9 +197,10 @@
               'default'  : req.status !== 'Completed' && req.status !== 'Cancelled' && req.status !== 'Pending'
             }"
           >
-            {{ req.status }}
+            {{ req.status }} <!--  zeigt den Text im Button an-->
           </button>
 
+            <!--  Überschrift mit Fahrer und Kunde-->
             <div class="ride-card__header">
               <p style="font-size: 1.3rem"  class="mt-4"><strong class="ml-1">Ride Request Id:  &nbsp; &nbsp;  &nbsp; {{req.id}} </strong>    </p>
               <p style="font-size: 1.2rem"  class="mt-4"><strong class="ml-1">Driver:      </strong>  &nbsp; &nbsp;{{req.driverFullName !== ' ' ? '  '+req.driverFullName+' ' : ' ' }}  {{ req.driverUserName !== ' ' ? '   ('+req.driverUserName+') ': ' there is no driver'}}   </p>
