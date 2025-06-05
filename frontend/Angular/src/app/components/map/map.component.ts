@@ -11,10 +11,11 @@ import {Sidebar} from 'primeng/sidebar';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import {rideResponse} from '../../models/rideResponse';
 import {Button} from 'primeng/button';
-import {Router, RouterLink} from "@angular/router";
+import {Router} from "@angular/router";
 import {Drawer} from 'primeng/drawer';
 import {MatDivider} from '@angular/material/divider';
 import {Rating} from 'primeng/rating';
+import {AuthenticationResponse} from '../../models/authentication-response';
 
 
 @Component({
@@ -22,7 +23,7 @@ import {Rating} from 'primeng/rating';
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
-  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider, Rating, RouterLink]
+  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider, Rating]
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private L!: typeof Leaflet;
@@ -57,7 +58,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   routeDurationMin : number = 0;
   routePriceInEuro: number = 0;
 
+//Sara hat die Variable hinzugefügt
 
+  isdriver : boolean =false;
+  myname:String = '' ;
 
   rideRequests: Array<rideRequestDTO> = [];
   rideResponses : Array<rideResponse> = [];
@@ -141,6 +145,18 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
   async ngAfterViewInit(): Promise<void> {
+
+    const storedUser = localStorage.getItem('user');
+    if(storedUser){
+      const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+      const kundeDTO = authResponse.kundeDTO;
+
+      this.myname = kundeDTO?.firstName + ' ' + kundeDTO?.lastName;
+      if(kundeDTO?.dtype !== 'Kunde') {
+        this.isdriver =true;
+      }
+    }
+
     if (!isPlatformBrowser(this.platformId)) return;
 
     const leafletModule = await import('leaflet');
@@ -663,6 +679,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   }
 
+  //Sara hat hinzugefügt
+  driverdashboard():void{
+    this.router.navigate(['/fahranfragen']);
+  }
 
   profile() {
     this.router.navigate(['/profile']);

@@ -34,11 +34,11 @@
   </thead>
   <tbody>
   <tr *ngFor="let request of fahranfragen">
-    <td class="column-distance">{{ request.distance }} km</td>
-    <td class="column-duration">{{ request.duration }} min</td>
-    <td class="column-price">{{ request.price | currency:'EUR' }}</td>
-    <td class="column-start">{{ request.startaddress }}</td>
-    <td class="column-destination">{{ request.destinationaddress }}</td>
+    <td class="column-id">{{ request.id }} </td>
+    <td class="column-createdAt">{{ request.createdAt }} </td>
+    <td class="column-distance">{{ request.distance }}km</td>
+    <td class="column-kunde">{{ request.customerFullName }}</td>
+    <td class="column-rating">{{ request.customerRating}}</td>
     <td class="column-carclass">{{ request.carClass }}</td>
   </tr>
   </tbody>
