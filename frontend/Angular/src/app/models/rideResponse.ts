@@ -4,6 +4,7 @@ export interface rideResponse {
   createdAt: Date;
   updatedAt: Date;
   startAddress: string;
+  zwischenstposaddress: string;
   destinationAddress: string;
   customerRating: number;
   driverRating: number;

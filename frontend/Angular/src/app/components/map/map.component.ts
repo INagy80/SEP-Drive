@@ -33,7 +33,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private destMarker?: any;
   private destCircle?: any;
   private routeControl?: any;
-  private routingControl: Leaflet.Routing.Control | null = null;
+  private routingControl: any;
   private routeMarkers: Leaflet.Layer[] = [];
 
 
@@ -47,6 +47,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   startAddress =  '';
   zielAddress =  '';
   zwischenstoppsText = '';
+
   vehicleClasses = ['klein', 'Medium', 'Deluxe'];
   selectedCarClass = '';
   visible: boolean = false;
@@ -57,14 +58,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   routeDurationMin : number = 0;
   routePriceInEuro: number = 0;
 
+  isdriver : boolean = false;
 
 
   rideRequests: Array<rideRequestDTO> = [];
   rideResponses : Array<rideResponse> = [];
 
-  ascendingitem: any;  // ausgewähltes Feld für aufsteigende Sortierung
-  descendingitem: any;
-  search: any;  //Suchbegriff für Fahrer- oder Kundennamen
+  ohnesortierungarray: Array<rideResponse> = [];
+  ascendingitem: String = '';
+  descendingitem: String = '';
+  search: String = '';
 
 
   constructor(
@@ -212,7 +215,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }).addTo(this.map);
 
 
-        this.calculateRoute();
+
     } else {
       // Set or reset destination
       if (this.destMarker) {
@@ -240,6 +243,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.calculateRoute();
     }
   }
+
+
 
   private calculateRoute(): void {
     if (!this.pickupMarker || !this.destMarker) return;
@@ -270,6 +275,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
       this.routeDistanceKm = distanceInKm;
       this.routeDurationMin = durationInMin;
+
 
       // 🟢 2. Generate GPX file
       const coords = route.coordinates.map((c: any) => [c.lng, c.lat]);
@@ -657,7 +663,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   }
 
-  protected readonly navigator = navigator;
+
 
 
 
@@ -695,59 +701,126 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  onAscendingitemChange(value: string): void {
-    this.descendingitem = '';
-    this.sortRequests(value, true);
+  onAscendingitemChange(ascendingitem: String) {
+    this.ascendingitem = ascendingitem;
+
+    switch (this.ascendingitem) {
+      case 'no':
+      case 'CFN':
+      case 'CUN':
+        this.rideResponses = this.ohnesortierungarray;
+        break;
+      case 'Id':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.id - b.id);
+        break;
+      case 'status':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.status.localeCompare(b.status) );
+        break;
+      case 'DFN':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.driverFullName.localeCompare(b.driverFullName) );
+        break;
+      case 'DUN':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.driverUserName.localeCompare(b.driverUserName) );
+        break;
+      case 'CC':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.carClass.localeCompare(b.carClass) );
+        break;
+      case 'SA':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.startAddress.localeCompare(b.startAddress) );
+        break;
+      case 'DA':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.destinationAddress.localeCompare(b.destinationAddress) );
+        break;
+      case 'CD':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+        break;
+      case 'UD':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime());
+        break;
+      case 'km':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.distance - b.distance);
+        break;
+      case 'min':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.duration - b.duration);
+        break;
+      case '€':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.price - b.price);
+        break;
+      case 'DR':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.driverRating - b.driverRating);
+        break;
+      case 'CR':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.customerRating - b.customerRating);
+        break;
+    }
+
+
   }
 
-  ondescendingitemChange(value: string): void {
-    this.ascendingitem = '';
-    this.sortRequests(value, false);
+  ondescendingitemChange(descendingitem: String) {
+    this.descendingitem = descendingitem;
+
+
+    switch (this.descendingitem) {
+      case 'no':
+      case 'CFN':
+      case 'CUN':
+        this.rideResponses = this.ohnesortierungarray;
+        break;
+      case 'Id':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.id - a.id);
+        break;
+      case 'status':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.status.localeCompare(a.status) );
+        break;
+      case 'DFN':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.driverFullName.localeCompare(a.driverFullName) );
+        break;
+      case 'DUN':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.driverUserName.localeCompare(a.driverUserName) );
+        break;
+      case 'CC':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.carClass.localeCompare(a.carClass) );
+        break;
+      case 'SA':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.startAddress.localeCompare(a.startAddress) );
+        break;
+      case 'DA':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.destinationAddress.localeCompare(a.destinationAddress) );
+        break;
+      case 'CD':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        break;
+      case 'UD':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+        break;
+      case 'km':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.distance - a.distance);
+        break;
+      case 'min':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.duration - a.duration);
+        break;
+      case '€':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.price - a.price);
+        break;
+      case 'DR':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.driverRating - a.driverRating);
+        break;
+      case 'CR':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.customerRating - a.customerRating);
+        break;
+    }
+
   }
-
-  sortRequests(field: string, ascending: boolean): void {
-    this.historyRequests.sort((a, b) => {
-      let valA = this.getFieldValue(a, field);
-      let valB = this.getFieldValue(b, field);
-
-      if (valA == null) valA = '';
-      if (valB == null) valB = '';
-
-      if (typeof valA === 'string') valA = valA.toLowerCase();
-      if (typeof valB === 'string') valB = valB.toLowerCase();
-
-      if (valA < valB) return ascending ? -1 : 1;
-      if (valA > valB) return ascending ? 1 : -1;
-      return 0;
-    });
-  }
-
-  getFieldValue(obj: any, field: string): any {
-    switch (field) {
-      case 'Id': return obj.id;
-      case 'Status': return obj.status;
-      case 'DFN': return obj.driverFullName;
-      case 'DUN': return obj.driverUserName;
-      case 'CFN': return obj.customerFullName;
-      case 'CUN': return obj.customerUserName;
-      case 'CC': return obj.carClass;
-      case 'SA': return obj.startAddress;
-      case 'DA': return obj.destinationAddress;
-      case 'CD': return obj.createdAt;
-      case 'UD': return obj.updatedAt;
-      case 'km': return obj.distance;
-      case 'min': return obj.duration;
-      case '€': return obj.price;
-      case 'DR': return obj.driverRating;
-      case 'CR': return obj.customerRating;
-      default: return '';
+  onSearchChange(search: string) {
+    this.search = search;
+    if (this.search !== '') {
+      this.rideResponses = this.rideResponses.filter(a => a.status==='Active' || a.driverFullName.toLowerCase().includes(this.search.toLowerCase()) || a.driverUserName.toLowerCase().includes(this.search.toLowerCase()));
+    }
+    else {
+      this.rideResponses = this.ohnesortierungarray;
     }
   }
-
-  goToRideHistory(): void {
-    this.router.navigate(['/ride-history']);
-  }
-
 
 
 }
