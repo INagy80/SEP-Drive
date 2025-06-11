@@ -1,0 +1,16 @@
+
+<div class="notification-wrapper" style="position: relative;">
+  <button type="button" (click)="toggleNotifications($event)">
+    🔔
+    <span class="notification-count" *ngIf="notifications.length > 0">
+      {{ notifications.length }}
+    </span>
+  </button>
+
+  <p-overlayPanel #notificationPanel [showCloseIcon]="true">
+    <div *ngIf="notifications.length === 0">Keine neuen Benachrichtigungen</div>
+    <ul *ngIf="notifications.length > 0">
+      <li *ngFor="let note of notifications">{{ note }}</li>
+    </ul>
+  </p-overlayPanel>
+</div>

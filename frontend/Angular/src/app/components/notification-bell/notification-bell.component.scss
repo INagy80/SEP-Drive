@@ -1,0 +1,25 @@
+.notification-wrapper {
+  position: relative;
+  display: inline-block;
+  top: -80px;
+  right: -30px;
+
+}
+
+.notification-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.notification-wrapper button {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}

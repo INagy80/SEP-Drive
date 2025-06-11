@@ -11,6 +11,8 @@ import {ForgotPasswordComponent} from './components/forgot-password/forgot-passw
 import {ProfileEditeComponent} from './components/profile-edite/profile-edite.component';
 import {TwoFAAccessGard} from './services/guard/TwoFA-access-gard';
 import {OthersProfileComponent} from './components/others-profile/others-profile.component';
+import { NotificationBellComponent } from './components/notification-bell/notification-bell.component';
+
 
 export const routes: Routes = [
   {path: '',           redirectTo: 'welcom', pathMatch: 'full'},
@@ -38,7 +40,7 @@ export const routes: Routes = [
 
   {path: 'search-profile/others',    component: OthersProfileComponent , canActivate: [AccessGuardService]},
 
-
+  {path: 'home', component: MapComponent, canActivate: [AccessGuardService] },
 
 
 

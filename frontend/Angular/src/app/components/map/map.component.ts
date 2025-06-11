@@ -15,6 +15,7 @@ import {Router} from "@angular/router";
 import {Drawer} from 'primeng/drawer';
 import {MatDivider} from '@angular/material/divider';
 import {Rating} from 'primeng/rating';
+import {NotificationBellComponent} from '../notification-bell/notification-bell.component';
 
 
 @Component({
@@ -22,7 +23,7 @@ import {Rating} from 'primeng/rating';
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
-  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider, Rating]
+  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider, Rating, NotificationBellComponent]
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private L!: typeof Leaflet;
@@ -265,6 +266,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
       this.routeDistanceKm = distanceInKm;
       this.routeDurationMin = durationInMin;
+      switch (this.selectedCarClass) {
+        case 'klein':
+          this.routePriceInEuro = this.routeDistanceKm * 1.0;
+          break;
+        case 'Medium':
+          this.routePriceInEuro = this.routeDistanceKm * 2.0;
+          break;
+        case 'Deluxe':
+          this.routePriceInEuro = this.routeDistanceKm * 10.0;
+      }
 
       // 🟢 2. Generate GPX file
       const coords = route.coordinates.map((c: any) => [c.lng, c.lat]);
