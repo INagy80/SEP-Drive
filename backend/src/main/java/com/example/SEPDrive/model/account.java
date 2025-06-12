@@ -18,6 +18,22 @@ public class account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<transaction> transactions = new ArrayList<>();
 
+
+    @Column(nullable = false, unique = true)
+    @Enumerated(EnumType.STRING)
+    private AccountType type;
+
+    public void setType(AccountType type) {
+        this.type = type;
+    }
+
+    public AccountType getType() {
+        return type;
+    }
+
+    public enum AccountType { USER,SEP_WALLET }
+
+
     public void addTransaction(transaction tx) {
         transactions.add(tx);
         tx.setAccount(this);

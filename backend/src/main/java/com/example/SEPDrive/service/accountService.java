@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class accountService {
@@ -88,13 +89,12 @@ public class accountService {
         user customer = request.getCustomer();
         BigDecimal amount = request.getAmount();
 
-        user website = userDao.findByUserName(websiteUsername);
-        if (website == null) {
-            throw new IllegalStateException("Website account not found");
-        }
+        account websiteAcc = accountDao.findByType(account.AccountType.SEP_WALLET)
+                .orElseThrow(() -> new IllegalStateException("Website account not found"));
+
 
         account customerAcc = customer.getAccount();
-        account websiteAcc = website.getAccount();
+
 
         if (customerAcc.getBalance().compareTo(amount) < 0) {
             throw new IllegalArgumentException("Insufficient balance in customer's account");
@@ -118,16 +118,13 @@ public class accountService {
         user driver = request.getDriver();
         BigDecimal amount = request.getAmount();
 
-        user website = userDao.findByUserName(websiteUsername);
-        if (website == null) {
-            throw new IllegalStateException("Website account not found");
-        }
+        account websiteAcc = accountDao.findByType(account.AccountType.SEP_WALLET)
+                .orElseThrow(() -> new IllegalStateException("Website account not found"));
 
-        account websiteAcc = website.getAccount();
         account driverAcc = driver.getAccount();
 
         if (websiteAcc.getBalance().compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Insufficient balance in website account");
+            throw new IllegalArgumentException("Low balance in website account");
         }
 
         transaction withdrawTx = new transaction(websiteAcc, amount.negate(), type.TRANSFER_OUT);
@@ -148,13 +145,11 @@ public class accountService {
         user customer = request.getCustomer();
         BigDecimal amount = request.getAmount();
 
-        user website = userDao.findByUserName(websiteUsername);
-        if (website == null) {
-            throw new IllegalStateException("Website account not found");
-        }
+        account websiteAcc = accountDao.findByType(account.AccountType.SEP_WALLET)
+                .orElseThrow(() -> new IllegalStateException("Website account not found"));
 
         account customerAcc = customer.getAccount();
-        account websiteAcc = website.getAccount();
+
 
         if (websiteAcc.getBalance().compareTo(amount) < 0) {
             throw new IllegalArgumentException("Low balance in website account");
