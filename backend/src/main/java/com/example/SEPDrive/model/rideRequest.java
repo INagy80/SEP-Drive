@@ -1,6 +1,8 @@
 package com.example.SEPDrive.model;
 
 
+import com.example.SEPDrive.repository.userDAO;
+import com.example.SEPDrive.service.rideRequestService;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -12,11 +14,14 @@ import java.util.List;
 
 import io.jenetics.jpx.Length;
 import io.jenetics.jpx.WayPoint;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
 
 @Entity
 @Table(name = "ride_requests")
 public class rideRequest {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -199,13 +204,7 @@ public class rideRequest {
         this.customer = customer;
     }
 
-    public carClass getcarClass() {
-        return this.carClass;
-    }
 
-    public void setcarClass(carClass carClass) {
-        this.carClass = carClass;
-    }
 
     public RequestStatus getStatus() {
         return status;
@@ -282,4 +281,10 @@ public class rideRequest {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+
+
+
+
+
 }

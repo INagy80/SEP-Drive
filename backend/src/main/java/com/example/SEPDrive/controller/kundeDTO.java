@@ -1,5 +1,8 @@
 package com.example.SEPDrive.controller;
 
+import com.example.SEPDrive.model.role;
+import jakarta.annotation.Nullable;
+
 import java.time.LocalDate;
 
 public record kundeDTO(
@@ -9,6 +12,7 @@ public record kundeDTO(
             String firstName,
             String lastName,
             LocalDate dateOfBirth,
-            byte[] profilePhoto
+            byte[] profilePhoto,
+            String dtype
 )
 { }

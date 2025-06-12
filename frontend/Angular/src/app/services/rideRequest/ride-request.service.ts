@@ -36,4 +36,22 @@ export class RideRequestService {
     return this.http.put(`${this.rideRequestUrl}/deletestatus`,{});
 
   }
+
+  updateRating(user:String, rideRequestId:number, rating:number)   {
+    return this.http.put(`${this.rideRequestUrl}/updateRating/${user}/${rideRequestId}/${rating}`,{});
+
+  }
+
+  getAllactiverideRequests() : Observable<rideResponse[]> {
+    return this.http.get<rideResponse[]>(`${this.rideRequestUrl}/getAllactiverideRequests`);
+  }
+
+  makeOffer(id : number) : Observable<any> {
+    return this.http.put<any>(`${this.rideRequestUrl}/makeOffer/${id}`,{});
+  }
+
+
+  OfferRespond(id : number, isAccepted : boolean) : Observable<any> {
+    return this.http.put<any>(`${this.rideRequestUrl}/OfferResponse/${id}/${isAccepted}`,{});
+  }
 }

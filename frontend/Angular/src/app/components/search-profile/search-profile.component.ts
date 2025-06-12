@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, ElementRef, ViewChild,OnInit} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import {Button} from "primeng/button";
@@ -7,16 +7,32 @@ import {CustomerCardComponent} from '../customer-card/customer-card.component';
 import {ProfileService} from '../../services/profile/profile.service';
 import {ProfileDTO } from '../../models/profileDTO';
 import {DomSanitizer} from '@angular/platform-browser';
-import {switchMap, tap} from 'rxjs';
+import {Subscription, switchMap, tap} from 'rxjs';
+import { NotificationService } from '../../services/notification.service';
+import {AuthenticationResponse} from '../../models/authentication-response';
+import {GeldKontoService} from '../../services/geld-konto.service';
+import {GeldKontoComponent} from '../geld-konto/geld-konto.component';
+import {HeaderComponent} from '../header/header.component';
+import {WebsocketService} from '../../services/websocket.service';
 
 @Component({
   selector: 'app-search-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, Button, CustomerCardComponent],
+  imports: [CommonModule, FormsModule, Button, CustomerCardComponent, GeldKontoComponent, HeaderComponent],
   templateUrl: './search-profile.component.html',
   styleUrls: ['./search-profile.component.scss']
 })
-export class SearchProfileComponent {
+export class SearchProfileComponent implements OnInit {
+
+
+
+
+  myphotoUrl : any = '/assets/images/default-profile.jpg';
+  myname = '';
+  isdriver= false;
+
+
+
   searchQuery: string = '';
   drivers: Array<ProfileDTO> = [];
   Imagesblob : Array<Blob> = [];
@@ -25,8 +41,13 @@ export class SearchProfileComponent {
 
   constructor( private router: Router,
                private profileService: ProfileService,
-               private sanitizer: DomSanitizer
+               private sanitizer: DomSanitizer,
+               private notificationService: NotificationService,
+               private geldKontoService: GeldKontoService,
+               private WebSocketService : WebsocketService,
                ) { }
+
+
 
   onSearch(): void {
     this.drivers = [];
@@ -61,6 +82,53 @@ export class SearchProfileComponent {
 
 
 
+  ngOnInit(): void {
+
+    this.loadmyprofilePhoto();
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+      const kundeDTO = authResponse.kundeDTO;
+
+      this.myname = kundeDTO?.firstName + ' ' + kundeDTO?.lastName;
+      if (kundeDTO?.dtype !== 'Kunde') {
+        this.isdriver = true;
+
+      }
+
+    }
+
+
+  }
+
+
+
+
+
+  loadmyprofilePhoto(){
+    this.profileService.getMyPhotoAsBlob().subscribe({
+      next: blob => {
+        this.myphotoUrl = blob;
+        console.log(blob);
+        if(blob !== null){
+
+          const url = URL.createObjectURL(blob);
+          this.myphotoUrl = this.sanitizer.bypassSecurityTrustUrl(url) as string;
+        }else{
+          this.myphotoUrl = '/assets/images/default-profile.jpg';
+        }
+
+
+      }, error (err){
+        console.log("error");
+        console.log(err);
+      }
+
+    });
+  }
+
+
+
 
 
 
@@ -73,15 +141,25 @@ export class SearchProfileComponent {
 
   }
 
-  Profile() {
+  profile() {
     this.router.navigate(['/profile']);
 
+  }
+
+
+  driverdashboard(){
+    this.router.navigate(['/driverdashboard']);
   }
 
   logout() {
     localStorage.removeItem('user');
     this.router.navigate(['/welcome']);
+    this.WebSocketService.disconnect();
 
+  }
+
+  fahrtangebote(){
+    this.router.navigate(['/fahrtangebote']);
   }
 
   deleteCustomer($event: ProfileDTO) {

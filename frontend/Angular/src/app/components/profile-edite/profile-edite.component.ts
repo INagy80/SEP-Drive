@@ -1,8 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import {Button} from "primeng/button";
+import {Subscription} from 'rxjs';
+import {ProfileService} from '../../services/profile/profile.service';
+import {DomSanitizer} from '@angular/platform-browser';
+import {NotificationService} from '../../services/notification.service';
+import {AuthenticationResponse} from '../../models/authentication-response';
+import {GeldKontoService} from '../../services/geld-konto.service';
+import {GeldKontoComponent} from '../geld-konto/geld-konto.component';
+import {HeaderComponent} from '../header/header.component';
+import {WebsocketService} from '../../services/websocket.service';
 
 
 @Component({
@@ -10,24 +19,56 @@ import {Button} from "primeng/button";
   standalone: true,
   templateUrl: './profile-edite.component.html',
   styleUrls: ['./profile-edite.component.scss'],
-    imports: [
-        FormsModule,
-        CommonModule,
-        Button,
-    ],
+  imports: [
+    FormsModule,
+    CommonModule,
+    Button,
+    GeldKontoComponent,
+    HeaderComponent,
+  ],
 
 
 })
 
 
 export class ProfileEditeComponent implements OnInit {
+
+
+
+  isdriver= false;
+  photoUrl : any = '/assets/images/default-profile.jpg';
+
   userProfile: any = {};
   selectedFile: File | null = null;
   previewUrl: string | null = null;
+  profilbildDatei: any;
+  profilbildVorschauUrl: any;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private profileService : ProfileService,
+    private sanitizer: DomSanitizer,
+    private notificationService: NotificationService,
+    private geldKontoService : GeldKontoService,
+    private WebSocketService : WebsocketService,
+
+  ) {}
 
   ngOnInit(): void {
+
+
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+      const kundeDTO = authResponse.kundeDTO;
+
+      if (kundeDTO?.dtype !== 'Kunde') {
+        this.isdriver = true;
+
+      }
+
+    }
+
     // Beispiel-Daten (ersetzt später einen Service)
     this.userProfile = {
       firstName: '',
@@ -41,19 +82,44 @@ export class ProfileEditeComponent implements OnInit {
     };
 
     this.previewUrl = this.userProfile.profilePicture;
+
+    this.loadmyPhoto();
+
   }
 
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      this.selectedFile = file;
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.previewUrl = reader.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
+
+
+  loadmyPhoto(){
+    this.profileService.getMyPhotoAsBlob().subscribe({
+      next: blob => {
+        this.photoUrl = blob;
+        console.log(blob);
+        if(blob !== null){
+
+          const url = URL.createObjectURL(blob);
+          this.photoUrl = this.sanitizer.bypassSecurityTrustUrl(url) as string;
+        }else{
+          this.photoUrl = '/assets/images/default-profile.jpg';
+        }
+
+
+      }, error (err){
+        console.log("error");
+        console.log(err);
+      }
+
+    });
+  }
+
+
+
+  onFileSelected($event: Event): void {
+
+      const file = ($event.target as HTMLInputElement).files![0];
+      this.profilbildDatei = file;
+      this.profilbildVorschauUrl = URL.createObjectURL(file);
+
   }
 
   async saveChanges(){
@@ -82,11 +148,11 @@ export class ProfileEditeComponent implements OnInit {
   }
 
   startseite() {
-    this.router.navigate(['/map']);
+    this.router.navigate(['/home']);
 
   }
 
-  Profile() {
+  profile() {
     this.router.navigate(['/profile']);
 
   }
@@ -94,6 +160,15 @@ export class ProfileEditeComponent implements OnInit {
   logout() {
     localStorage.removeItem('user');
     this.router.navigate(['/welcome']);
+    this.WebSocketService.disconnect();
 
   }
+  fahrtangebote(){
+    this.router.navigate(['/fahrtangebote']);
+  }
+
+  driverdashboard(){
+    this.router.navigate(['/driverdashboard']);
+  }
+
 }

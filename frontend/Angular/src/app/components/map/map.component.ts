@@ -14,6 +14,19 @@ import {Router} from "@angular/router";
 import {Drawer} from 'primeng/drawer';
 import {MatDivider} from '@angular/material/divider';
 import {Rating} from 'primeng/rating';
+import {AuthenticationResponse} from '../../models/authentication-response';
+import {ProfileService} from '../../services/profile/profile.service';
+import {DomSanitizer} from '@angular/platform-browser';
+import { BadgeModule } from 'primeng/badge';
+import { CommonModule } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import {Subscription, switchMap, tap} from 'rxjs';
+import { NotificationService } from '../../services/notification.service';
+import { GeldKontoService } from '../../services/geld-konto.service';
+import {GeldKontoComponent} from '../geld-konto/geld-konto.component';
+import {HeaderComponent} from '../header/header.component';
+import { ToastrService } from 'ngx-toastr';
+import {WebsocketService} from '../../services/websocket.service';
 
 
 @Component({
@@ -21,12 +34,13 @@ import {Rating} from 'primeng/rating';
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
-  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, NgForOf, DatePipe, NgIf, NgClass, Button, Drawer, MatDivider, Rating]
+  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, Drawer, MatDivider, Rating, BadgeModule, CommonModule, ButtonModule, HeaderComponent],
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('simulationMapContainer', { static: false })
   private simulationMapContainer!: ElementRef<HTMLDivElement>;
+
 
 
   private L!: typeof Leaflet;
@@ -63,6 +77,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   routeDistanceKm : number = 0;
   routeDurationMin : number = 0;
   routePriceInEuro: number = 0;
+
+
+
+  isdriver : boolean = false;
+  myBalance = 0.0;
+
+
 
 
 
@@ -141,8 +162,17 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     @Inject(PLATFORM_ID) private platformId: Object,
     private rideRequestService : RideRequestService,
     private router: Router,
+    private profileService : ProfileService,
+    private sanitizer: DomSanitizer,
+    private notificationService: NotificationService,
+    private geldkontoService: GeldKontoService,
+    private toastr: ToastrService,
+    private WebSocketService : WebsocketService,
 
   ) {}
+
+
+
 
   onCarClassChange(newClass: string) {
     this.selectedCarClass = newClass;
@@ -160,18 +190,54 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
+  async loadMyBalance() : Promise<void> {
+    this.geldkontoService.getMyBalance().subscribe({
+      next: balance => {
+        this.myBalance = balance;
+      }, error: error => {
+        console.log(error);
+      }
+    });
+
+  }
 
 
   isvisible(){
     this.visible = true;
   }
 
+  updateRating(user:String , rideRequestId:number, rating:number) {
+    this.rideRequestService.updateRating(user, rideRequestId, rating).subscribe({
+      next: ()  => {
+        console.log('rating updated to '+ rating);
+        console.log(rideRequestId);
+        console.log(user);
+        this.findAllrideRequests();
+      },
+      error: (err) => {
+        //alert('something went wrong');
+        this.toastr.error('something went wrong', 'Error!!');
+      }
+
+      }
+    );
+
+  }
+
+  otherProfileClicked(userName: string | undefined) {
+    localStorage.setItem('otherProfile', userName || '');
+    this.router.navigate(['search-profile/others']);
+
+  }
+
   get activeRequest(): rideResponse | undefined {
-    return this.rideResponses.find(r => r.status === 'Active');
+    return this.rideResponses.find(r => r.status === 'Active' || 'Assigned');
   }
 
   get historyRequests(): rideResponse[] {
-    return this.rideResponses.filter(r => r.status !== 'Active');
+    return this.rideResponses.filter(
+      r => r.status !== 'Active' && r.status !== 'Assigned'
+    );
   }
 
 
@@ -190,7 +256,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         },
         error: (err) => {
           console.log(err);
-          alert('something went wrong');
+         // alert('something went wrong');
+          this.toastr.error('something went wrong', 'Error!!');
+
         }
       })
   }
@@ -208,7 +276,30 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   }
 
+
+
   async ngAfterViewInit(): Promise<void> {
+
+
+    this.WebSocketService.connect();
+
+    this.loadMyBalance();
+
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+        const kundeDTO = authResponse.kundeDTO;
+
+        if (kundeDTO?.dtype !== 'Kunde') {
+          this.isdriver = true;
+
+        }
+
+      }
+
+
+
+
     if (!isPlatformBrowser(this.platformId)) return;
 
     // 1) Load Leaflet and LRM
@@ -511,84 +602,126 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
-   createRideRequest(): void {
+   async createRideRequest(): Promise<void> {
 
-   if(this.routeDurationMin === 0 || this.routeDistanceKm === 0){
-     alert("please click on (Route anzeigen) button first to calculate the route");
-     return;
-   }
-   if(this.routePriceInEuro === 0){
-     alert("Bitte wählen Sie eine Auto Klasse aus.");
-     return;
-   }
+     this.geldkontoService.getMyBalance().subscribe({
+       next: balance => {
+         this.myBalance = balance;
 
-    this.updateRoute().then(() => {
+         if (this.routeDurationMin === 0 || this.routeDistanceKm === 0) {
+           //alert("please click on (Route anzeigen) button first to calculate the route");
+           this.toastr.warning('please click on (Route anzeigen) button first to calculate the route', 'Oups!!');
 
-     const startLatLng: LatLng = {
-       lat: this.pickupMarker.getLatLng().lat,
-       lng: this.pickupMarker.getLatLng().lng
-     };
-     const destLatLng: LatLng = {
-       lat: this.destMarker.getLatLng().lat,
-       lng: this.destMarker.getLatLng().lng
-     };
+           return;
+         }
 
-     //  Build the DTO
-     const requestDto: rideRequestDTO = {
-       distance: parseFloat(this.routeDistanceKm.toFixed(2)),
-       duration: parseFloat(this.routeDurationMin.toFixed(2)),
-       price: parseFloat(this.routePriceInEuro.toFixed(2)),
-       start: startLatLng,
-       startaddress: this.startAddress,
-       zwischenstops: this.zwischenstops,
-       zwischenstopssaddress: this.zwischenstoppsTextArray,
-       destination: destLatLng,
-       destinationaddress: this.zielAddress,
-       carClass: this.selectedCarClass as "Medium" | "Deluxe" | "klein"
-     };
+         if (this.routePriceInEuro === 0) {
+           //alert("Bitte wählen Sie eine Auto Klasse aus.");
+           this.toastr.warning('Bitte wählen Sie eine Auto Klasse aus.', 'Oups!!');
+
+           return;
+         }
+
+         if (this.routePriceInEuro > this.myBalance) {
+           //alert("Sie haben nicht genug Geld. Bitte laden Sie Ihr Konto auf!");
+           this.toastr.warning('Sie haben nicht genug Geld. Bitte laden Sie Ihr Konto auf!', 'Oups!!');
+
+           return;
+         }
 
 
+         this.updateRoute().then(() => {
+
+           const startLatLng: LatLng = {
+             lat: this.pickupMarker.getLatLng().lat,
+             lng: this.pickupMarker.getLatLng().lng
+           };
+           const destLatLng: LatLng = {
+             lat: this.destMarker.getLatLng().lat,
+             lng: this.destMarker.getLatLng().lng
+           };
+
+           //  Build the DTO
+           const requestDto: rideRequestDTO = {
+             distance: parseFloat(this.routeDistanceKm.toFixed(2)),
+             duration: parseFloat(this.routeDurationMin.toFixed(2)),
+             price: parseFloat(this.routePriceInEuro.toFixed(2)),
+             start: startLatLng,
+             startaddress: this.startAddress,
+             zwischenstops: this.zwischenstops,
+             zwischenstopssaddress: this.zwischenstoppsTextArray,
+             destination: destLatLng,
+             destinationaddress: this.zielAddress,
+             carClass: this.selectedCarClass as "Medium" | "Deluxe" | "klein"
+           };
 
 
-       // Call the service
-     if (this.selectedCarClass === '') {
-       this.errorMsg = 'Bitte wählen Sie eine Auto Klasse aus.';
-       alert(this.errorMsg);
-       return;
+           // Call the service
+           if (this.selectedCarClass === '') {
+             this.errorMsg = 'Bitte wählen Sie eine Auto Klasse aus.';
+             //alert(this.errorMsg);
+             this.toastr.warning('Bitte wählen Sie eine Auto Klasse aus.', 'Oups!!');
 
-     }
+             return;
 
-         this.rideRequestService.create(requestDto)
-           .subscribe({
-             next: (res) => {
-               alert('Fahrt angefordert');
+           }
 
-             },
-             error: (err) => {
-               if (err.error.statusCode === 401 || err.error.statusCode === 403 || err.error.statusCode === 500) {
-                 if (err.error.message.includes('You already have an active request')){
-                   this.errorMsg = 'you already have an active ride request';
-                   alert(this.errorMsg);
-                 }else if (err.error.message.includes('No acceptable representation')){
+           this.rideRequestService.create(requestDto)
+             .subscribe({
+               next: (res) => {
+                 alert('Fahrt angefordert');
+                 this.toastr.success('Fahrt angefordert', 'Done!!');
+
+
+               },
+               error: (err) => {
+                 console.log(err)
+                 if (err.message.includes('Http failure during parsing')) {
                    this.errorMsg = 'your ride request is succesfully created';
-                   alert(this.errorMsg);
-                 }
-                 else{
-                   this.errorMsg = 'something went wrong';
-                   alert(this.errorMsg);
-                   window.location.reload();
+                   //alert(this.errorMsg);
+                   this.toastr.success('your ride request is succesfully created', 'Done!!');
 
+                 }
+                 if (err.error.statusCode === 401 || err.error.statusCode === 403 || err.error.statusCode === 500) {
+                   if (err.error.message.includes('You already have an active request')) {
+                     this.errorMsg = 'you already have an active ride request';
+                     //alert(this.errorMsg);
+                     this.toastr.info('you already have an active ride request', 'info!!');
+
+                   } else {
+                     this.errorMsg = 'something went wrong';
+                     //alert(this.errorMsg);
+                     window.location.reload();
+                     this.toastr.error('something went wrong', 'Oups!!');
+
+
+
+                   }
                  }
                }
-             }
-           });
+             });
 
-    }).catch(err => {
-      console.error('Failed to update route:', err);
-      alert('Fehler beim Aktualisieren der Route. Bitte erst auf "Route anzeigen" klicken und dann erneut versuchen.');
-    })
+         }).catch(err => {
+           console.error('Failed to update route:', err);
+           //alert('Fehler beim Aktualisieren der Route. Bitte erst auf "Route anzeigen" klicken und dann erneut versuchen.');
+           this.toastr.error('Fehler beim Aktualisieren der Route. Bitte erst auf "Route anzeigen" klicken und dann erneut versuchen.', 'Oups!!');
 
-     }
+         })
+
+
+       }, error: error => {
+         console.log(error);
+       }
+
+
+     });
+   }
+
+
+
+
+
+
 
 
 
@@ -694,7 +827,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   useCurrentPosition(): void {
-    if (!navigator.geolocation) { alert('Geolocation wird von deinem Browser nicht unterstützt.'); return; }
+    if (!navigator.geolocation) { //alert('Geolocation wird von deinem Browser nicht unterstützt.');
+      this.toastr.error('Geolocation wird von deinem Browser nicht unterstützt.', 'Oups!!');
+
+      return; }
 
     navigator.geolocation.getCurrentPosition(
       pos => {
@@ -706,14 +842,19 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         //this.routeMarkers.push(curr);
       },
       err =>{
-       alert('Fehler beim Abrufen der Position: ' + err.message)
+      // alert('Fehler beim Abrufen der Position: ' + err.message)
+        this.toastr.error('Fehler beim Abrufen der Position: ' + err.message, 'Oups!!');
 
       }
     );
   }
 
   setCurrentlocation(): void{
-    if (!navigator.geolocation) { alert('Geolocation wird von deinem Browser nicht unterstützt.'); return; }
+    if (!navigator.geolocation) {
+      //alert('Geolocation wird von deinem Browser nicht unterstützt.');
+      this.toastr.error('Geolocation wird von deinem Browser nicht unterstützt.', 'Oups!!');
+
+      return; }
     navigator.geolocation.getCurrentPosition(
       pos => {
         const coord = this.L.latLng(pos.coords.latitude, pos.coords.longitude);
@@ -749,8 +890,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         //this.routeMarkers.push(curr);
       },
       err => {
-        alert('Fehler beim Abrufen der Position: ' + err.message)
+       // alert('Fehler beim Abrufen der Position: ' + err.message)
         window.location.reload();
+        this.toastr.error('Fehler beim Abrufen der Position: ' + err.message, 'Oups!!');
+
       }
     );
 
@@ -768,7 +911,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const hasStart = !!this.pickupMarker || !!this.startAddress;
     const hasEnd   = !!this.destMarker   || !!this.zielAddress;
     if (!hasStart || !hasEnd) {
-      alert('Bitte setzen Sie Start- und Zielpunkt (Marker oder Adresse) bevor Sie eine Route anfordern.');
+      //alert('Bitte setzen Sie Start- und Zielpunkt (Marker oder Adresse) bevor Sie eine Route anfordern.');
+      this.toastr.warning('Bitte setzen Sie Start- und Zielpunkt (Marker oder Adresse) bevor Sie eine Route anfordern.', 'Oops!!');
+
       return;
     }
 
@@ -936,6 +1081,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   }
 
+  driverdashboard(){
+    this.router.navigate(['/driverdashboard']);
+  }
+
+  fahrtangebote(){
+    this.router.navigate(['/fahrtangebote']);
+  }
+
   profile() {
     this.router.navigate(['/profile']);
 
@@ -944,21 +1097,43 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   logout() {
     localStorage.removeItem('user');
     this.router.navigate(['/welcome']);
+    this.WebSocketService.disconnect();
 
   }
 
-  statusdelete() {
+  statusdelete(ride:rideResponse) {
 
 
-        this.rideRequestService.deletestatus().subscribe({
-            next: () => {
-                alert('rideRequest deleted succesfully');
-                this.findAllrideRequests();
-            },
-            error: (err) => {
-                alert('something went wrong');
-            }
-        });
+    if(ride.status === 'Assigned'){
+      this.toastr.warning('you Can not delete this ride request because you are already Assigned with a driver', 'Oops!!');
+
+      return;
+    }
+
+    this.rideRequestService.deletestatus().pipe(
+      // 1) show delete toast as soon as deletion succeeds
+      tap(() => {
+        this.toastr.success('Ride request deleted successfully.', 'Deleted!!');
+      }),
+      // 2) once deleted, switch to the “get all” Observable
+      switchMap(() => this.rideRequestService.getAll()),
+      // 3) now we have the fresh array—assign it and calc stats
+      tap(requests => {
+        this.rideResponses = requests;
+        this.ohnesortierungarray = [...requests]
+
+      })
+    ).subscribe({
+      error: err => {
+        if (err.error.message.includes('you Can not delete this ride request because you are already in a ride')){
+          this.toastr.warning('you Can not delete this ride request because you are already in a ride', 'Oops!!');
+        }else{
+        this.toastr.error('Something went wrong', 'Oops!!');
+
+        }
+        console.error(err);
+      }
+    });
         this.simulationmap.removeLayer(this.simroutingControl)
         this.clearsimRouteMarkers()
         this.simulationmap.removeControl(this.simroutingControl);
@@ -973,6 +1148,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         localStorage.removeItem('simTravelFrac');
 
   }
+
+
 
 
   onAscendingitemChange(ascendingitem: String) {
@@ -1395,13 +1572,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
+    if(response?.driverUserName !== ' ') {
 
-    this.simulationvisible = true;
+      this.simulationvisible = true;
       console.log(response)
       this.simstartAddress = `${response?.startLatLong?.lat ?? ''} , ${response?.startLatLong?.lng ?? ''}`;
       this.simzielAddress = `${response?.destinationLatLong?.lat ?? ''} , ${response?.destinationLatLong?.lng ?? ''}`
       this.simzwischenstoppsText = '';
-      for ( var latlng of response?.zwischenstposlatlong ?? [] ){
+      for (var latlng of response?.zwischenstposlatlong ?? []) {
         this.simzwischenstoppsText += `${latlng.lat} ${latlng.lng} , `;
 
       }
@@ -1409,21 +1587,22 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.simrouteDistanceKm = response?.distance ?? 0;
       this.simroutePriceInEuro = response?.price ?? 0;
 
-    if (response?.status === 'Active') {
+      if (response?.status === 'Active' || 'Assigned' ) {
 
-      this.simulationstatus = true;
+        this.simulationstatus = true;
 
         this.updateRouteforsimulation(true);
 
 
-    }else {
-      this.simulationstatus = false;
-      this.updateRouteforsimulation(false);
+      } else {
+        this.simulationstatus = false;
+        this.updateRouteforsimulation(false);
+      }
+
+      setTimeout(() => this.simulationmap.invalidateSize(), 300);
+
+
     }
-
-    setTimeout(() => this.simulationmap.invalidateSize(), 300);
-
-
   }
 
 
@@ -1439,7 +1618,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const hasStart = !!this.simpickupMarker || !!this.simstartAddress;
     const hasEnd   = !!this.simdestMarker   || !!this.simzielAddress;
     if (!hasStart || !hasEnd) {
-      alert('Bitte setzen Sie Start- und Zielpunkt (Marker oder Adresse) bevor Sie eine Route anfordern.');
+     // alert('Bitte setzen Sie Start- und Zielpunkt (Marker oder Adresse) bevor Sie eine Route anfordern.');
+      this.toastr.warning('Bitte setzen Sie Start- und Zielpunkt (Marker oder Adresse) bevor Sie eine Route anfordern.', 'Oops!!');
+
       return;
     }
 

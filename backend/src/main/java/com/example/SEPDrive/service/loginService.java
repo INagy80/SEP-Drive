@@ -3,6 +3,8 @@ package com.example.SEPDrive.service;
 import com.example.SEPDrive.controller.AuthenticatinResponse;
 import com.example.SEPDrive.controller.kundeDTO;
 import com.example.SEPDrive.exceptions.requestValidationException;
+import com.example.SEPDrive.model.Kunde;
+import com.example.SEPDrive.model.role;
 import com.example.SEPDrive.model.user;
 import com.example.SEPDrive.repository.userDAO;
 import lombok.RequiredArgsConstructor;
@@ -78,6 +80,11 @@ public class loginService {
                 ", \n \n" +" successful login at " + DateFormat.getInstance().format(System.currentTimeMillis()) + ". \n \n was it you? if not please please change your password. \n \n \n Best regards,\n SEPDrive ");
 
 
+        String Kunde = null;
+
+        if(user instanceof Kunde){
+            Kunde = "Kunde";
+        }
 
 
         var jwtToken = jwtService.generateToken(userName);
@@ -88,7 +95,8 @@ public class loginService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getDateOfBirth(),
-                user.getProfilePhoto()
+                user.getProfilePhoto(),
+                Kunde
 
         )).build();
 

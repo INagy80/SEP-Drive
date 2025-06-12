@@ -11,7 +11,7 @@ export interface rideResponse {
   destinationLatLong: LatLng;
   customerRating: number;
   driverRating: number;
-  status: 'Active' | 'Rejected' | 'Completed' | 'Cancelled' | 'Pending';
+  status: 'Active' | 'Rejected' | 'Completed' | 'Cancelled' | 'Pending' | 'Assigned';
   id: number;
   driverFullName: string;
   customerFullName: string;

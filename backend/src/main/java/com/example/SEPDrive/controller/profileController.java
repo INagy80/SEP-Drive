@@ -77,5 +77,12 @@ public class profileController {
     }
 
 
+    @GetMapping("/getRating/{userName}")
+    public ResponseEntity<Double> getRating(@PathVariable String userName) {
+        return new ResponseEntity<Double>(profileService.getrating(userName), HttpStatus.OK);
+    }
+
+
+
 
 }

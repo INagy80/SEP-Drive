@@ -1,38 +1,97 @@
-<!-- Header mit Logo und Titel -->
-<p-drawer
-  [(visible)]="simulationvisible"
-  (visibleChange)="onSimulationVisibleChange($event)"
-  [position]="'right'"
-  [showCloseIcon]="true"
-  [closeOnEscape]="false"
-  [showCloseIcon]="true"
-  [blockScroll]="true"
-  [style.backgroundColor]="'#ffffff'"
-  [transitionOptions]="'300ms cubic-bezier(0, 0, 0.2, 1)'"
-  class="simulation-sidebar"
-  styleClass="simulation-sidebar"
-
->
-
-  <div class="simulation-header ">
-    <label>
-      Speed ×
-      <input
-        type="range"
-        min="0.1" max="30" step="0.1"
-        [(ngModel)]="simulationSpeedFactor" />
-      {{ simulationSpeedFactor.toFixed(1) }}× ({{((simrouteDurationMin/ simulationSpeedFactor)).toFixed(2) }} min)
-    </label>
-    <button class="p-2 mt-3 mb-3" style="height: 40px ; width: 110px  " (click)="enableAutoZoom();enableAutoZoom()">🔍 Focus</button>
-    <button  class="p-2 mt-3 mb-3" style="height: 40px ; width: 110px" (click)="toggleSimulation()">
-      {{ simulationPaused ? 'Weiterfahren' : 'Pause' }}
-    </button>
-  </div>
-  <div #simulationMapContainer class="map-container"></div>
 
 
 
-</p-drawer>
+
+
+
+<app-header></app-header>
+
+   <div class="navbar">
+
+
+     <div class=" gap-6 navbar " style="width: 60vw ; justify-content: space-around;
+     align-items: center; right: 30vw; left: 15vw; position: absolute" >
+
+       <p-button (click)="logout()" class="nav-item">
+         <div class="icons gap-2">
+           <p style="font-size: 1.1rem">Abmelden</p>
+           <img  src="/assets/icons/exit.png">
+         </div>
+
+       </p-button>
+       <p-button (click)="findAllrideResponse()" class="nav-item" >
+         <div class="icons gap-2">
+           <p >Fahranfragen</p>
+           <img  src="/assets/icons/rideRequest.png">
+         </div>
+
+       </p-button>
+
+       <p-button *ngIf="isdriver === true"   (click)="driverdashboard()" class="nav-item" >
+         <div class="icons gap-2">
+           <p >Dashboard</p>
+           <img  src="/assets/icons/route.png">
+         </div>
+       </p-button>
+
+       <p-button   (click)="fahrtangebote()" class="nav-item"  >
+         <div class="icons gap-2">
+           <p >FahrtAngebote</p>
+           <img  src="/assets/icons/fahrtangebote.png">
+         </div>
+       </p-button>
+
+       <p-button (click)="startseite()" class="nav-item">
+         <div class="icons gap-2">
+           <p >Startseite</p>
+           <img  src="/assets/icons/home.png">
+         </div>
+       </p-button>
+
+     </div>
+   </div>
+
+
+
+
+
+
+
+
+  <p-drawer
+    [(visible)]="simulationvisible"
+    (visibleChange)="onSimulationVisibleChange($event)"
+    [position]="'right'"
+    [showCloseIcon]="true"
+    [closeOnEscape]="false"
+    [showCloseIcon]="true"
+    [blockScroll]="true"
+    [style.backgroundColor]="'#ffffff'"
+    [transitionOptions]="'300ms cubic-bezier(0, 0, 0.2, 1)'"
+    class="simulation-sidebar"
+    styleClass="simulation-sidebar"
+
+  >
+
+    <div class="simulation-header ">
+      <label>
+        Speed ×
+        <input
+          type="range"
+          min="0.1" max="30" step="0.1"
+          [(ngModel)]="simulationSpeedFactor" />
+        {{ simulationSpeedFactor.toFixed(1) }}× ({{((simrouteDurationMin/ simulationSpeedFactor)).toFixed(2) }} min)
+      </label>
+      <button class="p-2 mt-3 mb-3" style="height: 40px ; width: 110px  " (click)="enableAutoZoom();enableAutoZoom()">🔍 Focus</button>
+      <button  class="p-2 mt-3 mb-3" style="height: 40px ; width: 110px" (click)="toggleSimulation()">
+        {{ simulationPaused ? 'Weiterfahren' : 'Pause' }}
+      </button>
+    </div>
+    <div #simulationMapContainer class="map-container"></div>
+
+
+
+  </p-drawer>
 
 
 
@@ -59,16 +118,22 @@
 
         <ng-container *ngIf="activeRequest; else noActiveTpl">
           <div class="ride-card ride-card--active boarder">
-          <button  class="active-button" (click)="simulationview(activeRequest)">
+          <button  *ngIf="activeRequest.status === 'Active'" class="active-button" (click)="simulationview(activeRequest)">
             {{ activeRequest.status }}
           </button>
+
+            <button *ngIf="activeRequest.status === 'Assigned'"  class="live-btn" (click)="simulationview(activeRequest)">
+              <span class="live-dot"></span>
+
+              LIVE
+            </button>
 
 
             <div class="ride-card__header">
 
               <p style="font-size: 1.3rem"  class="mt-4"><strong class="ml-1">Ride Request Id:  &nbsp; &nbsp;  &nbsp; {{activeRequest.id}} </strong>    </p>
-              <p style="font-size: 1.2rem"  class="mt-4"><strong class="ml-1">Driver:      </strong>  &nbsp; &nbsp;{{activeRequest.driverFullName !== ' ' ? '  '+activeRequest.driverFullName+' ' : ' ' }}  {{ activeRequest.driverUserName !== ' ' ? '   ('+activeRequest.driverUserName+') ': ' there is no driver'}}   </p>
-              <p style="font-size: 1.2rem" ><strong class="ml-1">Customer:      </strong>   &nbsp; &nbsp; {{'   '+activeRequest.customerFullName}}  {{'   ('+activeRequest.customerUserName + ') '}}</p>
+              <p style="font-size: 1.2rem" class="mt-4" (click)="otherProfileClicked(activeRequest?.driverUserName) " ><strong class=" ml-1">Driver:      </strong>  &nbsp; &nbsp;{{activeRequest.driverFullName !== ' ' ? '  '+activeRequest.driverFullName+' ' : ' ' }}  {{ activeRequest.driverUserName !== ' ' ? '   ('+activeRequest.driverUserName+') ': ' there is no driver'}}   </p>
+              <p style="font-size: 1.2rem" (click)="otherProfileClicked(activeRequest?.customerUserName)"  ><strong class="ml-1"  >Customer:      </strong>   &nbsp; &nbsp; {{'   '+activeRequest.customerFullName}}  {{'   ('+activeRequest.customerUserName + ') '}}</p>
 
 
 
@@ -121,7 +186,7 @@
             <div class="ride-card__ratings">
               <div class="rating flex flex-row">
                 <span class="rating__label mr-3">Kunde:</span>
-                  <div class="star">
+                  <div class="star" >
                     <p-rating class="p-1" [(ngModel)]="activeRequest.customerRating" [readonly]="true" />
                   </div>
                 <span class="rating__label mr-3">({{activeRequest.customerRating}})</span>
@@ -135,7 +200,7 @@
 
               </div>
             </div>
-            <button class="delete-button" (click)="statusdelete()">Löschen</button>
+            <button class="delete-button" (click)="statusdelete(activeRequest)">Löschen</button>
 
             <br><br>
 
@@ -240,8 +305,8 @@
 
             <div class="ride-card__header">
               <p style="font-size: 1.3rem"  class="mt-4"><strong class="ml-1">Ride Request Id:  &nbsp; &nbsp;  &nbsp; {{req.id}} </strong>    </p>
-              <p style="font-size: 1.2rem"  class="mt-4"><strong class="ml-1">Driver:      </strong>  &nbsp; &nbsp;{{req.driverFullName !== ' ' ? '  '+req.driverFullName+' ' : ' ' }}  {{ req.driverUserName !== ' ' ? '   ('+req.driverUserName+') ': ' there is no driver'}}   </p>
-              <p style="font-size: 1.2rem" ><strong class="ml-1">Customer:      </strong>   &nbsp; &nbsp; {{'   '+req.customerFullName}}  {{'   ('+req.customerUserName + ') '}}</p>
+              <p style="font-size: 1.2rem"  class="mt-4"  (click)="otherProfileClicked(req?.driverUserName)" ><strong class="ml-1"  >Driver:      </strong>  &nbsp; &nbsp;{{req.driverFullName !== ' ' ? '  '+req.driverFullName+' ' : ' ' }}  {{ req.driverUserName !== ' ' ? '   ('+req.driverUserName+') ': ' there is no driver'}}   </p>
+              <p style="font-size: 1.2rem"  (click)="otherProfileClicked(req?.customerUserName)" ><strong class="ml-1">Customer:      </strong>   &nbsp; &nbsp; {{'   '+req.customerFullName}}  {{'   ('+req.customerUserName + ') '}}</p>
             </div>
 
             <div class="ride-card__body mb-4 p-2">
@@ -287,15 +352,15 @@
             <div class="ride-card__ratings">
               <div class="rating flex flex-row">
                 <span class="rating__label mr-3">Kunde:</span>
-                <div class="star">
-                  <p-rating class="p-1" [(ngModel)]="req.customerRating" [readonly]="true" />
+                <div class="star" >
+                  <p-rating class="p-1" [(ngModel)]="req.customerRating" [readonly]="req.status !== 'Completed' || isdriver == false" (onRate)="updateRating('Customer' , req.id, req.customerRating)" />
                 </div>
                 <span class="rating__label mr-3">({{req.customerRating}})</span>
               </div>
               <div class="rating mb-4 flex flex-row">
                 <span class="rating__label mr-3">Fahrer:</span>
                 <div class="star">
-                  <p-rating class="p-1" [(ngModel)]="req.driverRating" [readonly]="true" />
+                  <p-rating class="p-1" [(ngModel)]="req.driverRating" [readonly]=" (req.status !== 'Completed' || isdriver == true)" (onRate)="updateRating('Driver' , req.id, req.driverRating)" />
                 </div>
                 <span class="rating__label mr-3">({{req.driverRating}})</span>
               </div>
@@ -311,19 +376,7 @@
 
 </p-drawer>
 
-<div class="header">
-  <img src="/assets/images/auto_logo.jpg" alt="Auto Logo" class="logo" />
-  <h1 class="site-title">SEP Drive</h1>
-</div>
 
-<!-- Navbar -->
-<div class="navbar">
-
-  <p-button (click)="startseite()" class="nav-item">Startseite</p-button>
-  <p-button (click)="findAllrideResponse()" class="nav-item">Fahranfragen</p-button>
-  <p-button (click)="profile()" class="nav-item">Profile</p-button>
-  <p-button (click)="logout()" class="nav-item">Abmelden</p-button>
-</div>
 
 <!-- Map Wrapper -->
 <div class="map-wrapper">

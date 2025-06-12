@@ -1,0 +1,32 @@
+<p-button  class="geld"  (click)="togglebalanceDropdown()">
+  <div class="icons gap-2">
+    <p style="font-size: 1.2rem; color: #0b113f">{{myBalance}}</p>
+    <img  src="/assets/icons/euro.png">
+  </div>
+</p-button>
+
+<div class="dropdown-container">
+
+  <!-- 2) The “dropdown menu” itself, shown/hidden via *ngIf -->
+  <div class="dropdown-menu" *ngIf="isBalanceDropdownOpen">
+    <!-- a) Input field to type a new balance -->
+    <div class="form-row">
+      <label for="balanceInput">Enter amount:</label>
+      <input
+        type="number"
+        id="balanceInput"
+        [(ngModel)]="amountInput"
+        placeholder="e.g. 100"
+      />
+    </div>
+
+    <!-- b) Two buttons in one row -->
+    <div class="form-row button-row">
+      <button (click)="addBalance()" >Add Balance</button>
+      <!--           <button (click)="toggleHistory()">-->
+      <!--             {{ showHistoryList ? 'Hide History' : 'Show History' }}-->
+      <!--           </button>-->
+    </div>
+
+  </div>
+</div>

@@ -8,7 +8,7 @@ public record fahrerDTO(
         Integer id,
         String userName,
         String email,
-        String fistName,
+        String firstName,
         String lastName,
         LocalDate dateOfBirth,
         byte[] profilePhoto,
