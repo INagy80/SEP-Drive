@@ -1,25 +1,25 @@
 services:
-  backend:
-    container_name: SEP_backend
-    build: ./backend
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/SEPDrive
-      SPRING_DATASOURCE_USERNAME: SEPDrive
-      SPRING_DATASOURCE_PASSWORD: SEPDriveC7
-    networks:
-      - SEPdb
-
-  frontend:
-    container_name: SEP_frontend
-    build: ./frontend/Angular
-    ports:
-      - "4200:80"
-    networks:
-      - SEPdb
+#  backend:
+#    container_name: SEP_backend
+#    build: ./backend
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - db
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/SEPDrive
+#      SPRING_DATASOURCE_USERNAME: SEPDrive
+#      SPRING_DATASOURCE_PASSWORD: SEPDriveC7
+#    networks:
+#      - SEPdb
+#
+#  frontend:
+#    container_name: SEP_frontend
+#    build: ./frontend/Angular
+#    ports:
+#      - "4200:80"
+#    networks:
+#      - SEPdb
 
 
 
