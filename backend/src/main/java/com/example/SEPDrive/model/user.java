@@ -81,6 +81,9 @@ public abstract class user {
     @Column(name = "is_email_verified", nullable = false)
     private Boolean isemailVerified;
 
+    @OneToOne
+    @JoinColumn(name = "account_id")
+    private account account;
 
 
     //constructor
@@ -208,7 +211,9 @@ public abstract class user {
         this.profilePhoto = profilePhoto;
     }
 
+    public account getAccount() { return account; }
 
+    public void setAccount(account account) { this.account = account; }
     public Double getRating() {
         return Rating;
     }
