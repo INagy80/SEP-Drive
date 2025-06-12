@@ -25,6 +25,7 @@
           <button  class="active-button">
             {{ activeRequest.status }}
           </button>
+          <button class="delete-button" (click)="statusdelete()">Löschen</button>
 
 
           <div class="ride-card__header">
@@ -98,7 +99,7 @@
 
             </div>
           </div>
-          <button class="delete-button" (click)="statusdelete()">Löschen</button>
+
 
           <br><br>
 
@@ -227,14 +228,6 @@
               <p><strong>Von:</strong></p>
               <div class="address-box">
                 <p class="address-text">{{ req.startAddress }}</p>
-              </div>
-            </div>
-
-            <p class="mb-0" ><strong class="mb-0">durch:</strong></p>
-            <div class="address-line mt-0 mb-2"  *ngFor="let address of req.zwischenstposaddress" >
-              <p class="mb-0"><strong  class="mb-0">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</strong></p>
-              <div class="address-box mt-1">
-                <p class="address-text">  {{address}}</p>
               </div>
             </div>
 

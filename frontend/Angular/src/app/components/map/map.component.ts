@@ -40,15 +40,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
-
-
-
-
   startAddress =  '';
   zielAddress =  '';
   zwischenstoppsText = '';
 
-  vehicleClasses = ['klein', 'Medium', 'Deluxe'];
+
   selectedCarClass = '';
   visible: boolean = false;
   private errorMsg: string = '';
@@ -106,10 +102,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return this.rideResponses.find(r => r.status === 'Active');
   }
 
-  //filtert alle nicht aktive vergangenen Fahrten
-  get historyRequests(): rideResponse[] {
-    return this.rideResponses.filter(r => r.status !== 'Active');
-  }
+
 
 
 
@@ -698,6 +691,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             }
         });
 
+  }
+
+  //filtert alle nicht aktive vergangenen Fahrten
+  get historyRequests(): rideResponse[] {
+    return this.rideResponses.filter(r => r.status !== 'Active');
   }
 
 
