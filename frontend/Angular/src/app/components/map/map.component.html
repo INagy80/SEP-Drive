@@ -212,6 +212,8 @@
         </ng-template>
       </div>
 
+      // Rawan's Part A //
+
       <mat-divider [vertical]="true" class="custom-mat-divider"></mat-divider>
       <div class="divider"></div>
 
@@ -298,6 +300,8 @@
               'pending'  : req.status === 'Pending',
               'default'  : req.status !== 'Completed' && req.status !== 'Cancelled' && req.status !== 'Pending'
             }"
+
+
             (click)="simulationview(req)"
           >
             {{ req.status }}
@@ -376,7 +380,7 @@
 
 </p-drawer>
 
-
+// Rawan's Part E //
 
 <!-- Map Wrapper -->
 <div class="map-wrapper">

@@ -85,7 +85,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
-
+// My Part A //
 
   rideRequests: Array<rideRequestDTO> = [];
   rideResponses : Array<rideResponse> = [];
@@ -95,7 +95,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   descendingitem: String = '';
   search: String = '';
 
-
+// My Part E //
 
 
 
@@ -234,11 +234,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return this.rideResponses.find(r => r.status === 'Active' || 'Assigned');
   }
 
-  get historyRequests(): rideResponse[] {
-    return this.rideResponses.filter(
-      r => r.status !== 'Active' && r.status !== 'Assigned'
-    );
-  }
+
 
 
 
@@ -1150,7 +1146,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
-
+  // My Part A //
+// c
+  get historyRequests(): rideResponse[] {
+    return this.rideResponses.filter(
+      r => r.status == 'Completed'
+    );
+  }
 
   onAscendingitemChange(ascendingitem: String) {
     this.ascendingitem = ascendingitem;
@@ -1273,6 +1275,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.rideResponses = this.ohnesortierungarray;
     }
   }
+
+  // My Part A //
+
+
 
   onAddresChange(adress: string) {
     this.routeDurationMin = 0;
