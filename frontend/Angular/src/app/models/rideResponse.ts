@@ -1,7 +1,6 @@
 import {LatLng} from "./rideRequestDTO";
 
 export interface rideResponse {
-  driverUserName: string;
   carClass: 'klein' | 'Medium' | 'Deluxe';
   createdAt: Date;
   updatedAt: Date;
@@ -13,6 +12,7 @@ export interface rideResponse {
   driverRating: number;
   status: 'Active' | 'Rejected' | 'Completed' | 'Cancelled' | 'Pending' | 'Assigned';
   id: number;
+  driverUserName: string;
   driverFullName: string;
   customerFullName: string;
   customerUserName: string;

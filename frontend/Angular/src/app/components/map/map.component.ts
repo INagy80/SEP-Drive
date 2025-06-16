@@ -1147,10 +1147,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   // My Part A //
-// c
   get historyRequests(): rideResponse[] {
     return this.rideResponses.filter(
-      r => r.status == 'Completed'
+      r => r.status == 'Completed' || r.status == 'Cancelled'
     );
   }
 
@@ -1159,9 +1158,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     switch (this.ascendingitem) {
       case 'no':
-      case 'CFN':
-      case 'CUN':
         this.rideResponses = this.ohnesortierungarray;
+        break;
+      case 'CFN':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.customerFullName.localeCompare(b.customerFullName) );
+        break;
+      case 'CUN':
+        this.rideResponses = this.rideResponses.sort((a, b) => a.customerUserName.localeCompare(b.customerUserName) );
         break;
       case 'Id':
         this.rideResponses = this.rideResponses.sort((a, b) => a.id - b.id);
@@ -1216,9 +1219,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     switch (this.descendingitem) {
       case 'no':
-      case 'CFN':
-      case 'CUN':
         this.rideResponses = this.ohnesortierungarray;
+        break;
+      case 'CFN':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.customerFullName.localeCompare(a.customerFullName) );
+        break;
+      case 'CUN':
+        this.rideResponses = this.rideResponses.sort((a, b) => b.customerUserName.localeCompare(a.customerUserName) );
         break;
       case 'Id':
         this.rideResponses = this.rideResponses.sort((a, b) => b.id - a.id);
@@ -1276,7 +1283,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  // My Part A //
+  // My Part E //
 
 
 
