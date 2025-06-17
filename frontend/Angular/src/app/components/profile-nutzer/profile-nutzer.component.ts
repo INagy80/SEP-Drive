@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {DatePipe, NgOptimizedImage} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -8,17 +8,30 @@ import {Router} from "@angular/router";
 import {ProfileService} from '../../services/profile/profile.service';
 import {ProfileDTO} from '../../models/profileDTO';
 import {DomSanitizer} from '@angular/platform-browser';
-
+import {Subscription} from 'rxjs';
+import {Rating} from 'primeng/rating';
+import {GeldKontoService} from '../../services/geld-konto.service';
+import {GeldKontoComponent} from '../geld-konto/geld-konto.component';
+import {HeaderComponent} from '../header/header.component';
+import {WebsocketService} from '../../services/websocket.service';
+import {AuthenticationResponse} from '../../models/authentication-response';
 
 
 @Component({
   selector: 'app-profile-nutzer',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, RouterModule, Button],
+  imports: [CommonModule, FormsModule, DatePipe, RouterModule, Button, Rating, GeldKontoComponent, HeaderComponent],
   templateUrl: './profile-nutzer.component.html',
   styleUrls: ['./profile-nutzer.component.scss']
 })
 export class ProfileNutzerComponent implements OnInit {
+
+
+
+
+
+
+  isdriver= false;
 
   profileDTO : ProfileDTO = {
     firstName: '',
@@ -39,7 +52,9 @@ export class ProfileNutzerComponent implements OnInit {
 
   constructor( private router: Router,
                private profileService : ProfileService,
-               private sanitizer: DomSanitizer
+               private sanitizer: DomSanitizer,
+               private geldKontoService :GeldKontoService,
+               private WebSocketService : WebsocketService,
 
   )
   { }
@@ -48,7 +63,20 @@ export class ProfileNutzerComponent implements OnInit {
     this.loadUserProfile();
     this.loadmyPhoto();
 
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+      const kundeDTO = authResponse.kundeDTO;
+
+      if (kundeDTO?.dtype !== 'Kunde') {
+        this.isdriver = true;
+
+      }
+
+    }
+
   }
+
 
 
 
@@ -105,6 +133,20 @@ export class ProfileNutzerComponent implements OnInit {
   logout() {
     localStorage.removeItem('user');
     this.router.navigate(['/welcome']);
+    this.WebSocketService.disconnect();
+
+  }
+
+  fahrtangebote(){
+    this.router.navigate(['/fahrtangebote']);
+  }
+
+  driverdashboard(){
+    this.router.navigate(['/driverdashboard']);
+  }
+
+  profile() {
+    this.router.navigate(['/profile']);
 
   }
 }
