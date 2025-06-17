@@ -1,5 +1,7 @@
 package com.example.SEPDrive.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
@@ -43,6 +45,7 @@ public abstract class user {
 
 
     @Column(name = "date_of_birth", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
 //    @Enumerated(EnumType.STRING)
@@ -81,6 +84,13 @@ public abstract class user {
     @Column(name = "is_email_verified", nullable = false)
     private Boolean isemailVerified;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "bank_account_id" )
+    @JsonBackReference
+    private geldKonto geldKonto ;
+
+
+
 
 
     //constructor
@@ -97,6 +107,7 @@ public abstract class user {
         numberOfRates = 0;
         totalRides = 0;
         isemailVerified= false;
+        geldKonto = new geldKonto(this);
 
     }
 
@@ -112,6 +123,7 @@ public abstract class user {
         numberOfRates = 0;
         totalRides = 0;
         isemailVerified= false;
+        geldKonto = new geldKonto(this);
     }
 
 
@@ -213,11 +225,50 @@ public abstract class user {
         return Rating;
     }
 
-    public void setRating(Double rating) {
-        numberOfRates += 1 ;
-        Rating = (Rating + rating) / numberOfRates;
-
+    public geldKonto getGeldKonto() {
+        return geldKonto;
     }
+
+    public void setGeldKonto(geldKonto geldKonto) {
+        this.geldKonto = geldKonto;
+    }
+
+//    public void setRating(Double rating) {
+//        numberOfRates += 1 ;
+//        Rating = (Rating + rating) / numberOfRates;
+//
+//    }
+
+
+
+    public void setNumberOfRates(int numberOfRates) {
+        this.numberOfRates = numberOfRates;
+    }
+
+    public void setRating(Double rating) {
+        Rating = rating;
+    }
+
+    public void setIsemailVerified(Boolean isemailVerified) {
+        this.isemailVerified = isemailVerified;
+    }
+
+    public int getNumberOfRates() {
+        return numberOfRates;
+    }
+
+    public Boolean getIsemailVerified() {
+        return isemailVerified;
+    }
+
+    public void setTotalRides(int totalRides) {
+        this.totalRides = totalRides;
+    }
+
+
+
+
+
 
     public int getTotalRides() {
         return totalRides;
@@ -226,6 +277,7 @@ public abstract class user {
     public void setTotalRides() {
         this.totalRides += 1 ;
     }
+
 
 
     @Override
