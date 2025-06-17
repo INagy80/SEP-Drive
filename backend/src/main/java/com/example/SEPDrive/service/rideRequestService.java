@@ -454,33 +454,7 @@ public class rideRequestService {
     }
 
 
-    public void onPersist() {
-        List<rideRequest> list = rideRequestDAO.findAll().stream().filter(request -> request.getStatus().equals(RequestStatus.Completed)).toList();
 
-        for (rideRequest r : list) {
-            user driver = r.getDriver();
-            driver.getTotalRides();
-
-
-            user Customer = r.getCustomer();
-            Customer.setTotalRides();
-
-
-
-            if (r.getDriver().getTotalRides() > 0) {
-                r.getDriver().setRating(r.getDrivererRating());
-
-            }
-            if (r.getCustomer().getTotalRides() > 0) {
-
-                r.getCustomer().setRating(r.getCustomer().getRating());
-            }
-
-
-            userDAO.save(Customer);
-            userDAO.save(driver);
-        }
-    }
 
 
     public void updateRating(int rideRequestId, Double rating, String user) {

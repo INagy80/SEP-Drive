@@ -32,23 +32,6 @@ public class notificationService {
     }
 
 
-//    public void notifyUser(notification note) {
-//        // 1) persist
-//        var saved = notificationDAO.save(note);
-//
-//        // 2) push to websocket queue
-//        NotificationMessage msg = new NotificationMessage(
-//                saved.getId(),
-//                saved.getTitle(),
-//                saved.getMessage(),
-//                saved.getCreatedAt()
-//        );
-//        messaging.convertAndSendToUser(
-//                saved.getReceiver().getUserName(),
-//                "/queue/notifications",
-//                msg
-//        );
-//    }
 
 }
 

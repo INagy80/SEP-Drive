@@ -120,11 +120,11 @@
 
         <ng-container *ngIf="activeRequest; else noActiveTpl">
           <div class="ride-card ride-card--active boarder">
-          <button  *ngIf="activeRequest.status === 'Active'" class="active-button" (click)="simulationview(activeRequest)">
+          <button  *ngIf="activeRequest.status === 'Active'" class="active-button" (click)="ViewRoadForUnassignedRides(activeRequest)">
             {{ activeRequest.status }}
           </button>
 
-            <button *ngIf="activeRequest.status === 'Assigned'"  class="live-btn" (click)="assigned(activeRequest)">
+            <button *ngIf="activeRequest.status === 'Assigned'"  class="live-btn" (click)="ViewSimulationmap(activeRequest)">
               <span class="live-dot"></span>
 
               LIVE
@@ -300,7 +300,7 @@
               'pending'  : req.status === 'Pending',
               'default'  : req.status !== 'Completed' && req.status !== 'Cancelled' && req.status !== 'Pending'
             }"
-            (click)="simulationview(req)"
+            (click)="ViewRoadForUnassignedRides(req)"
           >
             {{ req.status }}
           </button>

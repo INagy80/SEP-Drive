@@ -70,12 +70,12 @@ h1{
   font-weight: 500;
 }
 
-.bttn:hover{
+.bttn:hover{ !important;
   margin-top: 10px;
   align-items: center;
   width: 20%;
   height: 60px;
-  background: #182942;
+  background: #182942; !important;
   border-radius: 30px;
   box-shadow: rgba(0, 0, 0, 0.6);
   border: none;

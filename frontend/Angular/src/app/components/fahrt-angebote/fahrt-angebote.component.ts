@@ -173,20 +173,7 @@ export class FahrtAngeboteComponent implements OnInit, OnDestroy {
 
 
 
-  onCarClassChange(newClass: string) {
-    this.selectedCarClass = newClass;
-    switch (newClass) {
-      case 'klein':
-        this.routePriceInEuro = this.routeDistanceKm * 1.0;
-        break;
-      case 'Medium':
-        this.routePriceInEuro = this.routeDistanceKm * 2.0;
-        break;
-      case 'Deluxe':
-        this.routePriceInEuro = this.routeDistanceKm * 10.0;
-    }
 
-  }
 
   loadOffers() {
 

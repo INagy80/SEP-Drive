@@ -58,7 +58,7 @@ export const appConfig: ApplicationConfig = {
         newestOnTop: true,
         tapToDismiss: true,
         positionClass: 'toast-bottom-right',
-        timeOut: 8000,
+        timeOut: 10000,
       }),
 
     ),

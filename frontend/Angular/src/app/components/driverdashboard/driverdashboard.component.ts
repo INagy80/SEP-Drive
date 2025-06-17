@@ -121,8 +121,6 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
   zwischenstoppsTextArray : string[] = [];
   selectedCarClass: string | null = null;
   visible: boolean = false;
-  private errorMsg: string = '';
-  private message: string = '';
   routeDistanceKm : number = 0;
   routeDurationMin : number = 0;
   routePriceInEuro: number = 0;
@@ -180,21 +178,6 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
   }
 
 
-
-  onCarClassChange(newClass: string) {
-    this.selectedCarClass = newClass;
-    switch (newClass) {
-      case 'klein':
-        this.routePriceInEuro = this.routeDistanceKm * 1.0;
-        break;
-      case 'Medium':
-        this.routePriceInEuro = this.routeDistanceKm * 2.0;
-        break;
-      case 'Deluxe':
-        this.routePriceInEuro = this.routeDistanceKm * 10.0;
-    }
-
-  }
 
   loadrideRequests() {
     this.riderespones= [];
