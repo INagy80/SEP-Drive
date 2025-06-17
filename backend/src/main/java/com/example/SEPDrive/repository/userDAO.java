@@ -30,4 +30,6 @@ public interface userDAO extends JpaRepository<user, Integer> {
     void photo(@Param("photo") byte[] bytes, @Param("name") String username);
 
 
+    @Query(value = "SELECT * FROM users WHERE users.dtype = 'Fahrer' " ,nativeQuery = true)
+    List<Fahrer> findalldrivers();
 }

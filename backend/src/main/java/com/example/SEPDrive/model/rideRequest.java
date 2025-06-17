@@ -1,19 +1,27 @@
 package com.example.SEPDrive.model;
 
 
+import com.example.SEPDrive.repository.userDAO;
+import com.example.SEPDrive.service.rideRequestService;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.jenetics.jpx.Length;
 import io.jenetics.jpx.WayPoint;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
 
 @Entity
 @Table(name = "ride_requests")
 public class rideRequest {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +53,14 @@ public class rideRequest {
     @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "start_address_id")
     private adress startAddress;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name               = "ride_request_stops",
+            joinColumns        = @JoinColumn(name = "ride_request_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private List<adress> zwischenstops = new ArrayList<>();
 
 
 
@@ -126,6 +142,19 @@ public class rideRequest {
 
     }
 
+
+
+
+
+
+    public List<adress> getZwischenstops() {
+        return zwischenstops;
+    }
+
+    public void setZwischenstops(List<adress> zwischenstops) {
+        this.zwischenstops = zwischenstops;
+    }
+
     public double getCost() {
         return cost;
     }
@@ -175,13 +204,7 @@ public class rideRequest {
         this.customer = customer;
     }
 
-    public carClass getcarClass() {
-        return this.carClass;
-    }
 
-    public void setcarClass(carClass carClass) {
-        this.carClass = carClass;
-    }
 
     public RequestStatus getStatus() {
         return status;
@@ -258,4 +281,10 @@ public class rideRequest {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+
+
+
+
+
 }
