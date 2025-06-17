@@ -5,7 +5,6 @@ import {Subscription} from 'rxjs';
 import {Router} from '@angular/router';
 import {ProfileService} from '../../services/profile/profile.service';
 import {DomSanitizer} from '@angular/platform-browser';
-import {NotificationService} from '../../services/notification.service';
 import {AuthenticationResponse} from '../../models/authentication-response';
 import {FormsModule} from "@angular/forms";
 import {DatePipe, isPlatformBrowser, NgClass, NgForOf, NgIf,CommonModule} from '@angular/common';
@@ -64,7 +63,6 @@ export class HeaderComponent implements OnInit {
   constructor( private router: Router,
                private profileService : ProfileService,
                private sanitizer: DomSanitizer,
-               private notificationService: NotificationService,
                private ws: WebsocketService,
                private toaster: ToastrService,
 
@@ -76,10 +74,6 @@ export class HeaderComponent implements OnInit {
    this.ws.connect();
 
     this.loadmyPhoto();
-    this.notifSub = this.notificationService.onNewNotification().subscribe({
-      next: () => this.animateBell(),
-      error: (err) => console.error('Notification stream error:', err),
-    });
 
 
     const storedUser = localStorage.getItem('user');
@@ -104,7 +98,6 @@ export class HeaderComponent implements OnInit {
   onBellClick() {
     // 2) Example behavior: clear the unread‐badge and open notification panel
     this.hasUnread = false;
-    this.notificationService.markAllAsRead();
     this.hasUnread = false;
     this.showNotifications = !this.showNotifications;
     // (Then, e.g., route to /notifications or toggle a dropdown)

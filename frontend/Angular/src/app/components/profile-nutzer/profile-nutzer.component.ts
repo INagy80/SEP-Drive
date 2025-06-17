@@ -9,7 +9,6 @@ import {ProfileService} from '../../services/profile/profile.service';
 import {ProfileDTO} from '../../models/profileDTO';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Subscription} from 'rxjs';
-import { NotificationService } from '../../services/notification.service';
 import {Rating} from 'primeng/rating';
 import {GeldKontoService} from '../../services/geld-konto.service';
 import {GeldKontoComponent} from '../geld-konto/geld-konto.component';
@@ -54,7 +53,6 @@ export class ProfileNutzerComponent implements OnInit {
   constructor( private router: Router,
                private profileService : ProfileService,
                private sanitizer: DomSanitizer,
-               private notificationService: NotificationService,
                private geldKontoService :GeldKontoService,
                private WebSocketService : WebsocketService,
 

@@ -14,6 +14,7 @@ export const environment = {
     profileUrl: 'v1/profile',
     geldKonto: 'v1/geldKonto',
     rideOffers: 'v1/rideOffers',
+    simulations: 'v1/simulations',
   }
 
 };

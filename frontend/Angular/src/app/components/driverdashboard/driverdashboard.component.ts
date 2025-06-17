@@ -22,7 +22,6 @@ import { ProfileService } from '../../services/profile/profile.service';
 import { RatingModule } from 'primeng/rating';
 import {Subscription} from 'rxjs';
 import {DomSanitizer} from '@angular/platform-browser';
-import {NotificationService} from '../../services/notification.service';
 import {AuthenticationResponse} from '../../models/authentication-response';
 import {GeldKontoService} from '../../services/geld-konto.service';
 import {GeldKontoComponent} from '../geld-konto/geld-konto.component';
@@ -112,7 +111,7 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
   private routingControl: any;
   private routeMarkers: Leaflet.Layer[] = [];
 
-
+  private drivaerMarker?: any;
 
 
   startAddress =  '';
@@ -128,6 +127,7 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
   routeDurationMin : number = 0;
   routePriceInEuro: number = 0;
 
+  driverstartAddress = '';
 
 
 
@@ -150,6 +150,9 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
   carClassOptions: SelectItem[] = [];
   statusOptions: SelectItem[] = [];
   private sub!: Subscription;
+
+  hasAllreadyOfferd: boolean = false;
+  OfferdRideId: number = -1;
 
 
   constructor(
@@ -217,34 +220,28 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
       tap(filtered => {
         this.riderespones = filtered;
         if (filtered.length === 0) {
-          this.toaster.info('There is no Active rideRequests now', 'Info');
+          // this.toaster.info('There is no Active rideRequests now', 'Info');
         }
       }),
 
       // 3) Map each ride → DTO *with* pickupdistance & photourl$ Observable
       map(filtered =>
-        filtered.map(r => {
-          const pickupdistance = Math.floor(Math.random() * 40) + 1;
-
-          return {
-            ...r,
-            pickupdistance,
-
-            // leave this as an Observable and bind with async in the template
-            photourl$: this.profileService
-              .getPhotoByUsername(r.customerUserName)
-              .pipe(
-                map((blob: Blob): SafeUrl|string => {
-                  if (blob.size > 0) {
-                    const url = URL.createObjectURL(blob);
-                    return this.sanitizer.bypassSecurityTrustUrl(url);
-                  }
-                  return '/assets/images/default-profile.jpg';
-                }),
-                catchError(() => of('/assets/images/default-profile.jpg'))
-              )
-          };
-        })
+        filtered.map(r => ({
+          ...r,
+          pickupdistance: 0,
+          photourl$: this.profileService
+            .getPhotoByUsername(r.customerUserName)
+            .pipe(
+              map((blob: Blob): SafeUrl|string => {
+                if (blob.size > 0) {
+                  const url = URL.createObjectURL(blob);
+                  return this.sanitizer.bypassSecurityTrustUrl(url);
+                }
+                return '/assets/images/default-profile.jpg';
+              }),
+              catchError(() => of('/assets/images/default-profile.jpg'))
+            )
+        }))
       )
     ).subscribe({
       next: ridesWithPhotos => {
@@ -261,8 +258,10 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
 
 
 
+
   async ngAfterViewInit(): Promise<void> {
 
+    this.WebSocketService.connect();
 
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -274,6 +273,18 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
       }
 
     }
+
+     this.refresh.refreshrejectedOffers$.subscribe(() => {
+      this.hasAllreadyOfferd = false;
+      this.OfferdRideId = -1;
+       localStorage.setItem('offeredId', JSON.stringify(this.OfferdRideId));
+       localStorage.setItem('hasAllreadyOfferd', JSON.stringify(false));
+
+    });
+
+
+    this.OfferdRideId = JSON.parse(localStorage.getItem('offeredId') || '-1');
+    this.hasAllreadyOfferd = JSON.parse(localStorage.getItem('hasAllreadyOfferd') || 'false');
 
 
     if (!isPlatformBrowser(this.platformId)) return;
@@ -295,6 +306,14 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
     this.sub = this.refresh.refreshOffers$.subscribe(() => {
       this.loadrideRequests();
     });
+
+    setTimeout(()=>{
+        if(this.riderespones.length === 0) {
+          this.toaster.info('There is no Active rideRequests now', 'Info');
+        }
+      },
+      1000);
+
 
 
   }
@@ -342,62 +361,6 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
   }
 
 
-
-
-
-  private calculateRoute(startLatLng: LatLng): Promise<number> {
-    return new Promise((resolve, reject) => {
-      // 1) Clean up any old control
-      if (this.routeControl) {
-        this.map.removeControl(this.routeControl);
-      }
-
-      // 2) Determine “current” position (fallback to fixed coords if needed)
-      let curr: Leaflet.LatLng;
-      if (!this.currLocationMarker) {
-        curr = this.L.latLng(51.430575, 6.896667);
-      } else {
-        curr = this.currLocationMarker.getLatLng();
-      }
-
-      // 3) Create a Routing control—set `show: false` if you don’t want it visible
-      const Routing = (this.L as any).Routing;
-      this.routeControl = Routing.control({
-        waypoints: [curr, this.L.latLng(startLatLng.lat, startLatLng.lng)],
-        router: Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
-        lineOptions: { styles: [{ weight: 0 }] }, // zero-weight = invisible line
-        createMarker: () => null,
-        fitSelectedRoutes: false,
-        show: false,
-        addWaypoints: false,
-        draggableWaypoints: false,
-        routeWhileDragging: false
-      });
-
-      // 4) **Crucial**: add it to the map so LRM actually makes the request
-      this.routeControl.addTo(this.map);
-
-      // 5) Listen for the route result
-      this.routeControl.on('routesfound', (e: any) => {
-        try {
-          const route = e.routes[0];
-          const distKm = (route.summary.totalDistance || route.summary.distance) / 1000;
-
-          // Remove the hidden control so it doesn’t linger
-          this.map.removeControl(this.routeControl!);
-          resolve(distKm);
-        } catch (ex) {
-          this.map.removeControl(this.routeControl!);
-          reject(ex);
-        }
-      });
-
-      this.routeControl.on('routingerror', (err: any) => {
-        this.map.removeControl(this.routeControl!);
-        reject(err.error?.message || err);
-      });
-    });
-  }
 
 
 
@@ -469,10 +432,7 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
     })
       .addTo(this.map);
 
-    // const container = this.routingControl.getContainer();
-    // if (container && container.parentNode) {
-    //   container.parentNode.removeChild(container);
-    // }
+
 
     this.routingControl.on('routesfound', (e: any) => {
       const route = e.routes[0];
@@ -510,7 +470,7 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
         });
         this.currLocationMarker = this.L
           .marker(coord, { icon: simIcon })
-          .addTo(this.map);
+
       },
       err =>{
         //alert('Fehler beim Abrufen der Position: ' + err.message)
@@ -833,7 +793,64 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
 
 
   makeOffer(ride: rideResponse) {
-   this.WebSocketService.makeOffer(ride.id, ride.customerFullName)
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+    const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+     const kundeDTO = authResponse.kundeDTO;
+    if(kundeDTO?.carClass!==ride.carClass){
+      this.toaster.error('Sorry you do not have the suitable car Class for this ride', 'Oops!!');
+      return;
+    }
+    }else{
+      return;
+    }
+
+    this.hasAllreadyOfferd = true;
+    this.OfferdRideId = ride.id;
+    this.WebSocketService.makeOffer(ride.id, ride.customerFullName).subscribe({
+      next: (success: boolean) => {
+        if (success) {
+          this.OfferdRideId = ride.id;
+          localStorage.setItem('offeredId', JSON.stringify(this.OfferdRideId));
+          localStorage.setItem('hasAllreadyOfferd', JSON.stringify(true));
+        }
+      },
+      error: (error: any) => {
+        this.hasAllreadyOfferd = false;
+        localStorage.setItem('hasAllreadyOfferd', JSON.stringify(false));
+        const storedUser = localStorage.getItem('offeredId');
+        if (storedUser) {
+          this.OfferdRideId = JSON.parse(storedUser);
+        }
+      }
+    });
+
+
+  }
+
+  cancelOffer(ride: rideResponse) {
+     this.hasAllreadyOfferd = false;
+     this.OfferdRideId = -1;
+    this.WebSocketService.CancellMyOffer(ride.id).subscribe({
+      next: (success: boolean) => {
+        if (success) {
+          localStorage.setItem('offeredId', JSON.stringify(this.OfferdRideId));
+          localStorage.setItem('hasAllreadyOfferd', JSON.stringify(false));
+        }
+      },
+      error: (error: any) => {
+        this.hasAllreadyOfferd = true;
+        localStorage.setItem('hasAllreadyOfferd', JSON.stringify(true));
+        const storedUser = localStorage.getItem('offeredId');
+        if (storedUser) {
+          this.OfferdRideId = JSON.parse(storedUser);
+        }
+      }
+    });
+  }
+
+  blocked(){
+    this.toaster.error('You already have a pending offer.', 'Oops!');
   }
 
 
@@ -859,4 +876,185 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
     this.WebSocketService.disconnect();
 
   }
+
+
+
+
+  async onAddressChange(): Promise<void> {
+    // A) Remove any existing driver marker
+    this.drivaerMarker?.remove();
+
+    let driverLatLng: Leaflet.LatLng;
+
+    if (!this.driverstartAddress?.trim()) {
+      // 1) No text entered → use map marker or browser geo
+      if (this.currLocationMarker) {
+        driverLatLng = this.currLocationMarker.getLatLng();
+      } else {
+        try {
+          const pos = await new Promise<GeolocationPosition>((res, rej) =>
+            navigator.geolocation.getCurrentPosition(res, rej)
+          );
+          driverLatLng = this.L.latLng(pos.coords.latitude, pos.coords.longitude);
+        } catch {
+          this.toaster.error('Unable to get your current location', 'Error');
+          return;
+        }
+      }
+      // 2) Reverse-geocode to fill in the text input
+      try {
+        this.driverstartAddress = await this.reverseGeocode(driverLatLng);
+      } catch {
+        this.driverstartAddress = `${driverLatLng.lat.toFixed(5)}, ${driverLatLng.lng.toFixed(5)}`;
+      }
+    } else {
+      // 3) Text was entered → geocode it
+      try {
+        driverLatLng = await this.geocodeAddress(this.driverstartAddress);
+      } catch {
+        this.toaster.error('Address not found', 'Error');
+        return;
+      }
+      // 4) Now reverse-geocode to normalize formatting
+      try {
+        this.driverstartAddress = await this.reverseGeocode(driverLatLng);
+      } catch {
+        // leave the user’s text as-is if reverse fails
+      }
+    }
+
+    // C) Place the driver marker
+    const driverIcon = this.L.icon({
+      iconUrl: 'assets/leaflet/carmarker.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [0, -41]
+    });
+    this.drivaerMarker = this.L
+      .marker(driverLatLng, { icon: driverIcon })
+      .addTo(this.map)
+      .bindPopup('Dein Start')
+      .openPopup();
+
+    // D) (Optional) Center map on driver
+    this.map.setView(driverLatLng, this.map.getZoom());
+
+    // E) Recompute all pickup distances
+    const tasks = this.rides.map(async ride => {
+      try {
+        const pickupLatLng = this.L.latLng(
+          ride.startLatLong.lat,
+          ride.startLatLong.lng
+        );
+        const km = await this.calculateRouteBetween(driverLatLng, pickupLatLng);
+        ride.pickupdistance = Math.round(km * 100) / 100;
+      } catch {
+        ride.pickupdistance = 0;
+      }
+    });
+    await Promise.all(tasks);
+
+    // F) Refresh the table in one go
+    this.rides = [...this.rides];
+  }
+
+
+
+  private calculateRouteBetween(
+    from: Leaflet.LatLng,
+    to: Leaflet.LatLng
+  ): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const Routing = (this.L as any).Routing;
+      const ctl = Routing.control({
+        waypoints: [from, to],
+        router: Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
+        lineOptions: { styles: [{ weight: 0 }] },      // invisible line
+        createMarker: () => null,
+        show: false,
+        addWaypoints: false,
+        draggableWaypoints: false,
+        routeWhileDragging: false
+      }).addTo(this.map);
+
+      ctl.on('routesfound', (e: any) => {
+        const route = e.routes[0];
+        const km = (route.summary.totalDistance || route.summary.distance) / 1000;
+        this.map.removeControl(ctl);
+        resolve(km);
+      });
+
+      ctl.on('routingerror', (err: any) => {
+        this.map.removeControl(ctl);
+        reject(err);
+      });
+    });
+  }
+
+
+  async setcurrentpossition(): Promise<void> {
+    if (!navigator.geolocation) {
+      this.toaster.error(
+        'Geolocation wird von deinem Browser nicht unterstützt.',
+        'Error'
+      );
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async pos => {
+        const coord = this.L.latLng(
+          pos.coords.latitude,
+          pos.coords.longitude
+        );
+
+        // // 1) Center map
+        // this.map.setView(coord, this.map.getZoom());
+
+        // 2) Remove old driver marker (if any)
+        this.drivaerMarker?.remove();
+
+        // 3) Drop new driver marker
+        const simIcon = this.L.icon({
+          iconUrl: 'assets/leaflet/carmarker.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [0, -41]
+        });
+        this.drivaerMarker = this.L
+          .marker(coord, { icon: simIcon })
+          .addTo(this.map)
+          .bindPopup('Dein Standort')
+          .openPopup();
+
+        // 4) Reverse-geocode to fill input (fallback to raw coords)
+        try {
+          this.driverstartAddress = await this.reverseGeocode(coord);
+        } catch {
+          this.driverstartAddress = `${coord.lat.toFixed(5)}, ${coord.lng.toFixed(5)}`;
+        }
+
+        // 5) Re-run your address-change logic to recalc all pickup distances
+        await this.onAddressChange();
+      },
+      err => {
+        this.toaster.error(
+          'Fehler beim Abrufen der Position: ' + err.message,
+          'Oops!!'
+        );
+      }
+    );
+  }
+
+  mapclick(){
+    if(this.driverstartAddress !== ''){
+      this.onAddressChange()
+    }else{
+      this.setcurrentpossition()
+    }
+
+  }
+
+
+
 }

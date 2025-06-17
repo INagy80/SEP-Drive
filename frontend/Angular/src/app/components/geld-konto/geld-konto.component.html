@@ -1,7 +1,9 @@
 <p-button  class="geld"  (click)="togglebalanceDropdown()">
-  <div class="icons gap-2">
-    <p style="font-size: 1.2rem; color: #0b113f">{{myBalance}}</p>
-    <img  src="/assets/icons/euro.png">
+  <div class="icons gap-2" *ngIf="formattedBalance != null">
+    <p style="font-size: 1.2rem; color: #0b113f">
+      {{ formattedBalance  }}
+    </p>
+    <img src="/assets/icons/euro.png" alt="€" />
   </div>
 </p-button>
 
@@ -28,5 +30,39 @@
       <!--           </button>-->
     </div>
 
+  </div>
+</div>
+
+<!-- Bewertungs-Overlay -->
+<div *ngIf="bewertungAktiv" class="bewertung-overlay">
+
+
+  <button
+    pButton
+    type="button"
+    icon="pi pi-times"
+    class="p-button-rounded p-button-text view-route-btn mb-2 "
+    style="color: red; font-size: 1.3rem;
+     position: absolute;
+     top: 43.5%;
+     right: 43.5%;"
+    (click)="close()"
+
+  ></button>
+
+  <div class="bewertung-box">
+
+    <h3>Please, Rate the ride: </h3>
+     <div class="sterne mb-4 ml-6" style="">
+
+    <p-rating
+      [(ngModel)]="sterne"
+      [stars]="5"
+      [readonly]="false"
+      class="custom-rating"
+    ></p-rating>
+
+     </div>
+    <button (click)="bewertungAbgeben()">Bewertung senden</button>
   </div>
 </div>

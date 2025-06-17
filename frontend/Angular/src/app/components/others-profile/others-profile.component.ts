@@ -7,7 +7,6 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {ProfileDTO} from '../../models/profileDTO';
 import {Subscription} from 'rxjs';
 import {AuthenticationResponse} from '../../models/authentication-response';
-import { NotificationService } from '../../services/notification.service';
 import {Rating} from 'primeng/rating';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';

@@ -1,6 +1,6 @@
 import {Inject, Injectable, PLATFORM_ID} from '@angular/core';
 import { Client, IMessage } from '@stomp/stompjs';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
 import {AuthenticationResponse} from '../models/authentication-response';
 import * as Stomp from 'stompjs';
 import {ToastrService} from 'ngx-toastr';
@@ -10,6 +10,7 @@ import {RideRequestService} from './rideRequest/ride-request.service';
 import {HttpClient} from '@angular/common/http';
 import {FahrtAngeboteComponent} from '../components/fahrt-angebote/fahrt-angebote.component';
 import { RefreshService } from './refresh-service';
+import { SimulationUpdate } from '../models/simulation-state.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -19,6 +20,8 @@ export class WebsocketService {
 
   socketClient: any = null;
   private notificationSubscription: Stomp.Subscription | null = null;
+
+
 
 
   constructor(
@@ -61,8 +64,31 @@ export class WebsocketService {
             (message: any) => {
 
               const notification: notification = JSON.parse(message.body);
-              this.toaster.info(notification.message, notification.title);
-              this.refresh.notifyOffersRefresh();
+
+              if(notification.title === 'Simulation Update!!'){
+                const simUpdate = notification.simulationUpdatePayload;
+                if (simUpdate) {
+                  console.log('📡 Received simulation update:', simUpdate);
+                  this.refresh.updateSimulationWithPayload(simUpdate);
+                }
+                //this.toaster.info(notification.message, notification.title);
+              }else if(notification.title === 'Ride Completed!!' || notification.title === 'Payment successful!!'){
+                const rideId = notification.rideRequestId;
+                this.toaster.success(notification.message, notification.title);
+                this.refresh.notifyAfterSimulationEnds(rideId);
+
+              }else if(notification.title === 'Offer Rejected!!' || notification.title === 'Offer Cancelled!!'){
+                this.toaster.info(notification.message, notification.title);
+                this.refresh.notifyOffersRefresh();
+                this.refresh.notifyRejectedOffersRefresh();
+
+              }else if (notification.title === 'Refresh!!'){
+
+              }else {
+                this.toaster.info(notification.message, notification.title);
+                this.refresh.notifyOffersRefresh();
+              }
+
 
             }
           );
@@ -79,30 +105,57 @@ export class WebsocketService {
 
 
   /** Send a make-offer frame */
-  makeOffer(requestId: number , customerFullName: String ): void {
-
+  makeOffer(requestId: number, customerFullName: string): Observable<boolean> {
     if (!this.connected) {
       console.warn('STOMP not yet connected; response will not be sent.');
-      return;
+      return of(false);
     }
 
-    this.rideRequestService.makeOffer(requestId).subscribe({
-      next: () => {
-        console.log('offer made ')
-        this.toaster.success('You have successfully created an offer to:  '+ customerFullName + ' Just wait for his/her Response. ' , 'Success!!');
-
-      }, error: err => {
-        console.log(err)
-        if(err.error.message.includes('You already offered')) {
-          this.toaster.error('You have already a pending offer you can not make new offers.', 'Oups!!');
-        }else{
-          this.toaster.error('Something went wrong .', 'Oups!!');
+    return this.rideRequestService.makeOffer(requestId).pipe(
+      map(() => {
+        this.toaster.success(
+          `You have successfully created an offer to: ${customerFullName}. Just wait for a response.`,
+          'Success!!'
+        );
+        return true;
+      }),
+      catchError((err) => {
+        console.error(err);
+        if (err.error?.message?.includes('You already offered')) {
+          this.toaster.error('You already have a pending offer.', 'Oops!');
+        } else {
+          this.toaster.error('Something went wrong.', 'Oops!');
         }
-
-      }
-
-    });
+        return of(false);
+      })
+    );
   }
+
+
+  CancellMyOffer(requestId: number): Observable<boolean> {
+    if (!this.connected) {
+      console.warn('STOMP not yet connected; response will not be sent.');
+      return of(false);
+    }
+
+    return this.rideRequestService.CancellMyOffer(requestId).pipe(
+      map(() => {
+        this.toaster.warning(
+          'You have Cancelled your Offer. you can make new offer now.',
+          'Cancelled!!'
+        );
+        return true;
+      }),
+      catchError((err) => {
+        console.error(err);
+          this.toaster.error('Something went wrong.', 'Oops!');
+        return of(false);
+      })
+    );
+
+  }
+
+
 
   /** Send an accept/reject response */
   respondToOffer(offerId: number, accepted: boolean, Fullname: String): void {
@@ -131,6 +184,22 @@ export class WebsocketService {
 
 
   }
+
+
+  sendSimulationUpdate(id: number,update: SimulationUpdate, hasEnded: boolean): void {
+    this.rideRequestService.sendsumlationupdate(id, update,hasEnded).subscribe({
+      next: () => {
+
+      },
+      error: err => {
+
+      }
+    })
+
+  }
+
+
+
 
 
 

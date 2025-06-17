@@ -121,6 +121,24 @@
       =============================== -->
       <ng-template #caption>
         <div class="global-search-wrapper">
+
+          <div class="driver-location-box">
+
+              <label for="startAddress" class="mr-2">Startadresse:</label>
+              <input pInputText type="text" id="startAddress"  [(ngModel)]="driverstartAddress" placeholder="Startadresse eingeben" class="location-input"   />
+
+
+            <button
+              pButton
+              type="button"
+              class="p-button-text p-button-sm p-button-rounded  view-route-btn"
+              (click)="mapclick()"
+              style="margin-left: 0.5rem;"
+            >
+              <img src="/assets/icons/currentlocation.png" width="32" height="32" />
+            </button>
+          </div>
+
           <div class="global-search-box">
             <i class="pi pi-search"></i>
             <input
@@ -137,6 +155,9 @@
             />
           </div>
         </div>
+
+
+
       </ng-template>
 
       <!-- =============================
@@ -416,7 +437,9 @@
       <ng-template #body let-ride>
         <tr>
           <td>
+            <!-- Case 1: No offer yet → green check icon for every ride -->
             <button
+              *ngIf="!hasAllreadyOfferd"
               pButton
               type="button"
               icon="pi pi-check"
@@ -424,6 +447,29 @@
               style="color: limegreen; font-size: 1.3rem"
               (click)="makeOffer(ride)"
             ></button>
+
+            <!-- Case 2: Offer exists → X icon only for the offeredRideId -->
+            <button
+              *ngIf="hasAllreadyOfferd && ride.id === OfferdRideId"
+              pButton
+              type="button"
+              icon="pi pi-times"
+              class="p-button-rounded p-button-text view-route-btn"
+              style="color: red; font-size: 1.3rem"
+              (click)="cancelOffer(ride)"
+            ></button>
+
+            <!-- Case 3: Offer exists → 🚫 icon for all other rides -->
+            <button
+              *ngIf="hasAllreadyOfferd && ride.id !== OfferdRideId"
+              pButton
+              type="button"
+              class="p-button-rounded p-button-text view-route-btn"
+              style="font-size: 1.3rem"
+              (click)="blocked()"
+            >
+              <img src="/assets/icons/forbidden.png" width="20" height="20" />
+            </button>
           </td>
 
           <td>
@@ -443,7 +489,7 @@
           <td>{{ ride.carClass }}</td>
           <td>{{ ride.price | currency }}</td>
           <td>{{ ride.pickupdistance | number: '1.0-2' }} km</td>
-          <td>{{ ride.distance | number: '1.0-2' }} km</td>
+          <td>{{ (ride.distance || 0) | number: '1.0-2' }} km</td>
           <td>{{ ride.duration | number: '1.0-0' }} min</td>
           <td>{{ ride.createdAt | date: 'short' }}</td>
           <td>

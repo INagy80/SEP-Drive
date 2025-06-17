@@ -6,7 +6,6 @@ import {Button} from "primeng/button";
 import {Subscription} from 'rxjs';
 import {ProfileService} from '../../services/profile/profile.service';
 import {DomSanitizer} from '@angular/platform-browser';
-import {NotificationService} from '../../services/notification.service';
 import {AuthenticationResponse} from '../../models/authentication-response';
 import {GeldKontoService} from '../../services/geld-konto.service';
 import {GeldKontoComponent} from '../geld-konto/geld-konto.component';
@@ -48,7 +47,6 @@ export class ProfileEditeComponent implements OnInit {
     private router: Router,
     private profileService : ProfileService,
     private sanitizer: DomSanitizer,
-    private notificationService: NotificationService,
     private geldKontoService : GeldKontoService,
     private WebSocketService : WebsocketService,
 

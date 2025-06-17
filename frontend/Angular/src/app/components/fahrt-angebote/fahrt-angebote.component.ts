@@ -23,7 +23,6 @@ import { ProfileService } from '../../services/profile/profile.service';
 import { RatingModule } from 'primeng/rating';
 import {Observable, of, Subscription} from 'rxjs';
 import {DomSanitizer} from '@angular/platform-browser';
-import {NotificationService} from '../../services/notification.service';
 import {AuthenticationResponse} from '../../models/authentication-response';
 import {GeldKontoService} from '../../services/geld-konto.service';
 import {GeldKontoComponent} from '../geld-konto/geld-konto.component';
@@ -197,7 +196,7 @@ export class FahrtAngeboteComponent implements OnInit, OnDestroy {
       // 1) show toast on empty and cache raw offers
       tap(result => {
         if (result.length === 0) {
-          this.toaster.info('You dont have any Offers right now.', 'Info!!');
+          // this.toaster.info('You dont have any Offers right now.', 'Info!!');
         }
         this.offers = result;
       }),
@@ -252,7 +251,7 @@ export class FahrtAngeboteComponent implements OnInit, OnDestroy {
       },
       error: err => {
         if (err.error.message.includes('Ride not found')) {
-          this.toaster.info('You dont have any Offers right now.', 'Info!!');
+          //this.toaster.info('You dont have any Offers right now.', 'Info!!');
         }else{
 
         this.toaster.error('Something went wrong', 'Oups!!');
@@ -264,9 +263,12 @@ export class FahrtAngeboteComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.loadOffers();
 
+
+
     this.sub = this.refresh.refreshOffers$.subscribe(() => {
       this.loadOffers();
     });
+
 
     const storedUser = localStorage.getItem('user');
     if (storedUser) {

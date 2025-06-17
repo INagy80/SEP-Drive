@@ -16,7 +16,8 @@ public record notificationDTO(
         rideResponseDTO rideResponseDTO,
         Integer OfferId,
         Integer rideRequestId,
-        Double totalDistance
+        Double totalDistance,
+        SimulationUpdatePayload simulationUpdatePayload
 
 )
 {}

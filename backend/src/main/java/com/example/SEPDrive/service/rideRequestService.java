@@ -7,27 +7,14 @@ import com.example.SEPDrive.model.*;
 import com.example.SEPDrive.repository.driverOfferDAO;
 import com.example.SEPDrive.repository.rideRequestDAO;
 import com.example.SEPDrive.repository.userDAO;
-import com.graphhopper.util.PointList;
-import jakarta.persistence.PostPersist;
-import jakarta.persistence.PostUpdate;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import com.graphhopper.GraphHopper;
-import com.graphhopper.config.Profile;
-import com.graphhopper.GHRequest;
-import com.graphhopper.GHResponse;
-import com.graphhopper.ResponsePath;
-
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+
 
 @Service
 public class rideRequestService {
@@ -54,6 +41,9 @@ public class rideRequestService {
     private driverOfferDAO driverOfferDAO;
     @Autowired
     private com.example.SEPDrive.repository.notificationDAO notificationDAO;
+
+    @Autowired
+    private geldKontoService geldKontoService;
 
 
     public List<rideRequest> getallRidesforuser() {
@@ -163,7 +153,8 @@ public class rideRequestService {
                     null,
                     0,
                     rideRequest.getId(),
-                    0.0
+                    0.0,
+                    null
 
             );
             notificationService.sendNotification(driver.getUserName(), notificationDTO);
@@ -300,22 +291,58 @@ public class rideRequestService {
     }
 
     public void deletestatus() {
-        rideRequest rideRequest = rideRequestDAO.findByCustomerId(httpInterpreter.Interpreter().getId()).stream().filter(request -> request.getStatus().equals(RequestStatus.Active)).toList().stream().findFirst().orElse(null);;
+        rideRequest request = rideRequestDAO.findByCustomerId(httpInterpreter.Interpreter().getId()).stream().filter(r -> r.getStatus().equals(RequestStatus.Active)).toList().stream().findFirst().orElse(null);;
 
 
-        if(rideRequest != null) {
-            if(rideRequest.getDriver() != null || rideRequest.getStatus().equals(RequestStatus.Assigned)) {
+        if(request != null) {
+            if(request.getDriver() != null ||request.getStatus().equals(RequestStatus.Assigned)) {
                 throw new RuntimeException("you Can not delete this ride request because you are already in a ride");
             }
-            rideRequest.setStatus(RequestStatus.Cancelled);
+            request.setStatus(RequestStatus.Cancelled);
         }
-//        else {
-//            rideRequest = rideRequestDAO.findByDriver_Id(httpInterpreter.Interpreter().getId()).stream().filter(request -> request.getStatus().equals(RequestStatus.Active)).toList().getFirst();
-//
-//            rideRequest.setStatus(RequestStatus.Cancelled);
-//        }
 
-        rideRequestDAO.save(rideRequest);
+        // reject all other pending offers
+        var others = driverOfferDAO.findByRideRequestId(request.getId());
+        for (var o : others) {
+            if (o.getStatus() == OfferStatus.PENDING) {
+                o.setStatus(OfferStatus.CANCELLED);
+                driverOfferDAO.save(o);
+
+
+                var note2 = new notification(
+                        request.getCustomer(),
+                        o.getDriver(),
+                        "you offer to ride request with id: "+request.getId()+"  is Cancelled because Customer has deleted this ride request",
+                        "Offer Cancelled!!",
+                        request
+                );
+                notificationDAO.save(note2);
+
+
+                notificationDTO notificationDTO = new notificationDTO(
+                        note2.getId(),
+                        new notificationpersonDTO(request.getCustomer().getId(), request.getCustomer().getUserName(), request.getCustomer().getEmail(), request.getCustomer().getFirstName(), request.getCustomer().getLastName(), request.getCustomer().getRating(), request.getCustomer().getTotalRides()),
+                        new notificationpersonDTO(o.getDriver().getId(), o.getDriver().getUserName(), o.getDriver().getEmail(), o.getDriver().getFirstName(), o.getDriver().getLastName(), o.getDriver().getRating(), o.getDriver().getTotalRides()),
+                        note2.getStatus(),
+                        note2.getCreatedAt(),
+                        note2.getUpdatedAt(),
+                        note2.getMessage(),
+                        note2.getTitle(),
+                        null,
+                        o.getId(),
+                        request.getId(),
+                        0.0,
+                        null
+
+                );
+
+                notificationService.sendNotification(o.getDriver().getUserName(), notificationDTO);
+            }
+        }
+
+
+
+        rideRequestDAO.save(request);
     }
 
 
@@ -602,7 +629,8 @@ public class rideRequestService {
                 response,
                 offer.getId(),
                 requestId,
-                totalDistance
+                totalDistance,
+                null
 
         );
         notificationService.sendNotification(request.getCustomer().getUserName(), notificationDTO);
@@ -658,7 +686,8 @@ public class rideRequestService {
                             null,
                             o.getId(),
                             request.getId(),
-                            0.0
+                            0.0,
+                            null
 
                     );
 
@@ -691,7 +720,8 @@ public class rideRequestService {
                 null,
                 offerId,
                 request.getId(),
-                0.0
+                0.0,
+                null
 
 
         );
@@ -699,6 +729,170 @@ public class rideRequestService {
         notificationService.sendNotification(offer.getDriver().getUserName(), notificationDTO);
     }
 
+
+
+
+    @Transactional
+    public void CancelMyOffer(Integer rideId) {
+
+        user currentuer = userDAO.findUserById(httpInterpreter.Interpreter().getId());
+
+        rideRequest request = rideRequestDAO.findById(rideId).orElseThrow(() -> new resourceNotFoundException("Ride request not found"));
+
+        DriverOffer offer = driverOfferDAO.findByRideRequestId(rideId).stream().filter(o -> o.getStatus() == OfferStatus.PENDING).findFirst().orElse(null);
+
+        if(offer == null) {
+            throw new resourceNotFoundException("Offer not found");
+        }
+
+        offer.setStatus(OfferStatus.CANCELLED);
+        driverOfferDAO.save(offer);
+
+
+        var note2 = new notification(
+                offer.getDriver(),
+                request.getCustomer(),
+                offer.getDriver().getFirstName()+" "+offer.getDriver().getLastName() +"  has Cancelled his offer to your ride request with id: " + request.getId()+" ",
+                "Offer Canceled!!",
+                request
+        );
+        //notificationDAO.save(note2);
+
+
+        notificationDTO notificationDTO = new notificationDTO(
+                note2.getId(),
+                new notificationpersonDTO(offer.getDriver().getId(), offer.getDriver().getUserName(),offer.getDriver().getEmail(),offer.getDriver().getFirstName(),offer.getDriver().getLastName(),offer.getDriver().getRating(),offer.getDriver().getTotalRides()),
+                new notificationpersonDTO(request.getCustomer().getId(), request.getCustomer().getUserName(),request.getCustomer().getEmail(),request.getCustomer().getFirstName(),request.getCustomer().getLastName(),request.getCustomer().getRating(),request.getCustomer().getTotalRides()),
+                note2.getStatus(),
+                note2.getCreatedAt(),
+                note2.getUpdatedAt(),
+                note2.getMessage(),
+                note2.getTitle(),
+                null,
+                offer.getId(),
+                request.getId(),
+                0.0,
+                null
+
+        );
+
+        notificationService.sendNotification(notificationDTO.receiver().userName(), notificationDTO);
+
+    }
+
+
+
+
+
+
+    @Transactional
+    public void updateSimulation(Integer id, SimulationUpdatePayload update,boolean hasEnded) {
+        rideRequest request = rideRequestDAO.findbyid(id);
+        user currentUser = userDAO.findUserById(httpInterpreter.Interpreter().getId());
+
+        if (hasEnded) {
+            if(currentUser.equals(request.getCustomer())) {
+                geldKontoService.sendMony(request.getDriver().getGeldKonto(), request.getCost(), request);
+                request.setStatus(RequestStatus.Completed);
+                rideRequestDAO.save(request);
+               var Offer = driverOfferDAO.findByRideRequestId(id).stream().filter(o -> o.getStatus() == OfferStatus.ACCEPTED).findFirst().orElse(null);
+               if(Offer != null) {
+                   Offer.setStatus(OfferStatus.COMPLETED);
+                   driverOfferDAO.save(Offer);
+               }
+
+
+                var endNote = new notification(
+                        null,
+                        null,
+                        "The ride has been completed. Thank you for your ride!",
+                        "Ride Completed!!",
+                        request
+                );
+
+                notificationDTO noteDTO = new notificationDTO(
+                        endNote.getId(),
+                        null,
+                        null,
+                        endNote.getStatus(),
+                        endNote.getCreatedAt(),
+                        endNote.getUpdatedAt(),
+                        endNote.getMessage(),
+                        endNote.getTitle(),
+                        null,
+                        0,
+                        request.getId(),
+                        0.0,
+                        update
+
+
+                );
+
+                this.notificationService.sendNotification(request.getDriver().getUserName(), noteDTO);
+                this.notificationService.sendNotification(request.getCustomer().getUserName(), noteDTO);
+
+            }
+
+
+        } else {
+
+
+            var drivernot = new notification(
+                    request.getCustomer(),
+                    request.getDriver(),
+                    "the customer has just updated the simulation state",
+                    "Simulation Update!!",
+                    request
+            );
+            notificationDTO drivernotDTO = new notificationDTO(
+                    drivernot.getId(),
+                    new notificationpersonDTO(request.getCustomer().getId(), request.getCustomer().getUserName(), request.getCustomer().getEmail(), request.getCustomer().getFirstName(), request.getCustomer().getLastName(), request.getCustomer().getRating(), request.getCustomer().getTotalRides()),
+                    new notificationpersonDTO(request.getDriver().getId(), request.getDriver().getUserName(), request.getDriver().getEmail(), request.getDriver().getFirstName(), request.getDriver().getLastName(), request.getDriver().getRating(), request.getDriver().getTotalRides()),
+                    drivernot.getStatus(),
+                    drivernot.getCreatedAt(),
+                    drivernot.getUpdatedAt(),
+                    drivernot.getMessage(),
+                    drivernot.getTitle(),
+                    null,
+                    0,
+                    request.getId(),
+                    0.0,
+                    update
+
+
+            );
+
+
+            var customernot = new notification(
+                    request.getDriver(),
+                    request.getCustomer(),
+                    "the driver has just updated the simulation state",
+                    "Simulation Update!!",
+                    request
+            );
+            notificationDTO customernotDTO = new notificationDTO(
+                    customernot.getId(),
+                    new notificationpersonDTO(request.getDriver().getId(), request.getDriver().getUserName(), request.getDriver().getEmail(), request.getDriver().getFirstName(), request.getDriver().getLastName(), request.getDriver().getRating(), request.getDriver().getTotalRides()),
+                    new notificationpersonDTO(request.getCustomer().getId(), request.getCustomer().getUserName(), request.getCustomer().getEmail(), request.getCustomer().getFirstName(), request.getCustomer().getLastName(), request.getCustomer().getRating(), request.getCustomer().getTotalRides()),
+                    customernot.getStatus(),
+                    customernot.getCreatedAt(),
+                    customernot.getUpdatedAt(),
+                    customernot.getMessage(),
+                    customernot.getTitle(),
+                    null,
+                    0,
+                    request.getId(),
+                    0.0,
+                    update
+
+
+            );
+
+            this.notificationService.sendNotification(request.getDriver().getUserName(), drivernotDTO);
+            this.notificationService.sendNotification(request.getCustomer().getUserName(), customernotDTO);
+        }
+
+    }
 
 }
 

@@ -95,4 +95,12 @@ public class rideRequisteController {
 
     }
 
+
+    @PutMapping("CancellMyOffer/{id}")
+    public void CancellMyOffer(@PathVariable int id) {
+
+        service.CancelMyOffer(id);
+
+    }
+
 }

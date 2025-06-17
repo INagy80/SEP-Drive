@@ -3,6 +3,7 @@ package com.example.SEPDrive.service;
 import com.example.SEPDrive.controller.AuthenticatinResponse;
 import com.example.SEPDrive.controller.kundeDTO;
 import com.example.SEPDrive.exceptions.requestValidationException;
+import com.example.SEPDrive.model.Fahrer;
 import com.example.SEPDrive.model.Kunde;
 import com.example.SEPDrive.model.role;
 import com.example.SEPDrive.model.user;
@@ -85,6 +86,11 @@ public class loginService {
         if(user instanceof Kunde){
             Kunde = "Kunde";
         }
+        String carClass = null;
+
+        if(user instanceof Fahrer){
+            carClass = String.valueOf(((Fahrer) user).getCarClass());
+        }
 
 
         var jwtToken = jwtService.generateToken(userName);
@@ -96,7 +102,8 @@ public class loginService {
                 user.getLastName(),
                 user.getDateOfBirth(),
                 user.getProfilePhoto(),
-                Kunde
+                Kunde,
+                carClass
 
         )).build();
 

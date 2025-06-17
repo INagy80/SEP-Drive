@@ -4,6 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {rideRequestDTO} from '../../models/rideRequestDTO';
 import {rideResponse} from '../../models/rideResponse';
+import {SimulationUpdate} from '../../models/simulation-state.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import {rideResponse} from '../../models/rideResponse';
 export class RideRequestService {
 
   private readonly rideRequestUrl = `${environment.api.baseUrl}/${environment.api.rideRequestUrl}`;
+  private readonly simulationUrl = `${environment.api.baseUrl}/${environment.api.simulations}`;
 
 
 
@@ -54,4 +56,13 @@ export class RideRequestService {
   OfferRespond(id : number, isAccepted : boolean) : Observable<any> {
     return this.http.put<any>(`${this.rideRequestUrl}/OfferResponse/${id}/${isAccepted}`,{});
   }
+
+  CancellMyOffer(id : number) : Observable<any> {
+    return this.http.put<any>(`${this.rideRequestUrl}/CancellMyOffer/${id}`,{});
+  }
+
+  sendsumlationupdate(id : number, SimulationUpdate: SimulationUpdate, hasEnded: boolean ) : Observable<any> {
+    return this.http.put<any>(`${this.simulationUrl}/simulation/${id}/${hasEnded}`,SimulationUpdate);
+  }
+
 }

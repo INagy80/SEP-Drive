@@ -63,12 +63,13 @@ public class geldKonto {
     }
 
 
-    public transactions SendMony(geldKonto reciever , Double amount , rideRequest rideRequest ) {
+    public transactions SendMony(geldKonto reciever , double amount , rideRequest rideRequest ) {
         if(amount > this.balance) {
             throw new IllegalArgumentException("you do not have enough  balance");
         }
         if(reciever != null && rideRequest != null) {
             this.balance -= amount;
+            reciever.balance += amount;
 
            return new transactions(reciever, owner.getGeldKonto(), amount, rideRequest );
 

@@ -147,6 +147,59 @@ body {
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
+
+.global-search-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between; // ⬅️ changed from flex-end
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.driver-location-box {
+  display: flex;
+  align-items: center;
+}
+
+.location-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccd0d9;
+  border-radius: 0.375rem;
+  font-size: 0.95rem;
+  color: #334155;
+  width: 16rem;
+}
+
+.location-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+
+label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333; /* Setzt die Schriftfarbe des Labels */
+}
+
+input, textarea {
+  width: 100%;               /* Setzt die Breite der Eingabefelder auf 100% */
+  padding: 8px;              /* Fügt Padding innerhalb der Felder hinzu */
+  font-size: 14px;           /* Setzt die Schriftgröße */
+  margin-top: 5px;           /* Fügt einen Abstand oben hinzu */
+  border: 1px solid #ccc;    /* Rand für Eingabefelder */
+  border-radius: 4px;        /* Abgerundete Ecken für die Eingabefelder */
+}
+
+textarea {
+  resize: vertical;          /* Erlaubt vertikales Resizing des Textarea-Feldes */
+  min-height: 100px;          /* Mindesthöhe für das Textarea-Feld */
+}
+
+
 /* ────────────────────────────────────────────────────
    4) STICKY HEADER: keep column names & filter row visible
    ──────────────────────────────────────────────────── */

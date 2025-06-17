@@ -1,5 +1,6 @@
 package com.example.SEPDrive.controller;
 
+import com.example.SEPDrive.model.carClass;
 import com.example.SEPDrive.model.role;
 import jakarta.annotation.Nullable;
 
@@ -13,6 +14,7 @@ public record kundeDTO(
             String lastName,
             LocalDate dateOfBirth,
             byte[] profilePhoto,
-            String dtype
+            String dtype,
+            String carClass
 )
 { }
