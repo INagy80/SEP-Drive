@@ -1,0 +1,63 @@
+<div class="header" >
+
+  <div class="logo">
+    <!-- Animate this car icon: -->
+    <span class="car-logo">
+      <!-- Replace with your actual SVG/IMG or icon markup -->
+      <img src="assets/icons/sep_drive_logo2.png" alt="Car Logo" />
+    </span>
+
+    <!-- The app name stays fixed in place: -->
+    <span class="site-title">SEP Drive</span>
+  </div>
+<!--  <audio #startAudio src="assets/sounds/fast-car-drive-by.mp3" preload="auto"></audio>-->
+<!--  <audio #hornAudio src="assets/sounds/car-double-horn.mp3" preload="auto"></audio>-->
+</div>
+
+
+
+
+  <div class="notification-container">
+
+    <div style="color: white">
+
+    <p-button
+      #bellBtn
+      class="notification-bell-btn "
+      icon="pi pi-bell"
+      [rounded]="true"
+      [text]="true"
+      [raised]="true"
+      severity="warn"
+      size="large"
+      [badge]="hasUnread ? ' ' : undefined"
+      badgeClass="p-badge-danger"
+      [ngClass]="{ ringing: isRinging }"
+      (click)="onBellClick()"
+    ></p-button>
+
+    </div>
+    <!-- The <audio> tag holds your “ding” sound.
+         Preload to reduce delay on first play. -->
+    <audio #notifAudio src="assets/sounds/notification.mp3" preload="auto"></audio>
+
+
+  </div>
+
+
+  <app-geld-konto></app-geld-konto>
+
+
+
+
+
+  <div (click)="profile()" class="profile-image-container">
+    <img  [src]="photoUrl"   alt="profile picture"
+          loading="lazy"
+          decoding="async"
+          class="avatar"/>
+  </div>
+
+  <p (click)="profile()" style="font-size: 1.6rem; color: white;  position: absolute; top: 4.3rem; right: 9rem">{{myname}}</p>
+
+

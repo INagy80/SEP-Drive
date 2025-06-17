@@ -1,0 +1,294 @@
+
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 5px 0;
+  background-color: #2B4057;
+}
+
+.logo {
+  height: 100px;
+  margin-right: 10px;
+}
+
+.site-title {
+  position: absolute;
+  right: 45vw;
+  font-size: 40px;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+}
+
+.navbar {
+  display: flex;
+  background-color: #2B4057;
+  color: white;
+  height: 45px;
+  font-size: 18px;
+  font-weight: bold;
+  width: 100%;
+}
+
+
+.nav-item {
+  cursor: pointer;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 25px;
+  position: relative;
+
+}
+
+.nav-item:hover {
+  padding-top: 0;
+  padding-bottom: 25px;
+  background-color: #444;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 25px;
+  position: relative;
+}
+
+
+::ng-deep .notification{
+  position: absolute;
+  right: 20rem;
+  top: 3rem;
+  font-size: 2rem;
+
+
+}
+
+.icons {
+
+  width: 130px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icons img {
+  max-width: 70%;
+  max-height: 70%;
+  object-fit: contain;
+
+}
+
+.geld{
+  position: absolute;
+  padding: 0.2rem 0.5rem;
+  background-color: #fdfdd9;
+  border: 2px solid #cdcd80;
+  cursor: pointer;
+  border-radius: 9999px;
+  top: 2rem;
+  right: 9.5rem;
+}
+
+
+
+
+
+.notification-container {
+  /* optional wrapper if you want to position the bell somewhere specific */
+  display: inline-block;
+  position: absolute;
+  height: 15px;
+  width: 15px;
+  right: 20.8rem;
+  top: 2.6rem;
+  font-size: 2.4rem;
+
+
+}
+
+.profile-image-container {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+
+
+}
+.avatar {
+  width: 100px;  // Bild größe
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
+/* We apply the “shake/ring” only to the icon inside the p-button */
+.notification-bell-btn.ringing .pi-bell {
+  animation: ring-animation 0.8s ease-in-out;
+}
+
+/* This keyframes block shakes/rotates the bell back-and-forth */
+@keyframes ring-animation {
+  0%   { transform: rotate(0deg);   }
+  15%  { transform: rotate(15deg);  }
+  30%  { transform: rotate(-10deg); }
+  45%  { transform: rotate(15deg);  }
+  60%  { transform: rotate(-5deg);  }
+  75%  { transform: rotate(10deg);  }
+  100% { transform: rotate(0deg);   }
+}
+
+/* Optional: Change icon color on hover/active if you like */
+.notification-bell-btn .p-button-icon {
+  /* .p-button-icon is the selector for the inner <i class="pi pi-bell"> */
+  color: #555; /* normal color */
+  transition: color 0.2s;
+}
+
+.notification-bell-btn:hover .p-button-icon {
+  color: #333;
+}
+
+
+.app-header {
+  width: 100%;
+  background-color: #2c3e50;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+}
+
+.car-logo {
+  display: inline-block;
+  transform: translateX(-100vw);
+  animation: slide-in 1.2s ease-out forwards;
+  img{
+    height: 20%;
+    width: 20%;
+  }
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(-100vw);
+  }
+  100% {
+    transform: translateX(calc(50vw - 48%));
+  }
+}
+
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin-left: 0.5rem;
+}
+
+
+/* app.component.css */
+
+/* Container positions relative so the absolute menu is positioned properly */
+.dropdown-container {
+  position: absolute;
+  right: 300px;
+  top: 160px;
+  display: inline-block;
+  font-family: Arial, sans-serif;
+}
+
+/* Style for the trigger button */
+.dropdown-trigger {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* When you hover the trigger, slightly darken */
+.dropdown-trigger:hover {
+  background-color: #0056b3;
+}
+
+/* The “panel” that appears */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.25rem); /* just below the button */
+  left: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 0.75rem;
+  min-width: 240px;
+  z-index: 100;
+  border-radius: 4px;
+}
+
+/* Each row inside the panel */
+.form-row {
+  margin-bottom: 0.75rem;
+}
+
+/* Label styling */
+.form-row label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+/* Input styling */
+.form-row input[type="number"] {
+  width: 100%;
+  padding: 0.4rem;
+  font-size: 1rem;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+/* Buttons row: put buttons side by side with a gap */
+.button-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Style for buttons inside the dropdown */
+.button-row button {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 3px;
+  background-color: #28a745;
+  color: white;
+}
+
+/* Hover state for "Add Balance" and "Show History" */
+.button-row button:hover {
+  background-color: #218838;
+}
+
+/* If you want the “Show History” button to look slightly different, you could override: */
+.button-row button:nth-child(2) {
+  background-color: #17a2b8;
+}
+.button-row button:nth-child(2):hover {
+  background-color: #117a8b;
+}
