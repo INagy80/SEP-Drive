@@ -35,4 +35,21 @@ export class AutoFocusNextDirective {
       this.prevInput.focus();
     }
   }
+
+
+  @HostListener('keydown.enter', ['$event'])
+  onEnter(event: KeyboardEvent) {
+    event.preventDefault();
+
+    // Try HTML5 form.requestSubmit() if available
+    const form: HTMLFormElement | null = (this.el.nativeElement as any).form;
+    if (form) {
+      if (typeof form.requestSubmit === 'function') {
+        form.requestSubmit();
+      } else {
+        form.submit();
+      }
+    }
+  }
+
 }
