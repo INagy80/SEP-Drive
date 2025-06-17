@@ -93,7 +93,7 @@ export class ProfileService {
 
 
 
-  getPhotoByUsername(userName: string): Observable<Blob> {
+  getPhotoByUsername(userName: any): Observable<Blob> {
     // const params = new HttpParams().set('userName', username);
     return this.http
       .get(
@@ -110,5 +110,12 @@ export class ProfileService {
         })
       );
   }
+
+
+  getRating(userName : String) : Observable<number> {
+    return this.http.get<number>(`${this.profileUrl}/getRating/${userName}`);
+  }
+
+
 
 }
