@@ -1,24 +1,18 @@
 package com.example.SEPDrive.controller;
 
 import com.example.SEPDrive.model.DriverOffer;
-import com.example.SEPDrive.model.adress;
-import com.example.SEPDrive.model.carClass;
 import com.example.SEPDrive.model.rideRequest;
 import com.example.SEPDrive.service.HttpInterpreter;
 import com.example.SEPDrive.service.rideRequestService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController()
 @RequestMapping("v1/rideRequest")
-public class rideRequisteController {
+public class rideRequesteController {
 
     @Autowired
     private rideRequestService service;
