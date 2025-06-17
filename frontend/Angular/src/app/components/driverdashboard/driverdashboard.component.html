@@ -1,0 +1,531 @@
+
+<p-drawer
+  [(visible)]="visible"
+  [position]="'left'"
+  (visibleChange)="onSimulationVisibleChange($event)"
+  [showCloseIcon]="true"
+  [closeOnEscape]="false"
+  [showCloseIcon]="true"
+  [blockScroll]="true"
+  [style.backgroundColor]="'#ffffff'"
+  [transitionOptions]="'300ms cubic-bezier(0, 0, 0.2, 1)'"
+  class="custom-sidebar"
+  styleClass="custom-sidebar"
+
+>
+
+
+  <div #simulationMapContainer class="map-container"></div>
+
+
+
+</p-drawer>
+
+
+<app-header/>
+
+<!-- Navbar -->
+<div class="navbar">
+
+  <div class=" gap-6 navbar " style="width: 50vw ; justify-content: space-around;
+  align-items: center; right: 25vw; left: 25vw; position: absolute" >
+
+    <p-button (click)="logout()" class="nav-item">
+      <div class="icons gap-2">
+        <p style="font-size: 1.1rem">Abmelden</p>
+        <img  src="/assets/icons/exit.png">
+      </div>
+    </p-button>
+
+    <p-button   (click)="fahrtangebote()" class="nav-item"  >
+      <div class="icons gap-2">
+        <p >FahrtAngebote</p>
+        <img  src="/assets/icons/fahrtangebote.png">
+      </div>
+    </p-button>
+
+    <p-button (click)="startseite()" class="nav-item">
+      <div class="icons gap-2">
+        <p >Startseite</p>
+        <img  src="/assets/icons/home.png">
+      </div>
+    </p-button>
+
+  </div>
+
+</div>
+
+
+
+<div class="ride-table-wrapper">
+  <!-- =============================
+       Top Controls: Prev / Reset / Next
+       (optional—you can remove if you only want the built-in paginator at bottom)
+  =============================== -->
+  <div class="table-action-bar mt-3 ml-3">
+    <p-button
+      type="button"
+      icon="pi pi-chevron-left"
+      (click)="prev()"
+      [disabled]="isFirstPage()"
+      text
+    ></p-button>
+    <p-button
+      type="button"
+      icon="pi pi-refresh"
+      (click)="reset()"
+      text
+    ></p-button>
+    <p-button
+      type="button"
+      icon="pi pi-chevron-right"
+      (click)="next()"
+      [disabled]="isLastPage()"
+      text
+    ></p-button>
+  </div>
+
+  <!-- =============================
+       The Actual Table
+  =============================== -->
+  <div class="ride-table-container">
+    <p-table
+      #dt
+      [value]="rides"
+      dataKey="id"
+      [paginator]="true"
+      [rows]="12"
+      [first]="first"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [globalFilterFields]="globalFilterFields"
+      [loading]="loading"
+      [autoLayout]="true"
+      [tableStyle]="{ 'min-width': '100%' }"
+      [customSort]="true"
+      (sortFunction)="customSort($event)"
+      (onPage)="pageChange($event)"
+      styleClass="ride-table"
+    >
+      <!-- Left & Right Paginator Slots (you can leave these empty or put custom buttons) -->
+      <ng-template #paginatorleft>
+        <!-- e.g. an “Add New” button could go here -->
+      </ng-template>
+      <ng-template #paginatorright>
+        <!-- e.g. a “Download CSV” button could go here -->
+      </ng-template>
+
+      <!-- =============================
+           GLOBAL SEARCH (Caption)
+           – aligned right, with a search icon inside the input
+      =============================== -->
+      <ng-template #caption>
+        <div class="global-search-wrapper">
+
+          <div class="driver-location-box">
+
+              <label for="startAddress" class="mr-2">Startadresse:</label>
+              <input pInputText type="text" id="startAddress"  [(ngModel)]="driverstartAddress" placeholder="Startadresse eingeben" class="location-input"   />
+
+
+            <button
+              pButton
+              type="button"
+              class="p-button-text p-button-sm p-button-rounded  view-route-btn"
+              (click)="mapclick()"
+              style="margin-left: 0.5rem;"
+            >
+              <img src="/assets/icons/currentlocation.png" width="32" height="32" />
+            </button>
+          </div>
+
+          <div class="global-search-box">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="
+                dt.filterGlobal(
+                  $any($event.target).value,
+                  'contains'
+                )
+              "
+              placeholder="Search all fields"
+              class="global-input"
+            />
+          </div>
+        </div>
+
+
+
+      </ng-template>
+
+      <!-- =============================
+           HEADER ROW (sortable column headers)
+      =============================== -->
+      <ng-template #header>
+        <!-- ───────────────
+             First Row: Column Titles + Sort Icons
+             ─────────────── -->
+        <tr>
+          <th>offer</th>
+          <th>Avatar</th>
+
+          <th pSortableColumn="id">
+            Ride Id
+            <p-sortIcon field="id"></p-sortIcon>
+          </th>
+          <th pSortableColumn="customerUserName">
+            Customer Username
+            <p-sortIcon field="customerUserName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="customerFullName">
+            Customer Name
+            <p-sortIcon field="customerFullName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="startAddress">
+            Start Address <p-sortIcon field="startAddress"></p-sortIcon>
+          </th>
+          <th pSortableColumn="destinationAddress">
+            Destination Address
+            <p-sortIcon field="destinationAddress"></p-sortIcon>
+          </th>
+          <th pSortableColumn="carClass">
+            Car Class <p-sortIcon field="carClass"></p-sortIcon>
+          </th>
+
+          <th pSortableColumn="price">
+            Price <p-sortIcon field="price"></p-sortIcon>
+          </th>
+          <th pSortableColumn="pickupdistance">
+            pickup Distance <p-sortIcon field="pickupdistance"></p-sortIcon>
+          </th>
+          <th pSortableColumn="distance">
+            Distance <p-sortIcon field="distance"></p-sortIcon>
+          </th>
+          <th pSortableColumn="duration">
+            Duration <p-sortIcon field="duration"></p-sortIcon>
+          </th>
+          <th pSortableColumn="createdAt">
+            Created At <p-sortIcon field="createdAt"></p-sortIcon>
+          </th>
+          <th pSortableColumn="customerRating">
+            Rating <p-sortIcon field="customerRating"></p-sortIcon>
+          </th>
+
+          <th>Route</th>
+        </tr>
+
+
+        <!-- ───────────────
+             Second Row: Per-Column Filter Inputs + Icons
+             ─────────────── -->
+        <tr>
+
+          <!-- makeoffer(no filter) -->
+          <th></th>
+          <th></th>
+
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="number"
+                (input)="
+                  dt.filter(
+                    $any($event.target).value,
+                    'id',
+                    'equals'
+                  )"
+                placeholder="Ride Id"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+
+          <!-- CUSTOMER USERNAME (text filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search "></i>
+              <input
+                pInputText
+                type="text"
+                (input)="
+                  dt.filter(
+                    $any($event.target).value,
+                    'customerUserName',
+                    'contains'
+                  )
+                "
+                placeholder="Search by username"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+          <!-- CUSTOMER FULL NAME (text filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search "></i>
+              <input
+                pInputText
+                type="text"
+                (input)="
+                  dt.filter(
+                    $any($event.target).value,
+                    'customerFullName',
+                    'contains'
+                  )
+                "
+                placeholder="Search by name"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+          <!-- START ADDRESS (text filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search "></i>
+              <input
+                pInputText
+                type="text"
+                (input)="
+                  dt.filter(
+                    $any($event.target).value,
+                    'startAddress',
+                    'contains'
+                  )
+                "
+                placeholder="Filter address"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+          <!-- DESTINATION ADDRESS (text filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search "></i>
+              <input
+                pInputText
+                type="text"
+                (input)="
+                  dt.filter(
+                    $any($event.target).value,
+                    'destinationAddress',
+                    'contains'
+                  )
+                "
+                placeholder="Filter address"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+          <!-- CAR CLASS (dropdown filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <p-dropdown
+                [ngModel]="selectedCarClass"
+                [options]="carClassOptions"
+                placeholder="All Classes"
+                (onChange)="dt.filter($event.value, 'carClass', 'equals')"
+                [showClear]="true"
+                class="column-filter-dropdown"
+              ></p-dropdown>
+
+            </div>
+          </th>
+
+          <!-- PRICE (numeric filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="number"
+                (input)="onpriceFilter($event)"
+                placeholder="Filter price"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+          <!-- pickupDISTANCE (numeric filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search "></i>
+              <input
+                pInputText
+                type="number"
+                (input)="onpickupDistanceFilter($event)"
+                placeholder="Filter distance"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+          <!-- DISTANCE (numeric filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search "></i>
+              <input
+                pInputText
+                type="number"
+                (input)="onDistanceFilter($event)"
+                placeholder="Filter distance"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+          <!-- DURATION (numeric filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search "></i>
+              <input
+                pInputText
+                type="number"
+                (input)="onDurationFilter($event)"
+                placeholder="Filter duration"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+          <!-- CREATED AT (date filter) -->
+          <th>
+            <div class="column-filter-wrapper">
+              <p-calendar
+                (onSelect)="
+                  dt.filter($event, 'createdAt', 'equals')
+                "
+                placeholder="Filter by date"
+                dateFormat="yy-mm-dd"
+                class="column-filter-calendar"
+                [showIcon]="true"
+              ></p-calendar>
+
+            </div>
+          </th>
+
+          <th>
+            <div class="column-filter-wrapper">
+              <i class="pi pi-search "></i>
+              <input
+                pInputText
+                type="number"
+                (input)="onRatingFilter($event)"
+                placeholder="Filter Rating"
+                class="column-filter-input"
+              />
+            </div>
+          </th>
+
+
+          <!-- ROUTE (no filter) -->
+          <th></th>
+        </tr>
+      </ng-template>
+
+      <!-- =============================
+           BODY ROW
+      =============================== -->
+      <ng-template #body let-ride>
+        <tr>
+          <td>
+            <!-- Case 1: No offer yet → green check icon for every ride -->
+            <button
+              *ngIf="!hasAllreadyOfferd"
+              pButton
+              type="button"
+              icon="pi pi-check"
+              class="p-button-rounded p-button-text view-route-btn"
+              style="color: limegreen; font-size: 1.3rem"
+              (click)="makeOffer(ride)"
+            ></button>
+
+            <!-- Case 2: Offer exists → X icon only for the offeredRideId -->
+            <button
+              *ngIf="hasAllreadyOfferd && ride.id === OfferdRideId"
+              pButton
+              type="button"
+              icon="pi pi-times"
+              class="p-button-rounded p-button-text view-route-btn"
+              style="color: red; font-size: 1.3rem"
+              (click)="cancelOffer(ride)"
+            ></button>
+
+            <!-- Case 3: Offer exists → 🚫 icon for all other rides -->
+            <button
+              *ngIf="hasAllreadyOfferd && ride.id !== OfferdRideId"
+              pButton
+              type="button"
+              class="p-button-rounded p-button-text view-route-btn"
+              style="font-size: 1.3rem"
+              (click)="blocked()"
+            >
+              <img src="/assets/icons/forbidden.png" width="20" height="20" />
+            </button>
+          </td>
+
+          <td>
+            <img
+              [src]="(ride.photourl$ | async) || '/assets/images/default-profile.jpg'"
+              [alt]="ride.userName"
+              width="40" height="40"
+              style="border-radius:50%"
+            />
+          </td>
+
+          <td>{{ ride.id }}</td>
+          <td (click)="otherProfileClicked(ride.customerUserName)" >{{ ride.customerUserName }}</td>
+          <td (click)="otherProfileClicked(ride.customerUserName)">{{ ride.customerFullName }}</td>
+          <td>{{ ride.startAddress }}</td>
+          <td>{{ ride.destinationAddress }}</td>
+          <td>{{ ride.carClass }}</td>
+          <td>{{ ride.price | currency }}</td>
+          <td>{{ ride.pickupdistance | number: '1.0-2' }} km</td>
+          <td>{{ (ride.distance || 0) | number: '1.0-2' }} km</td>
+          <td>{{ ride.duration | number: '1.0-0' }} min</td>
+          <td>{{ ride.createdAt | date: 'short' }}</td>
+          <td>
+
+            <div class="rating flex flex-row">
+              <div class="star">
+                <p-rating  [ngModel]="ride.customerRating" class="p-1" [readonly]="true" [stars]="5"   ></p-rating>
+              </div>
+              <span class="rating__label mr-3">({{ride.customerRating | number:'1.1-1'  }})</span>
+
+            </div>
+
+          </td>
+
+          <td>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-map"
+              class="p-button-rounded p-button-text view-route-btn"
+              (click)="viewRoute(ride)"
+              style="font-size: 1rem"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- =============================
+           EMPTY MESSAGE
+      =============================== -->
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="13" class="text-center">No rides found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
