@@ -9,7 +9,26 @@
   background-size: cover;
   background-position: center;
   min-height: 100%;
+
+  ///* 1 second per cycle, 4 cycles total, then stay on last keyframe. */
+  //animation-name: flashBg;
+  //animation-duration: 0.09s;
+  //animation-iteration-count: 4;
+  //animation-timing-function: linear;
+  //animation-fill-mode: forwards;
 }
+
+//@keyframes flashBg {
+//  0%, 49.99% {
+//    background-image: url('/assets/images/welcome.png');
+//  }
+//  50%, 99.99% {
+//    background-image: url('/assets/images/welcomwithflash.jpg');
+//  }
+//  100% {
+//    background-image: url('/assets/images/welcome.png');
+//  }
+//}
 
 error-message-custom {
   color: #ff0000; /* Set the text color explicitly to red */

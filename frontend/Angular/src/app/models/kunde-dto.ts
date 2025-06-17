@@ -8,5 +8,6 @@ export interface kundeDto {
   dateOfBirth?: Date;
   password?: string;
   dtype : 'Kunde' ;
+  carClass?: string;
 
 }

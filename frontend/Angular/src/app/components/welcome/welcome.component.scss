@@ -5,23 +5,23 @@ html, body {
   padding: 0;
 }
 
-:host {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  height: 100vh;
-  padding-left: 5vw;
-  padding-top: 10vh;
-  background-image: url('/assets/images/welcome.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  color: rgb(255, 255, 255);
-  font-family: 'Barlow Condensed', sans-serif;
-
-}
+//:host {
+//  text-align: center;
+//  display: flex;
+//  flex-direction: column;
+//  justify-content: flex-start;
+//  align-items: flex-start;
+//  height: 100vh;
+//  padding-left: 5vw;
+//  padding-top: 10vh;
+//  background-image: url('/assets/images/welcome.png');
+//  background-size: cover;
+//  background-position: center;
+//  background-repeat: no-repeat;
+//  color: rgb(255, 255, 255);
+//  font-family: 'Barlow Condensed', sans-serif;
+//
+//}
 
 h1 {
   font-size: 13rem;
@@ -62,8 +62,21 @@ body {
 }
 
 .content {
+  position: relative;
   text-align: center;
   color: white; /* Adjust contrast for better text visibility */
   padding: 20px;
 }
 
+:host {
+  position: relative;
+  /* your existing background… */
+  background-image:
+    /* overlay first */
+    linear-gradient(rgba(60,79,107, 0.6), rgba(60,79,107, 0.6)),
+      /* then your image */
+    url('/assets/images/welcome.png');
+  background-size: cover;
+  background-position: center;
+  /* …the rest of your CSS */
+}

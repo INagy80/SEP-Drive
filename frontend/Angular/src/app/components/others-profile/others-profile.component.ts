@@ -1,23 +1,46 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Button} from 'primeng/button';
-import {DatePipe, NgIf} from '@angular/common';
+import {DatePipe, NgIf,NgClass } from '@angular/common';
 import {Router, RouterLink, ActivatedRoute} from '@angular/router';
 import {ProfileService} from '../../services/profile/profile.service';
 import {DomSanitizer} from '@angular/platform-browser';
 import {ProfileDTO} from '../../models/profileDTO';
+import {Subscription} from 'rxjs';
+import {AuthenticationResponse} from '../../models/authentication-response';
+import {Rating} from 'primeng/rating';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { GeldKontoService } from '../../services/geld-konto.service';
+import {GeldKontoComponent} from '../geld-konto/geld-konto.component';
+import {HeaderComponent} from '../header/header.component';
+import {WebsocketService} from '../../services/websocket.service';
+
 
 @Component({
   selector: 'app-others-profile',
+  standalone: true,
   imports: [
+    RouterLink,
+    Rating,
     Button,
-    DatePipe,
-    NgIf,
-    RouterLink
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    HeaderComponent
   ],
   templateUrl: './others-profile.component.html',
   styleUrl: './others-profile.component.scss'
 })
 export class OthersProfileComponent implements OnInit {
+
+
+
+
+  isdriver= false;
+  userName = '';
+
+
 
   profileDTO : ProfileDTO = {
     firstName: '',
@@ -32,7 +55,7 @@ export class OthersProfileComponent implements OnInit {
     profilePicture: new Blob(),
   }
 
-  userName = '';
+
 
 
   isImageLoading: boolean = false;
@@ -42,6 +65,7 @@ export class OthersProfileComponent implements OnInit {
                private route: ActivatedRoute,
                private profileService : ProfileService,
                private sanitizer: DomSanitizer,
+               private WebSocketService : WebsocketService,
 
   )
   { }
@@ -50,7 +74,22 @@ export class OthersProfileComponent implements OnInit {
     this.userName = localStorage.getItem('otherProfile') ?? '';
     this.loadUserProfile();
     this.loadmyPhoto();
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+      const kundeDTO = authResponse.kundeDTO;
+
+      if (kundeDTO?.dtype !== 'Kunde') {
+        this.isdriver = true;
+
+      }
+
+    }
   }
+
+
+
+
 
 
 
@@ -99,15 +138,27 @@ export class OthersProfileComponent implements OnInit {
 
   }
 
-  Profile() {
-    this.router.navigate(['/profile']);
 
-  }
 
   logout() {
     localStorage.removeItem('user');
     this.router.navigate(['/welcome']);
+    this.WebSocketService.disconnect();
 
+  }
+
+  fahrtangebote(){
+    this.router.navigate(['/fahrtangebote']);
+  }
+
+  profile() {
+    this.router.navigate(['/profile']);
+
+  }
+
+
+  driverdashboard(){
+    this.router.navigate(['/driverdashboard']);
   }
 }
 

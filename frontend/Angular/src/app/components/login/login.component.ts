@@ -7,6 +7,7 @@ import {Message} from "primeng/message";
 import {NgIf} from "@angular/common";
 import { ButtonModule } from 'primeng/button';
 import {AutoFocus} from 'primeng/autofocus';
+import { ToastrService } from 'ngx-toastr';
 
 
 
@@ -39,7 +40,8 @@ export class LoginComponent {
 
   constructor(
       private authenticationService: AuthenticationService,
-      private router: Router
+      private router: Router,
+      private toastService: ToastrService,
   ) {}
 
 
@@ -53,10 +55,12 @@ export class LoginComponent {
               next: (res) => {
                   localStorage.setItem('login', JSON.stringify(this.authenticationRequest));
                   this.router.navigate(['auth/2FA']);
+                  this.toastService.info('Enter your 2FA that we Just sent to you on Email');
               },
               error: (err) => {
                   if (err.error.statusCode === 401 || err.error.statusCode === 403 || err.error.statusCode === 500) {
                       this.errorMsg = 'userName or password is incorrect';
+                      this.toastService.error(this.errorMsg, 'Oups!!');
                   }
               }
           });

@@ -7,6 +7,8 @@ import {TwoFaRequest} from '../../models/two-fa-request';
 import {Message} from 'primeng/message';
 import {NgIf} from '@angular/common';
 import {AutoFocusNextDirective} from '../../services/auto-focus-next.directive';
+import { ToastrService } from 'ngx-toastr';
+import {WebsocketService} from '../../services/websocket.service';
 
 
 
@@ -51,7 +53,9 @@ export class TwoFAComponent {
 
   constructor(
       private authenticationService: AuthenticationService,
-      private router: Router
+      private router: Router,
+      private toastr: ToastrService,
+      private WebSocketService : WebsocketService,
   ) {}
 
   updateFacode(): void {
@@ -79,10 +83,13 @@ export class TwoFAComponent {
                   localStorage.setItem('user', JSON.stringify(authenticationResponse));
                   localStorage.removeItem('login');
                   this.router.navigate(['home']);
+                  this.toastr.success('login is Successful!', 'Success!!');
+                  this.WebSocketService.connect;
               },
               error: (err) => {
                   if (err.error.statusCode === 401 || err.error.statusCode === 403 || err.error.statusCode === 500) {
                       this.errorMsg = 'Invalid code';
+                      this.toastr.error('Invalid code Please try again', 'Oups!!');
                   }
               }
           });

@@ -4,6 +4,7 @@ import com.example.SEPDrive.controller.AuthenticatinResponse;
 import com.example.SEPDrive.controller.kundeDTO;
 import com.example.SEPDrive.exceptions.duplicatResourceException;
 import com.example.SEPDrive.model.Kunde;
+import com.example.SEPDrive.model.geldKonto;
 import com.example.SEPDrive.model.user;
 import com.example.SEPDrive.repository.userDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,8 @@ public class registerService {
             user.setTwoFA(new Random().nextInt(900000) + 100000);
             user.setEmail(user.getEmail().toLowerCase());
             userDao.save(user);
+            user.setGeldKonto(new geldKonto(user));
+            userDao.save(user);
             emailSenderService.sendEmail(user.getEmail(), "SEPDrive Verification Code",
                     "Hello "+ user.getFirstName()+" "+user.getLastName()+", \n \n" +"Your verification code is:  " + user.getTwoFA() + ". \n \n \n Best regards,\n SEPDrive ");
             return true;
@@ -91,10 +94,13 @@ public class registerService {
             user.setIsemailVerified(false);
             user.setTwoFA(new Random().nextInt(900000) + 100000);
             user.setEmail(user.getEmail().toLowerCase());
+
             if(image != null && !image.isEmpty()){
               user.setProfilePhoto(image.getBytes());
               user.setImageName(filename);
              }
+            userDao.save(user);
+            user.setGeldKonto(new geldKonto(user));
             userDao.save(user);
             emailSenderService.sendEmail(user.getEmail(), "SEPDrive Verification Code",
                     "Hello "+ user.getFirstName()+" "+user.getLastName()+", \n \n" +"Your verification code is:  " + user.getTwoFA() + ". \n \n \n Best regards,\n SEPDrive ");

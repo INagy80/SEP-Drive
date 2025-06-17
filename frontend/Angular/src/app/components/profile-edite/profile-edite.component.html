@@ -1,15 +1,46 @@
-<div class="header">
-  <img src="/assets/images/auto_logo.jpg" alt="Auto Logo" class="logo" />
-  <h1 class="site-title">SEP Drive</h1>
-</div>
+
+<app-header></app-header>
 
 <!-- Navbar -->
 <div class="navbar">
 
-  <p-button (click)="startseite()" class="nav-item">Startseite</p-button>
-  <p-button (click)="Profile()" class="nav-item">Profile</p-button>
-  <p-button (click)="logout()" class="nav-item">Abmelden</p-button>
+  <div class=" gap-6 navbar " style="width: 50vw ; justify-content: space-around;
+  align-items: center; right: 25vw; left: 25vw; position: absolute" >
+
+    <p-button (click)="logout()" class="nav-item">
+      <div class="icons gap-2">
+        <p style="font-size: 1.1rem">Abmelden</p>
+        <img  src="/assets/icons/exit.png">
+      </div>
+
+    </p-button>
+
+    <p-button *ngIf="isdriver === true"   (click)="driverdashboard()" class="nav-item" >
+      <div class="icons gap-2">
+        <p >Dashboard</p>
+        <img  src="/assets/icons/route.png">
+      </div>
+    </p-button>
+
+    <p-button    (click)="fahrtangebote()" class="nav-item"  >
+      <div class="icons gap-2">
+        <p >FahrtAngebote</p>
+        <img  src="/assets/icons/fahrtangebote.png">
+      </div>
+    </p-button>
+
+
+    <p-button (click)="startseite()" class="nav-item">
+      <div class="icons gap-2">
+        <p >Startseite</p>
+        <img  src="/assets/icons/home.png">
+      </div>
+    </p-button>
+
+  </div>
+
 </div>
+
 
 
 <div class="container">

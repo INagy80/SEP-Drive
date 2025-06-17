@@ -117,7 +117,7 @@ public class profileService {
     public byte[] fetchProfilePhoto() {
         user currentUser = userDao.findUserById(httpInterpreter.Interpreter().getId());
 
-        System.out.println("Profile Photo Length: " + (currentUser.getProfilePhoto() == null ? 0 : currentUser.getProfilePhoto().length));
+        //System.out.println("Profile Photo Length: " + (currentUser.getProfilePhoto() == null ? 0 : currentUser.getProfilePhoto().length));
 
         return currentUser.getProfilePhoto();
 
@@ -127,6 +127,15 @@ public class profileService {
         user currentUser = userDao.findUserById(httpInterpreter.Interpreter().getId());
         return currentUser.getImageName();
     }
+
+
+    public Double getrating(String username){
+        user user = userDao.findByUserName(username);
+        return user.getRating();
+    }
+
+
+
 
 
 }
