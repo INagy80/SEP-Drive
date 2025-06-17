@@ -1792,6 +1792,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       if (this.simulationmap.distance(currentLL, stopLL) <= threshold) {
         this.pauseSimulation();
         data.stops = data.stops.filter(s => !(s.lat === stopLL.lat && s.lng === stopLL.lng));
+        this.toastr.info('The ride has been paused in a middle Stopp. you can resume it any time','Ride Paused on ZwischenStop!!')
         return;
       }
     }
