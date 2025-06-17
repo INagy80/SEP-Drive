@@ -89,12 +89,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   rideRequests: Array<rideRequestDTO> = [];
-  rideResponses : Array<rideResponse> = [];
+  rideResponses : Array<rideResponse> = [];      //Liste aller Fahrten
 
-  ohnesortierungarray: Array<rideResponse> = [];
-  ascendingitem: String = '';
+  ohnesortierungarray: Array<rideResponse> = [];    // Eine Kopie der ursprünglichen, unsortierten Fahrtenliste.
+  ascendingitem: String = '';      // Speichert aktuell ausgewählte Sortierkriterium
   descendingitem: String = '';
-  search: String = '';
+  search: String = '';    // Suchbegriff für Fahrer-/Kundennamen
 
 
 
@@ -250,11 +250,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return this.rideResponses.find(r => r.status === 'Active' || r.status === 'Assigned');
   }
 
-  get historyRequests(): rideResponse[] {
-    return this.rideResponses.filter(
-      r => r.status !== 'Active' && r.status !== 'Assigned'
-    );
-  }
+
 
 
 
@@ -1306,9 +1302,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   }
 
+//  Gibt eine gefilterte Liste von Fahrten zurück, die nicht aktiv oder zugewiesen sind
+  get historyRequests(): rideResponse[] {
+    return this.rideResponses.filter(
+      r => r.status !== 'Active' && r.status !== 'Assigned'
+    );
+  }
 
-
-
+// Wird aufgerufen, wenn das Sortierkriterium für aufsteigende Sortierung geändert wird
   onAscendingitemChange(ascendingitem: String) {
     this.ascendingitem = ascendingitem;
 
@@ -1429,10 +1430,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   }
 
+// Wird aufgerufen, wenn sich der Suchbegriff ändert
   onSearchChange(search: string) {
     this.search = search;
     if (this.search !== '') {
-     this.rideResponses = this.rideResponses.filter(a => a.status==='Active' || a.driverFullName.toLowerCase().includes(this.search.toLowerCase()) || a.driverUserName.toLowerCase().includes(this.search.toLowerCase()));
+     this.rideResponses = this.rideResponses.filter(a =>  a.driverFullName.toLowerCase().includes(this.search.toLowerCase()) || a.driverUserName.toLowerCase().includes(this.search.toLowerCase()));
     }
     else {
       this.rideResponses = this.ohnesortierungarray;

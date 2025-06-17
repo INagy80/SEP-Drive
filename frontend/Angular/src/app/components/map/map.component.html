@@ -221,6 +221,7 @@
       <h2 class="section__title mb-8">Verlauf:</h2>
 
       <div class="order flex flex-row ">
+        <!-- Dropdown für aufsteigende Sortierung -->
         <div class="coords-row ascending">
           <span>Ascending  </span>
           <select [(ngModel)]="ascendingitem" name="ascendingitem" (ngModelChange)="onAscendingitemChange($event)">
@@ -247,6 +248,7 @@
           </select>
         </div>
 
+        <!-- Dropdown für absteigende Sortierung -->
         <div class="coords-row descending">
           <span class="descending-text">Descending </span>
 
@@ -270,27 +272,31 @@
             <option value="DR" >Driver rate</option>
             <option value="CR" >customer rate</option>
 
-
           </select>
         </div>
 
+        <!-- Eingabefeld zur Suche nach Namen -->
         <div class="coords-row search flex flex-row">
           <input type="text" id="search" [(ngModel)]="search" placeholder="search by name " (ngModelChange)="onSearchChange($event)" />
         </div>
 
       </div>
 
+
+      <!-- Trennlinie zur optischen Abgrenzung -->
       <mat-divider [vertical]="true" class="custom-mat-divider"></mat-divider>
       <div class="divider"></div>
 
-      <!-- History Section -->
+      <!-- History Section, -->
       <section class="section section--history" *ngIf="historyRequests.length">
 
 
 
 
-        <div class="history-list">
+        <div class="history-list">  <!-- Einzelne Fahrtanfragen -->
           <div *ngFor="let req of historyRequests" class="ride-card ride-card--history">
+
+            <!-- Statusanzeige mit farblicher Markierung -->
           <button
 
             class="status-pill"
@@ -305,14 +311,20 @@
             {{ req.status }}
           </button>
 
+
+            <!-- Header mit Fahrer- und Kundendaten -->
             <div class="ride-card__header">
               <p style="font-size: 1.3rem"  class="mt-4"><strong class="ml-1">Ride Request Id:  &nbsp; &nbsp;  &nbsp; {{req.id}} </strong>    </p>
+              <!-- Fahrerinfo-->
               <p style="font-size: 1.2rem"  class="mt-4"  (click)="otherProfileClicked(req?.driverUserName)" ><strong class="ml-1"  >Driver:      </strong>  &nbsp; &nbsp;{{req.driverFullName !== ' ' ? '  '+req.driverFullName+' ' : ' ' }}  {{ req.driverUserName !== ' ' ? '   ('+req.driverUserName+') ': ' there is no driver'}}   </p>
+              <!-- Kundeninfo-->
               <p style="font-size: 1.2rem"  (click)="otherProfileClicked(req?.customerUserName)" ><strong class="ml-1">Customer:      </strong>   &nbsp; &nbsp; {{'   '+req.customerFullName}}  {{'   ('+req.customerUserName + ') '}}</p>
             </div>
 
+            <!-- Detailbereich: Fahrzeug, Adressen usw. -->
             <div class="ride-card__body mb-4 p-2">
               <p style="font-size: 1.5rem" ><strong class="ml-1 ">Fahrzeugklasse: </strong>  &nbsp; &nbsp;  {{ req.carClass }}</p>
+
               <div class="address-line mb-2">
                 <p><strong>Von:</strong></p>
                 <div class="address-box">
@@ -336,6 +348,7 @@
               </div>
             </div>
 
+            <!-- Zeitstempel und weitere Fahrtdaten -->
             <div class="ride-card__timestamps">
               <span class="pr-3" style="font-size: 1rem" >Erstellt: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{ req.createdAt | date:'short' }}</span>
               <br><br>
@@ -351,7 +364,10 @@
             </div>
 
             <br><br>
+
+            <!-- Bewertungsbereich für Kunde und Fahrer -->
             <div class="ride-card__ratings">
+              <!-- Kundenbewertung -->
               <div class="rating flex flex-row">
                 <span class="rating__label mr-3">Kunde:</span>
                 <div class="star" >
@@ -359,6 +375,8 @@
                 </div>
                 <span class="rating__label mr-3">({{req.customerRating}})</span>
               </div>
+
+              <!-- Fahrerbewertung -->
               <div class="rating mb-4 flex flex-row">
                 <span class="rating__label mr-3">Fahrer:</span>
                 <div class="star">
@@ -367,6 +385,7 @@
                 <span class="rating__label mr-3">({{req.driverRating}})</span>
               </div>
             </div>
+            <!-- Trennlinie zwischen Karten -->
             <div class="divider"></div>
           </div>
         </div>

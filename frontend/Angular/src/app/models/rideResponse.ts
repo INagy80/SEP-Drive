@@ -1,4 +1,4 @@
-import {LatLng} from "./rideRequestDTO";
+import {LatLng} from "./rideRequestDTO";       // Import für Geokoordinaten (Latitude/Longitude)
 
 export interface rideResponse {
   driverUserName: string;
