@@ -36,4 +36,5 @@ export class RideRequestService {
     return this.http.put(`${this.rideRequestUrl}/deletestatus`,{});
 
   }
+
 }
