@@ -64,5 +64,8 @@ export class RideRequestService {
   sendsumlationupdate(id : number, SimulationUpdate: SimulationUpdate, hasEnded: boolean ) : Observable<any> {
     return this.http.put<any>(`${this.simulationUrl}/simulation/${id}/${hasEnded}`,SimulationUpdate);
   }
+  refreshsumilation(id : number) : Observable<any> {
+    return this.http.get<any>(`${this.simulationUrl}/refreshsumilation/${id}`,{});
+  }
 
 }

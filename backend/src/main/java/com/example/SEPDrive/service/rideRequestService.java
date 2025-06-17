@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -340,6 +341,38 @@ public class rideRequestService {
             }
         }
 
+
+
+        List<Fahrer> drivers = userDAO.findalldrivers().stream().filter(d -> !others.contains(d)).collect(Collectors.toList());
+
+        for (Fahrer driver : drivers) {
+            notification note = new notification(
+                    request.getCustomer(),
+                    driver,
+                    "deleted Ride Request!!",
+                    "deleted Ride Request!!",
+                    request
+            );
+
+            notificationDTO notificationDTO = new notificationDTO(
+                    note.getId(),
+                    new notificationpersonDTO(request.getCustomer().getId(), request.getCustomer().getUserName(),request.getCustomer().getEmail(),request.getCustomer().getFirstName(),request.getCustomer().getLastName(),request.getCustomer().getRating(),request.getCustomer().getTotalRides()),
+                    new notificationpersonDTO(driver.getId(), driver.getUserName(),driver.getEmail(),driver.getFirstName(),driver.getLastName(),driver.getRating(),driver.getTotalRides()),
+                    note.getStatus(),
+                    note.getCreatedAt(),
+                    note.getUpdatedAt(),
+                    note.getMessage(),
+                    note.getTitle(),
+                    null,
+                    0,
+                    request.getId(),
+                    0.0,
+                    null
+
+            );
+            notificationService.sendNotification(driver.getUserName(), notificationDTO);
+
+        }
 
 
         rideRequestDAO.save(request);
@@ -894,6 +927,42 @@ public class rideRequestService {
 
     }
 
+
+    public void refreshSimulation(Integer id) {
+        rideRequest request = rideRequestDAO.findbyid(id);
+        user currentUser = userDAO.findUserById(httpInterpreter.Interpreter().getId());
+        String username = request.getDriver().getUserName();
+        if (currentUser.equals(request.getDriver())) {
+            username = request.getCustomer().getUserName();
+        }
+
+        user reciever =  userDAO.findByUserName(username);
+
+        var note = new notification(
+                null,
+                reciever,
+                "refresh simulation",
+                "Refresh!!",
+                request
+        );
+
+        this.notificationService.sendNotification(username, new notificationDTO(
+                note.getId(),
+                null,
+                new notificationpersonDTO(reciever.getId(), reciever.getUserName(), reciever.getEmail(), reciever.getFirstName(), reciever.getLastName(), reciever.getRating(), reciever.getTotalRides()),
+                note.getStatus(),
+                note.getCreatedAt(),
+                note.getUpdatedAt(),
+                note.getMessage(),
+                note.getTitle(),
+                null,
+                0,
+                request.getId(),
+                0.0,
+                null
+        ));
+
+    }
 }
 
 

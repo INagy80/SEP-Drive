@@ -446,6 +446,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     });
 
+    this.refresh.simulationrefresh$.subscribe(() =>{
+      if(this.simulationPaused){
+        this.pauseSimulation()
+      }else{
+      this.resumeSimulation()
+      }
+    })
+
 
 
 
@@ -1273,11 +1281,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.toastr.success('Ride request deleted successfully.', 'Deleted!!');
       }),
       // 2) once deleted, switch to the “get all” Observable
-      switchMap(() => this.rideRequestService.getAll()),
+      switchMap(() => this.rideRequestService.getAll() ),
       // 3) now we have the fresh array—assign it and calc stats
       tap(requests => {
         this.rideResponses = requests;
         this.ohnesortierungarray = [...requests]
+        this.refresh.notifyOffersRefresh();
+
 
       })
     ).subscribe({
@@ -1834,8 +1844,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  assigned(){
+  assigned(response: rideResponse | undefined){
     this.simulationvisible = true;
+    if(response){
+    this.rideRequestService.refreshsumilation(response?.id).subscribe();
+    }
     setTimeout(() => this.simulationmap.invalidateSize(), 300);
   }
 

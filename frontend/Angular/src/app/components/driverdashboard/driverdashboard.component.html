@@ -498,7 +498,7 @@
               <div class="star">
                 <p-rating  [ngModel]="ride.customerRating" class="p-1" [readonly]="true" [stars]="5"   ></p-rating>
               </div>
-              <span class="rating__label mr-3">({{ride.customerRating}})</span>
+              <span class="rating__label mr-3">({{ride.customerRating | number:'1.1-1'  }})</span>
 
             </div>
 

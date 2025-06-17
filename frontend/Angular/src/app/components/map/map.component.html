@@ -124,7 +124,7 @@
             {{ activeRequest.status }}
           </button>
 
-            <button *ngIf="activeRequest.status === 'Assigned'"  class="live-btn" (click)="assigned()">
+            <button *ngIf="activeRequest.status === 'Assigned'"  class="live-btn" (click)="assigned(activeRequest)">
               <span class="live-dot"></span>
 
               LIVE

@@ -28,4 +28,10 @@ public class SimulationController {
         this.service.updateSimulation(id,update,hasEnded);
     }
 
+    @GetMapping("refreshsumilation/{id}")
+    public void refreshSumilation(@PathVariable Integer id) {
+        this.service.refreshSimulation(id);
+    }
+
+
 }

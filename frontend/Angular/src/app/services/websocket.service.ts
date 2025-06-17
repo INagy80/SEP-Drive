@@ -83,8 +83,12 @@ export class WebsocketService {
                 this.refresh.notifyRejectedOffersRefresh();
 
               }else if (notification.title === 'Refresh!!'){
+                this.refresh.refreshSimulation();
 
-              }else {
+              }else if(notification.title === 'deleted Ride Request!!'){
+                this.refresh.notifyOffersRefresh();
+
+              } else {
                 this.toaster.info(notification.message, notification.title);
                 this.refresh.notifyOffersRefresh();
               }
