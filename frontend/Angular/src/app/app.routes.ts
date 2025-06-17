@@ -11,6 +11,8 @@ import {ForgotPasswordComponent} from './components/forgot-password/forgot-passw
 import {ProfileEditeComponent} from './components/profile-edite/profile-edite.component';
 import {TwoFAAccessGard} from './services/guard/TwoFA-access-gard';
 import {OthersProfileComponent} from './components/others-profile/others-profile.component';
+import {DriverdashboardComponent} from './components/driverdashboard/driverdashboard.component';
+import {FahrtAngeboteComponent} from './components/fahrt-angebote/fahrt-angebote.component';
 
 export const routes: Routes = [
   {path: '',           redirectTo: 'welcom', pathMatch: 'full'},
@@ -37,6 +39,12 @@ export const routes: Routes = [
   {path: 'search-profile',    component: SearchProfileComponent , canActivate: [AccessGuardService]},
 
   {path: 'search-profile/others',    component: OthersProfileComponent , canActivate: [AccessGuardService]},
+
+  {path: 'driverdashboard',    component: DriverdashboardComponent , canActivate: [AccessGuardService]},
+
+  {path: 'fahrtangebote',    component: FahrtAngeboteComponent , canActivate: [AccessGuardService]},
+
+
 
 
 

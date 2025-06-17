@@ -23,6 +23,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import {ConfirmationService, MessageService} from "primeng/api";
 import {GoogleMapsModule} from '@angular/google-maps';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import {MatButtonModule} from '@angular/material/button';
+import {ToastrModule} from 'ngx-toastr';
 
 
 export const appConfig: ApplicationConfig = {
@@ -31,6 +34,8 @@ export const appConfig: ApplicationConfig = {
       BrowserAnimationsModule,
       FormsModule,
       HttpClientModule,
+      SocketIoModule.forRoot({ url: 'http://localhost:3000', options: {} }),
+
 
       // Prime modules
       InputTextModule,
@@ -47,6 +52,14 @@ export const appConfig: ApplicationConfig = {
       GoogleMapsModule,
       BrowserAnimationsModule,
       MatSidenavModule,
+      ToastrModule.forRoot({
+        progressBar: true,
+        closeButton: true,
+        newestOnTop: true,
+        tapToDismiss: true,
+        positionClass: 'toast-bottom-right',
+        timeOut: 10000,
+      }),
 
     ),
     {
