@@ -11,7 +11,10 @@ export const environment = {
     userUrl: 'v1/user',
     rideRequestUrl: 'v1/rideRequest',
     profileSucheUrl: 'v1/profilesuche',
-    profileUrl: 'v1/profile'
+    profileUrl: 'v1/profile',
+    geldKonto: 'v1/geldKonto',
+    rideOffers: 'v1/rideOffers',
+    simulations: 'v1/simulations',
   }
 
 };
