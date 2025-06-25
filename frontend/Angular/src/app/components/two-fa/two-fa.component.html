@@ -23,7 +23,7 @@
   <h1>Zwei-Faktor-Authentifizierung</h1>
   <p>Bitte gib den Bestätigungscode ein, den wir dir gesendet haben:</p>
 
-  <form class="code-input" required>
+  <form class="code-input" required (ngSubmit)="verify()">
   <input #c1  [(ngModel)]="a" (input)="updateFacode()" name="a" type="text" maxlength="1"  appAutoFocusNext [appAutoFocusNext]="c2"                  >
   <input #c2  [(ngModel)]="b" (input)="updateFacode()" name="b" type="text" maxlength="1"  appAutoFocusNext [appAutoFocusNext]="c3"  [prevInput]="c1">
   <input #c3  [(ngModel)]="c" (input)="updateFacode()" name="c" type="text" maxlength="1"  appAutoFocusNext [appAutoFocusNext]="c4"  [prevInput]="c2">
