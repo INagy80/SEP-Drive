@@ -1,3 +1,82 @@
+/* Gesamtcontainer */
+
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+/* Überschrift (optional) */
+h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Suchfeld */
+.filter {
+  margin-bottom: 1rem;
+}
+
+.filter input {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Tabelle */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+/* Tabellenkopf */
+thead th {
+  text-align: left;
+  padding: 0.75rem;
+  background-color: #f9f9f9;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Sortierbare Spalten – optional: kleiner Pfeil */
+thead th:hover {
+  background-color: #f0f0f0;
+}
+
+/* Tabelleninhalt */
+tbody td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+/* Hover-Zeile */
+tbody tr:hover {
+  background-color: #f7f7f7;
+}
+
+/* Optionale Formatierungen für bestimmte Spalten */
+td:nth-child(4) {
+  color: #fbbf24; /* goldene Farbe für Bewertung */
+  font-weight: bold;
+}
+
+td:last-child {
+  font-weight: bold;
+}
+
+
+
+/*map*/
+
 @import "primeicons/primeicons.css";
 
 /* Color palette */
@@ -101,68 +180,68 @@ $white:       #ffffff;
 
 
 
-    .section {
-      &__title {
-        font-size: 200px;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-      }
-      &--active {
-        margin-bottom: 1rem;
-      }
-      &--history {
-        background-color: red;
-        margin-top: 1rem;
-      }
+  .section {
+    &__title {
+      font-size: 200px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
     }
-
-    .ride-card {
-      position: relative;
-      background-color: #fff;
-      border: 2px solid #080808;
-      border-radius: 0.5rem;
-      padding: 1rem;
+    &--active {
       margin-bottom: 1rem;
-      max-width: 20px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      margin-left: 20px;
-      padding-left: 20px;
-    } /* .ride-card */
-
-
-
-    .rating {
-
-      margin-right: 12px;
-      display: flex;
-      align-items: center;
-      padding: 0.25rem ;
-
-      &__label {
-        margin-right: 0.5rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #6b7280; /* gray */
-      }
     }
-
-    .star {
-      margin-left: 12px;
-      font-size: 2rem;
-      color: #d1d5db; /* gray-light */
-      transition: color 0.3s ease-in-out;
-
-      &.filled {
-        color: #fbbf24; /* yellow */
-      }
+    &--history {
+      background-color: red;
+      margin-top: 1rem;
     }
+  }
 
-    .no-active {
-      font-style: italic;
+  .ride-card {
+    position: relative;
+    background-color: #fff;
+    border: 2px solid #080808;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    max-width: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-left: 20px;
+    padding-left: 20px;
+  } /* .ride-card */
+
+
+
+  .rating {
+
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    padding: 0.25rem ;
+
+    &__label {
+      margin-right: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
       color: #6b7280; /* gray */
     }
+  }
+
+  .star {
+    margin-left: 12px;
+    font-size: 2rem;
+    color: #d1d5db; /* gray-light */
+    transition: color 0.3s ease-in-out;
+
+    &.filled {
+      color: #fbbf24; /* yellow */
+    }
+  }
+
+  .no-active {
+    font-style: italic;
+    color: #6b7280; /* gray */
+  }
 } /* .ride-requests */
- /* .p-sidebar.custom-sidebar */
+/* .p-sidebar.custom-sidebar */
 
 .status-pill {
   position: absolute;
@@ -731,10 +810,10 @@ button, .controls {
 
 }
 .avatar {
-    width: 100px;  // Bild größe
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
+  width: 100px;  // Bild größe
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 

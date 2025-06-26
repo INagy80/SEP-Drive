@@ -1,0 +1,116 @@
+<app-header></app-header>
+
+<div class="navbar">
+  <div class=" gap-6 navbar " style="width: 60vw ; justify-content: space-around;
+     align-items: center; right: 30vw; left: 15vw; position: absolute" >
+
+    <p-button (click)="logout()" class="nav-item">
+      <div class="icons gap-2">
+        <p style="font-size: 1.1rem">Abmelden</p>
+        <img  src="/assets/icons/exit.png">
+      </div>
+    </p-button>
+
+
+    <p-button *ngIf="isdriver === true"   (click)="driverdashboard()" class="nav-item" >
+      <div class="icons gap-2">
+        <p >Dashboard</p>
+        <img  src="/assets/icons/route.png">
+      </div>
+    </p-button>
+
+
+
+    <p-button   (click)="fahrtangebote()" class="nav-item"  >
+      <div class="icons gap-2">
+        <p >FahrtAngebote</p>
+        <img  src="/assets/icons/fahrtangebote.png">
+      </div>
+    </p-button>
+
+
+    <p-button (click)="startseite()" class="nav-item">
+      <div class="icons gap-2">
+        <p >Startseite</p>
+        <img  src="/assets/icons/home.png">
+      </div>
+    </p-button>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<h1>Fahrer Leaderboard</h1>
+<div class="filter">
+  <input [(ngModel)]="suchbegriff" placeholder="Nach Fahrernamen filtern" />
+</div>
+
+<p-table
+  [value]="gefilterteFahrer"
+  [paginator]="false"
+  [autoLayout]="true"
+  [rows]="10"
+  [customSort]="true"
+  (sortFunction)="customSort($event)"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="benutzername">
+        Benutzername
+        <p-sortIcon field="benutzername"></p-sortIcon>
+      </th>
+      <th pSortableColumn="name">
+        Name
+        <p-sortIcon field="name"></p-sortIcon>
+      </th>
+      <th pSortableColumn="distanz">
+        Gesamtstrecke (km)
+        <p-sortIcon field="distanz"></p-sortIcon>
+      </th>
+      <th pSortableColumn="bewertung">
+        Bewertung
+        <p-sortIcon field="bewertung"></p-sortIcon>
+      </th>
+      <th pSortableColumn="fahrzeit">
+        Fahrzeit (min)
+        <p-sortIcon field="fahrzeit"></p-sortIcon>
+      </th>
+      <th pSortableColumn="fahrten">
+        Fahrten
+        <p-sortIcon field="fahrten"></p-sortIcon>
+      </th>
+      <th pSortableColumn="geld">
+        Verdientes Geld (€)
+        <p-sortIcon field="geld"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-fahrer>
+    <tr>
+      <td>{{ fahrer.benutzername }}</td>
+      <td>{{ fahrer.name }}</td>
+      <td>{{ fahrer.distanz }}</td>
+      <td>
+        <p-rating
+          [ngModel]="fahrer.bewertung"
+          [readonly]="true"
+          [stars]="5"
+        ></p-rating>
+        <span style="margin-left: 4px">({{ fahrer.bewertung | number:'1.1-1' }})</span>
+      </td>
+      <td>{{ fahrer.fahrzeit }}</td>
+      <td>{{ fahrer.fahrten }}</td>
+      <td>{{ fahrer.geld | currency: 'EUR' }}</td>
+    </tr>
+  </ng-template>
+</p-table>
