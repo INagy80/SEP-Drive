@@ -13,7 +13,7 @@ import java.util.List;
 public interface rideRequestDAO extends JpaRepository<rideRequest, Integer> {
 
     List<rideRequest> findByCustomerId(Integer customerId);
-
+    List<rideRequest> findByDriver_UserName(String userName); // NEW ONLY FOR Statistics
     List<rideRequest> findAll();
 
     @Query(value = "SELECT * from ride_requests where driver_id = :driverId",nativeQuery = true)
