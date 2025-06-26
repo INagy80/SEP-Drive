@@ -11,13 +11,17 @@ import org.hibernate.type.SqlTypes;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 
 @Entity
 @Table(name="users")
 public abstract class user {
+
+    private static final int LAST_ACTIVATE_INTERVAL = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -89,7 +93,13 @@ public abstract class user {
     @JsonBackReference
     private geldKonto geldKonto ;
 
+    @OneToMany(mappedBy = "sender")
+    private List<Chat> chatsAsSender;
 
+    @OneToMany(mappedBy = "recipient")
+    private List<Chat> chatsAsRecipient;
+
+    private LocalDateTime lastSeen;
 
 
 
@@ -129,6 +139,30 @@ public abstract class user {
 
     //getters and setters
 
+
+    public List<Chat> getChatsAsSender() {
+        return chatsAsSender;
+    }
+
+    public void setChatsAsSender(List<Chat> chatsAsSender) {
+        this.chatsAsSender = chatsAsSender;
+    }
+
+    public List<Chat> getChatsAsRecipient() {
+        return chatsAsRecipient;
+    }
+
+    public void setChatsAsRecipient(List<Chat> chatsAsRecipient) {
+        this.chatsAsRecipient = chatsAsRecipient;
+    }
+
+    public LocalDateTime getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setLastSeen(LocalDateTime lastSeen) {
+        this.lastSeen = lastSeen;
+    }
 
     public String getImageName() {
         return imageName;
@@ -278,6 +312,12 @@ public abstract class user {
         this.totalRides += 1 ;
     }
 
+
+
+    @Transient
+    public boolean isUserOnline() {
+        return lastSeen != null && lastSeen.isAfter(LocalDateTime.now().minusMinutes(LAST_ACTIVATE_INTERVAL));
+    }
 
 
     @Override

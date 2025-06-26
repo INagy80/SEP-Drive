@@ -15,6 +15,8 @@ export const environment = {
     geldKonto: 'v1/geldKonto',
     rideOffers: 'v1/rideOffers',
     simulations: 'v1/simulations',
+    Chaturl: 'v1/chats',
+    Messageurl: 'v1/messages'
   }
 
 };

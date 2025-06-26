@@ -13,6 +13,7 @@ import {TwoFAAccessGard} from './services/guard/TwoFA-access-gard';
 import {OthersProfileComponent} from './components/others-profile/others-profile.component';
 import {DriverdashboardComponent} from './components/driverdashboard/driverdashboard.component';
 import {FahrtAngeboteComponent} from './components/fahrt-angebote/fahrt-angebote.component';
+import {ChatComponent} from './components/chat/chat.component';
 
 export const routes: Routes = [
   {path: '',           redirectTo: 'welcom', pathMatch: 'full'},
@@ -43,6 +44,8 @@ export const routes: Routes = [
   {path: 'driverdashboard',    component: DriverdashboardComponent , canActivate: [AccessGuardService]},
 
   {path: 'fahrtangebote',    component: FahrtAngeboteComponent , canActivate: [AccessGuardService]},
+
+  {path: 'chat',    component: ChatComponent , canActivate: [AccessGuardService] },
 
 
 
