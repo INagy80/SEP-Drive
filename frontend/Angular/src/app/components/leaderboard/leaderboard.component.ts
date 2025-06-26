@@ -41,6 +41,9 @@ export class LeaderboardComponent implements OnInit {
   isdriver: boolean = false;
   fahrerListe: Fahrer[] = [];
 
+  first: number = 0;  // Startindex der Seite
+  rows: number = 10;  // Anzahl der Zeilen pro Seite
+
   constructor(
     private router: Router,
     private WebSocketService: WebsocketService,
@@ -84,6 +87,15 @@ export class LeaderboardComponent implements OnInit {
 
       return event.order * result;
     });
+  }
+
+  pageChange(event: any) {
+    this.first = event.first;
+    this.rows = event.rows;
+  }
+
+  resetPagination() {
+    this.first = 0;
   }
 
   startseite() {

@@ -1,66 +1,58 @@
 <app-header></app-header>
 
 <div class="navbar">
-  <div class=" gap-6 navbar " style="width: 60vw ; justify-content: space-around;
-     align-items: center; right: 30vw; left: 15vw; position: absolute" >
-
+  <div class="gap-6 navbar" style="width: 60vw; justify-content: space-around; align-items: center; right: 30vw; left: 15vw; position: absolute;">
     <p-button (click)="logout()" class="nav-item">
       <div class="icons gap-2">
         <p style="font-size: 1.1rem">Abmelden</p>
-        <img  src="/assets/icons/exit.png">
+        <img src="/assets/icons/exit.png" />
       </div>
     </p-button>
 
-
-    <p-button *ngIf="isdriver === true"   (click)="driverdashboard()" class="nav-item" >
+    <p-button *ngIf="isdriver" (click)="driverdashboard()" class="nav-item">
       <div class="icons gap-2">
-        <p >Dashboard</p>
-        <img  src="/assets/icons/route.png">
+        <p>Dashboard</p>
+        <img src="/assets/icons/route.png" />
       </div>
     </p-button>
 
-
-
-    <p-button   (click)="fahrtangebote()" class="nav-item"  >
+    <p-button (click)="fahrtangebote()" class="nav-item">
       <div class="icons gap-2">
-        <p >FahrtAngebote</p>
-        <img  src="/assets/icons/fahrtangebote.png">
+        <p>FahrtAngebote</p>
+        <img src="/assets/icons/fahrtangebote.png" />
       </div>
     </p-button>
-
 
     <p-button (click)="startseite()" class="nav-item">
       <div class="icons gap-2">
-        <p >Startseite</p>
-        <img  src="/assets/icons/home.png">
+        <p>Startseite</p>
+        <img src="/assets/icons/home.png" />
       </div>
     </p-button>
-
   </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
 <h1>Fahrer Leaderboard</h1>
-<div class="filter">
-  <input [(ngModel)]="suchbegriff" placeholder="Nach Fahrernamen filtern" />
+
+<div class="filter" style="margin-bottom: 1rem;">
+  <input
+    [(ngModel)]="suchbegriff"
+    placeholder="Nach Fahrernamen filtern"
+    (input)="resetPagination()"
+    style="width: 250px; padding: 0.4rem;"
+  />
 </div>
 
 <p-table
   [value]="gefilterteFahrer"
-  [paginator]="false"
+  [paginator]="true"
+  [rows]="rows"
+  [rowsPerPageOptions]="[5,10,20]"
   [autoLayout]="true"
-  [rows]="10"
   [customSort]="true"
   (sortFunction)="customSort($event)"
+  [first]="first"
+  (onPage)="pageChange($event)"
 >
   <ng-template pTemplate="header">
     <tr>
@@ -101,12 +93,8 @@
       <td>{{ fahrer.name }}</td>
       <td>{{ fahrer.distanz }}</td>
       <td>
-        <p-rating
-          [ngModel]="fahrer.bewertung"
-          [readonly]="true"
-          [stars]="5"
-        ></p-rating>
-        <span style="margin-left: 4px">({{ fahrer.bewertung | number:'1.1-1' }})</span>
+        <p-rating [ngModel]="fahrer.bewertung" [readonly]="true" [stars]="5"></p-rating>
+        <span style="margin-left: 4px">({{ fahrer.bewertung | number: '1.1-1' }})</span>
       </td>
       <td>{{ fahrer.fahrzeit }}</td>
       <td>{{ fahrer.fahrten }}</td>
