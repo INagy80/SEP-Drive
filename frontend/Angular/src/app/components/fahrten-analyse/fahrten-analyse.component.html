@@ -1,0 +1,212 @@
+
+
+<app-header/>
+
+<!-- Navbar -->
+<div class="navbar">
+
+  <div class=" gap-6 navbar " style="width: 50vw ; justify-content: space-around;
+  align-items: center; right: 25vw; left: 25vw; position: absolute" >
+
+    <p-button (click)="logout()" class="nav-item">
+      <div class="icons gap-2">
+        <p style="font-size: 1.1rem">Abmelden</p>
+        <img  src="/assets/icons/exit.png">
+      </div>
+    </p-button>
+
+    <p-button   (click)="fahrtangebote()" class="nav-item"  >
+      <div class="icons gap-2">
+        <p >FahrtAngebote</p>
+        <img  src="/assets/icons/fahrtangebote.png">
+      </div>
+    </p-button>
+
+
+    <p-button  (click)="driverdashboard()" class="nav-item" >
+      <div class="icons gap-2">
+        <p >Dashboard</p>
+        <img  src="/assets/icons/route.png">
+      </div>
+    </p-button>
+
+
+    <p-button (click)="startseite()" class="nav-item">
+      <div class="icons gap-2">
+        <p >Startseite</p>
+        <img  src="/assets/icons/home.png">
+      </div>
+    </p-button>
+
+  </div>
+
+</div>
+
+
+<!---------------------------------------------Garphik part------------------------------------------------>
+<div class="fahrten-analyse-container">
+
+  <!-- Controls Section -->
+  <div class="controls-section">
+    <div class="control-group">
+      <label for="viewMode">Ansicht:</label>
+      <select id="viewMode" [(ngModel)]="viewMode" (change)="onViewModeChange()">
+        <option value="monthly">Monatlich</option>
+        <option value="daily">Täglich</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="year">Jahr:</label>
+      <select id="year" [(ngModel)]="selectedYear" (change)="onYearChange()">
+        <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+      </select>
+    </div>
+
+    <div class="control-group" *ngIf="viewMode === 'daily'">
+      <label for="month">Monat:</label>
+      <select id="month" [(ngModel)]="selectedMonth" (change)="onMonthChange()">
+        <option *ngFor="let month of availableMonths" [value]="month.value">{{ month.label }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-content">
+        <h3>Gesamteinnahmen</h3>
+        <p class="stat-value">{{ getTotalValue(statisticsData.earnings) | currency:'EUR' }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📏</div>
+      <div class="stat-content">
+        <h3>Gefahrene Distanz</h3>
+        <p class="stat-value">{{ getTotalValue(statisticsData.distance) }} km</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-content">
+        <h3>Fahrzeit</h3>
+        <p class="stat-value">{{ getTotalValue(statisticsData.drivingTime) }} Stunden</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-content">
+        <h3>Durchschnittliche Bewertung</h3>
+        <p class="stat-value">{{ getAverageValue(statisticsData.averageRating) | number:'1.1-1' }}/5.0</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <!-- Earnings Chart -->
+    <div class="chart-container">
+      <h2>Einnahmen</h2>
+      <div class="chart">
+        <svg class="line-chart" viewBox="0 0 1000 300">
+          <polyline
+            [attr.points]="getLineChartPoints(statisticsData.earnings)"
+            fill="none"
+            stroke="#4CAF50"
+            stroke-width="3"/>
+          <circle
+            *ngFor="let item of statisticsData.earnings; let i = index"
+            [attr.cx]="(i / (statisticsData.earnings.length - 1)) * 1000"
+            [attr.cy]="300 - (item.value / getMaxValue(statisticsData.earnings)) * 250"
+            r="5"
+            fill="#4CAF50"
+            class="data-point"
+            [title]="item.label + ': ' + (item.value | currency:'EUR')"/>
+        </svg>
+        <div class="chart-labels">
+          <span *ngFor="let item of statisticsData.earnings" class="chart-label">{{ item.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Distance Chart -->
+    <div class="chart-container">
+      <h2>Gefahrene Distanz</h2>
+      <div class="chart">
+        <svg class="line-chart" viewBox="0 0 1000 300">
+          <polyline
+            [attr.points]="getLineChartPoints(statisticsData.distance)"
+            fill="none"
+            stroke="#2196F3"
+            stroke-width="3"/>
+          <circle
+            *ngFor="let item of statisticsData.distance; let i = index"
+            [attr.cx]="(i / (statisticsData.distance.length - 1)) * 1000"
+            [attr.cy]="300 - (item.value / getMaxValue(statisticsData.distance)) * 250"
+            r="5"
+            fill="#2196F3"
+            class="data-point"
+            [title]="item.label + ': ' + item.value + ' km'"/>
+        </svg>
+        <div class="chart-labels">
+          <span *ngFor="let item of statisticsData.distance" class="chart-label">{{ item.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Driving Time Chart -->
+    <div class="chart-container">
+      <h2>Fahrzeit</h2>
+      <div class="chart">
+        <svg class="line-chart" viewBox="0 0 1000 300">
+          <polyline
+            [attr.points]="getLineChartPoints(statisticsData.drivingTime)"
+            fill="none"
+            stroke="#FF9800"
+            stroke-width="3"/>
+          <circle
+            *ngFor="let item of statisticsData.drivingTime; let i = index"
+            [attr.cx]="(i / (statisticsData.drivingTime.length - 1)) * 1000"
+            [attr.cy]="300 - (item.value / getMaxValue(statisticsData.drivingTime)) * 250"
+            r="5"
+            fill="#FF9800"
+            class="data-point"
+            [title]="item.label + ': ' + item.value + ' Stunden'"/>
+        </svg>
+        <div class="chart-labels">
+          <span *ngFor="let item of statisticsData.drivingTime" class="chart-label">{{ item.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rating Chart -->
+    <div class="chart-container">
+      <h2>Durchschnittliche Bewertung</h2>
+      <div class="chart">
+        <svg class="line-chart" viewBox="0 0 1000 300">
+          <polyline
+            [attr.points]="getLineChartPoints(statisticsData.averageRating)"
+            fill="none"
+            stroke="#F44336"
+            stroke-width="3"/>
+          <circle
+            *ngFor="let item of statisticsData.averageRating; let i = index"
+            [attr.cx]="(i / (statisticsData.averageRating.length - 1)) * 1000"
+            [attr.cy]="300 - (item.value / getMaxValue(statisticsData.averageRating)) * 250"
+            r="5"
+            fill="#F44336"
+            class="data-point"
+            [title]="item.label + ': ' + item.value + '/5.0'"/>
+        </svg>
+        <div class="chart-labels">
+          <span *ngFor="let item of statisticsData.averageRating" class="chart-label">{{ item.label }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

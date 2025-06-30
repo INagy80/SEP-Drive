@@ -877,6 +877,10 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
 
   }
 
+  fahrtenanaylse() {
+    this.router.navigate(['/fahrten-analyse']);
+  }
+
 
 
 
