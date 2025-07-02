@@ -1,14 +1,14 @@
-export interface ChartDataPoint {
+export interface ChartData {
   label: string;
   value: number;
   date: string;
 }
 
 export interface StatisticsData {
-  earnings: ChartDataPoint[];
-  distance: ChartDataPoint[];
-  drivingTime: ChartDataPoint[];
-  averageRating: ChartDataPoint[];
+  earnings: ChartData[];
+  distance: ChartData[];
+  drivingTime: ChartData[];
+  averageRating: ChartData[];
 }
 
 export interface StatisticsRequest {

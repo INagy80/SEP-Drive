@@ -5,19 +5,11 @@ import { Router } from '@angular/router';
 import {WebsocketService} from '../../services/websocket.service';
 import {Button} from 'primeng/button';
 import {HeaderComponent} from '../header/header.component';
+import { StatisticsData, ChartData } from '../../models/statistics-data';
+import { StatisticsService } from '../../services/statistics/statistics.service';
 
-interface ChartData {
-  label: string;
-  value: number;
-  date: string;
-}
 
-interface StatisticsData {
-  earnings: ChartData[];
-  distance: ChartData[];
-  drivingTime: ChartData[];
-  averageRating: ChartData[];
-}
+
 
 @Component({
   selector: 'app-fahrten-analyse',
@@ -79,6 +71,11 @@ export class FahrtenAnalyseComponent implements OnInit {
   ngOnInit(): void {
     this.loadStatisticsData();
   }
+
+
+  /**
+   * Generiert die Liste der verfügbaren Jahre für die Auswahl.
+   */
   private generateAvailableYears(): void {
     const currentYear = new Date().getFullYear();
     for (let year = currentYear - 5; year <= currentYear; year++) {
@@ -86,13 +83,37 @@ export class FahrtenAnalyseComponent implements OnInit {
     }
   }
 
+
+
   private loadStatisticsData(): void {
-    // Mock data - in real implementation, this would come from a service
-    if (this.viewMode === 'monthly') {
-      this.loadMonthlyData();
-    } else {
-      this.loadDailyData();
-    }
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const observable = this.statisticsService.getCurrentDriverStatistics(
+      this.viewMode,
+      this.selectedYear,
+      this.viewMode === 'daily' ? this.selectedMonth : undefined
+    );
+
+    observable.subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.statisticsData = response.data;
+        } else {
+          this.errorMessage = response.message || 'Fehler beim Laden der Statistiken';
+          // Fallback to mock data if backend fails
+          this.loadMockData();
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading statistics:', error);
+        this.errorMessage = 'Verbindungsfehler. Verwende Beispieldaten.';
+        // Fallback to mock data
+        this.loadMockData();
+        this.isLoading = false;
+      }
+    });
   }
 
   private loadMonthlyData(): void {
@@ -114,6 +135,8 @@ export class FahrtenAnalyseComponent implements OnInit {
       averageRating: this.generateDailyRatingData()
     };
   }
+
+  // Mock-Daten, durch Zufallszahlen pro Monat/Tag  // werden später beim verbinden entfernt
 
   private generateMonthlyEarningsData(): ChartData[] {
     const data: ChartData[] = [];
@@ -214,6 +237,7 @@ export class FahrtenAnalyseComponent implements OnInit {
     }
     return data;
   }
+ //--------------------------------------Mock Daten ---------------------------
 
   onViewModeChange(): void {
     this.loadStatisticsData();
@@ -230,6 +254,10 @@ export class FahrtenAnalyseComponent implements OnInit {
   getMaxValue(data: ChartData[]): number {
     return Math.max(...data.map(item => item.value));
   }
+
+  /**
+   * Berechnet die Punkte für das Liniendiagramm als String.
+   */
 
   getLineChartPoints(data: ChartData[]): string {
     if (data.length === 0) return '';
