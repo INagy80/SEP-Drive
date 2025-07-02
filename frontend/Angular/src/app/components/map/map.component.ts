@@ -1276,6 +1276,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 //<-----------------Navigation------------------->//
 
+  chat(){
+    this.router.navigate(['/chat']);
+  }
+
   startseite() {
     this.router.navigate(['/home']);
 

@@ -45,16 +45,8 @@ export const routes: Routes = [
 
   {path: 'fahrtangebote',    component: FahrtAngeboteComponent , canActivate: [AccessGuardService]},
 
-  {path: 'chat',    component: ChatComponent , canActivate: [AccessGuardService] },
 
-
-
-
-
-
-
-
-
+  {path: 'chat' , component: ChatComponent, canActivate :[AccessGuardService]},
 
 
   {path: '**', redirectTo: 'welcome'}

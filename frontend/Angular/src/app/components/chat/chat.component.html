@@ -1,0 +1,50 @@
+<!-- Navbar -->
+<div class="navbar">
+
+  <div class=" gap-6 navbar " style="width: 50vw ; justify-content: space-around;
+  align-items: center; right: 25vw; left: 25vw; position: absolute" >
+
+    <p-button (click)="logout()" class="nav-item">
+      <div class="icons gap-2">
+        <p style="font-size: 1.1rem">Abmelden</p>
+        <img  src="/assets/icons/exit.png">
+      </div>
+    </p-button>
+
+    <p-button   (click)="fahrtangebote()" class="nav-item"  >
+      <div class="icons gap-2">
+        <p >FahrtAngebote</p>
+        <img  src="/assets/icons/fahrtangebote.png">
+      </div>
+    </p-button>
+
+    <p-button (click)="startseite()" class="nav-item">
+      <div class="icons gap-2">
+        <p >Startseite</p>
+        <img  src="/assets/icons/home.png">
+      </div>
+    </p-button>
+
+  </div>
+
+</div>
+
+
+<nb-chat title="Fahrer & Kunde Chat" size="large">
+  <nb-chat-message *ngFor="let msg of messages"
+                   [type]="msg.type"
+                    [message]="msg.text"
+                   [reply]="msg.reply"
+                   [sender]="msg.user.name"
+                   [date]="msg.date"
+                   [avatar]="msg.user.avatar"
+                   (click)="onEditClicked(msg)"
+                   (contextmenu)="onDeleteClicked($event, msg)">
+  </nb-chat-message>
+
+  <nb-chat-form (send)="sendMessage($event)" [dropFiles]="true">
+  </nb-chat-form>
+
+  <router-outlet></router-outlet>
+
+</nb-chat>
