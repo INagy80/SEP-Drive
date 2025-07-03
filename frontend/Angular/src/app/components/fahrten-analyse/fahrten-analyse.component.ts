@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import {WebsocketService} from '../../services/websocket.service';
 import {Button} from 'primeng/button';
 import {HeaderComponent} from '../header/header.component';
-import { StatisticsData, ChartData } from '../../models/statistics-data';
+import { StatisticsData, ChartData, StatisticsResponse } from '../../models/statistics-data';
 import { StatisticsService } from '../../services/statistics/statistics.service';
 
 
@@ -62,6 +62,7 @@ export class FahrtenAnalyseComponent implements OnInit {
   constructor(
     private router: Router,
     private WebSocketService : WebsocketService,
+    private statisticsService: StatisticsService
 
   ) {
     this.generateAvailableYears();
@@ -89,32 +90,52 @@ export class FahrtenAnalyseComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const observable = this.statisticsService.getCurrentDriverStatistics(
+
+    const username = localStorage.getItem('username');
+    if (!username) {
+      this.errorMessage = 'Kein Benutzername gefunden.';
+      this.isLoading = false;
+      return;
+    }
+
+    this.statisticsService.getCurrentDriverStatistics(
+      username,
       this.viewMode,
       this.selectedYear,
       this.viewMode === 'daily' ? this.selectedMonth : undefined
-    );
-
-    observable.subscribe({
+    )
+      .subscribe({
       next: (response) => {
         if (response.success) {
           this.statisticsData = response.data;
         } else {
           this.errorMessage = response.message || 'Fehler beim Laden der Statistiken';
-          // Fallback to mock data if backend fails
-          this.loadMockData();
+
         }
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading statistics:', error);
-        this.errorMessage = 'Verbindungsfehler. Verwende Beispieldaten.';
-        // Fallback to mock data
-        this.loadMockData();
+        this.errorMessage = 'Verbindungsfehler.';
+
         this.isLoading = false;
       }
     });
   }
+
+
+
+  //----------------------------------- Mock-Daten------------------------------------------
+
+  /**
+  private loadStatisticsData(): void {
+    if (this.viewMode === 'monthly') {
+      this.loadMonthlyData();
+    }else {
+      this.loadDailyData();
+    }
+  }
+*/
 
   private loadMonthlyData(): void {
     // Generate mock monthly data for the selected year

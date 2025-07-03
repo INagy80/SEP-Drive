@@ -9,6 +9,7 @@ import { environment } from '../../../eviroments/environment';
 })
 export class StatisticsService {
 
+// URL noch nicht vollständig !!
   private readonly statisticsUrl = `${environment.api.baseUrl}/statistics`;
 
   constructor(private http: HttpClient) { }
@@ -25,6 +26,31 @@ export class StatisticsService {
     };
     return this.http.post<StatisticsResponse>(`${this.statisticsUrl}/driver`, request);
   }
+
+  /**
+   * Holt die täglichen Statistiken für einen Fahrer
+   */
+  getDailyStatistics(driverUsername: string, year: number, month: number): Observable<StatisticsResponse> {
+    const request: StatisticsRequest = {
+      driverUsername,
+      viewMode: 'daily',
+      year,
+      month
+    };
+    return this.http.post<StatisticsResponse>(`${this.statisticsUrl}/driver`, request);
+  }
+
+  /**
+   * Holt die Statistiken für den aktuellen Fahrer (Username muss übergeben werden)
+   */
+  getCurrentDriverStatistics(driverUsername: string, viewMode: 'daily' | 'monthly', year: number, month?: number): Observable<StatisticsResponse> {
+    if (viewMode === 'daily' && month) {
+      return this.getDailyStatistics(driverUsername, year, month);
+    } else {
+      return this.getMonthlyStatistics(driverUsername, year);
+    }
+  }
+
 
 
 }
