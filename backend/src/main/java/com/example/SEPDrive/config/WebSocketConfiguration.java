@@ -45,14 +45,14 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     }
 
 
-    @Override
-    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
-        DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
-        resolver.setDefaultMimeType(APPLICATION_JSON);
-        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-        converter.setObjectMapper(new ObjectMapper());
-        converter.setContentTypeResolver(resolver);
-        messageConverters.add(converter);
-        return false;
-    }
+//    @Override
+//    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+//        DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
+//        resolver.setDefaultMimeType(APPLICATION_JSON);
+//        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+//        converter.setObjectMapper(new ObjectMapper());
+//        converter.setContentTypeResolver(resolver);
+//        messageConverters.add(converter);
+//        return false;
+//    }
 }

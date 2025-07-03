@@ -67,5 +67,5 @@ application:
 
 
 
-springdoc:
-  default-produces-media-type: application/json
+#springdoc:
+#  default-produces-media-type: application/json

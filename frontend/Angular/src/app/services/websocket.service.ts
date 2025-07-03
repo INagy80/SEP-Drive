@@ -88,7 +88,10 @@ export class WebsocketService {
               }else if(notification.title === 'deleted Ride Request!!'){
                 this.refresh.notifyOffersRefresh();
 
-              } else {
+              } else if(notification.title === 'Simulation Edited is Implemented!!' || notification.title === 'Simulation Edited!!'){
+                this.toaster.info(notification.message, notification.title);
+              }
+              else {
                 this.toaster.info(notification.message, notification.title);
                 this.refresh.notifyOffersRefresh();
               }

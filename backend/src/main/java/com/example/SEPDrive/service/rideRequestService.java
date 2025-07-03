@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -937,6 +938,156 @@ public class rideRequestService {
         ));
 
     }
+
+
+
+    @Transactional
+    public void liveEdit(rideEditDto rideEditDto) {
+        user customer = httpInterpreter.Interpreter();
+
+        rideRequest aktiveRide = rideRequestDAO.findByCustomerId(customer.getId()).stream().filter(r -> r.getStatus().equals(RequestStatus.Assigned)).findFirst().orElse(null);
+
+        if (aktiveRide == null) {
+            throw new RuntimeException("Ride not found");
+        }
+
+
+
+
+
+//        List<adress> zwischenstops = new ArrayList<>();
+//        for (LatLng a : rideEditDto.zwischenstops()) {
+//            adress temp = new adress(a.getLat(), a.getLng());
+//            zwischenstops.add(temp);
+//
+//        }
+//
+//        int i = 0;
+//        for (String s : rideEditDto.zwischenstopssaddress()) {
+//
+//            adress a = zwischenstops.get(i);
+//            String[] zwischenstopsparts = s.split("\\s*,\\s*");
+//            a.setHouseNumberAndStreet(zwischenstopsparts[0] + ", " + zwischenstopsparts[1]);
+//            a.setCountry(zwischenstopsparts[zwischenstopsparts.length - 1]);
+//            a.setZip(zwischenstopsparts[zwischenstopsparts.length - 2]);
+//            a.setState(zwischenstopsparts[zwischenstopsparts.length - 3]);
+//            a.setCity(zwischenstopsparts[zwischenstopsparts.length - 4]);
+//            i++;
+//        }
+
+        List<LatLng> dtoStops     = rideEditDto.zwischenstops();
+        List<String> dtoAddresses = rideEditDto.zwischenstopssaddress();
+
+// only loop up to the smaller of the two sizes
+        int count = Math.min(dtoStops.size(), dtoAddresses.size());
+
+        List<adress> zwischenstops = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            LatLng ll = dtoStops.get(i);
+            String  s  = dtoAddresses.get(i);
+
+            adress a = new adress(ll.getLat(), ll.getLng());
+
+            String[] parts = s.split("\\s*,\\s*");
+            if (parts.length >= 5) {
+                a.setHouseNumberAndStreet(parts[0] + ", " + parts[1]);
+                a.setCity(parts[parts.length - 4]);
+                a.setState(parts[parts.length - 3]);
+                a.setZip(parts[parts.length - 2]);
+                a.setCountry(parts[parts.length - 1]);
+            } else {
+                // handle or log malformed addresses
+            }
+
+            zwischenstops.add(a);
+        }
+
+
+
+        adress destadress = new adress(rideEditDto.destination().getLat(), rideEditDto.destination().getLng());
+
+        String[] parts2 = rideEditDto.destinationaddress().split("\\s*,\\s*");
+        destadress.setHouseNumberAndStreet(parts2[0] + ", " + parts2[1]);
+        destadress.setCountry(parts2[parts2.length - 1]);
+        destadress.setZip(parts2[parts2.length - 2]);
+        destadress.setState(parts2[parts2.length - 3]);
+        destadress.setCity(parts2[parts2.length - 4]);
+
+
+        adressDAO.save(destadress);
+
+        List<adress> currentStops = aktiveRide.getZwischenstops();
+        currentStops.clear();
+        currentStops.addAll(zwischenstops);
+
+        aktiveRide.setDestAddress(destadress);
+        aktiveRide.setDuration(rideEditDto.duration());
+        aktiveRide.setCost(rideEditDto.cost());
+        aktiveRide.setDistance(rideEditDto.distance());
+
+        rideRequestDAO.save(aktiveRide);
+
+        user driver = aktiveRide.getDriver();
+
+        notification drivernote = new notification(
+                customer,
+                driver,
+                "Hello, "+customer.getFirstName()+" "+customer.getLastName()+ "\n"+".     have edited the live Simulation.",
+                "Simulation Edited!!",
+                aktiveRide
+        );
+        notificationDAO.save(drivernote);
+
+        notificationDTO notificationDTO = new notificationDTO(
+                drivernote.getId(),
+                new notificationpersonDTO(customer.getId(), customer.getUserName(),customer.getEmail(),customer.getFirstName(),customer.getLastName(),customer.getRating(),customer.getTotalRides()),
+                new notificationpersonDTO(driver.getId(), driver.getUserName(),driver.getEmail(),driver.getFirstName(),driver.getLastName(),driver.getRating(),driver.getTotalRides()),
+                drivernote.getStatus(),
+                drivernote.getCreatedAt(),
+                drivernote.getUpdatedAt(),
+                drivernote.getMessage(),
+                drivernote.getTitle(),
+                null,
+                0,
+                aktiveRide.getId(),
+                0.0,
+                null
+
+        );
+        notificationService.sendNotification(driver.getUserName(), notificationDTO);
+
+
+        notification customernote = new notification(
+                customer,
+                driver,
+                "your edit has been successfully Saved you can now complete your ride",
+                "Simulation Edited is Implemented!!",
+                aktiveRide
+        );
+        notificationDAO.save(customernote);
+
+        notificationDTO notificationDTO2 = new notificationDTO(
+                customernote.getId(),
+                new notificationpersonDTO(driver.getId(), driver.getUserName(),driver.getEmail(),driver.getFirstName(),driver.getLastName(),driver.getRating(),driver.getTotalRides()),
+                new notificationpersonDTO(customer.getId(), customer.getUserName(),customer.getEmail(),customer.getFirstName(),customer.getLastName(),customer.getRating(),customer.getTotalRides()),
+                customernote.getStatus(),
+                customernote.getCreatedAt(),
+                customernote.getUpdatedAt(),
+                customernote.getMessage(),
+                customernote.getTitle(),
+                null,
+                0,
+                aktiveRide.getId(),
+                0.0,
+                null
+
+        );
+        notificationService.sendNotification(customer.getUserName(), notificationDTO2);
+
+    }
+
+
+
 }
 
 

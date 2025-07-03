@@ -267,6 +267,23 @@ html, body {
   overflow: visible;
 }
 
+.simulation-edit{
+  background-color: #ffffff !important;
+  position: absolute;
+  margin-left: 80px;
+  top: 170px;
+  width: 65%;
+  left: 0;
+  padding: 1.6rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  overflow: visible;
+}
+
 
 .map-container{
   width: calc(100vw - 800px) !important;
@@ -897,4 +914,69 @@ button, .controls {
 }
 .button-row button:nth-child(2):hover {
   background-color: #117a8b;
+}
+
+
+
+
+
+
+/* label + multiselect wrapper: flex layout */
+.zwischen-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.zwischen-label {
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+/* === Multiselect base styling: force opaque white === */
+:host ::ng-deep .zwischen-ms .p-multiselect {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  border: 1px solid #28303f;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+}
+
+/* focus ring */
+:host ::ng-deep .zwischen-ms .p-multiselect:focus-within {
+  box-shadow: 0 0 0 2px rgba(40,48,63,0.25);
+}
+
+/* === Overlay panel: ensure it’s above everything and opaque === */
+:host ::ng-deep .zwischen-ms .p-multiselect-panel {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  border-radius: 0.375rem;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  z-index: 1100 !important;
+}
+
+/* Panel footer styling */
+:host ::ng-deep .zwischen-ms .panel-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Layout of each item in the list */
+.item-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* chip spacing */
+:host ::ng-deep .zwischen-ms .p-multiselect-token {
+  margin: 0.25rem 0.25rem 0 0;
+}
+
+/* wrap chips onto multiple lines if needed */
+:host ::ng-deep .zwischen-ms .p-multiselect-label-container {
+  flex-wrap: wrap;
 }

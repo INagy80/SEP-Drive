@@ -84,11 +84,40 @@
         />
         {{ simulationSpeedFactor.toFixed(1) }}× ({{((simrouteDurationMin/ simulationSpeedFactor)).toFixed(2) }} min)
       </label>
+
       <button class="p-2 mt-3 mb-3" style="height: 40px ; width: 110px  " (click)="enableAutoZoom();enableAutoZoom()">🔍 Focus</button>
-      <button  class="p-2 mt-3 mb-3" style="height: 40px ; width: 110px" (click)="toggleSimulation()">
+      <button  class="p-2 mt-3 mb-3 mr-0" style="height: 40px ; width: 110px" (click)="toggleSimulation()">
         {{ simulationPaused ? 'Weiterfahren' : 'Pause' }}
       </button>
+      <p-button class="mt-2 mb-4 ml-0" (click)="toggeleditsimulation()"*ngIf="!isdriver">
+        <div class="icons gap-2">
+          <img  src="/assets/icons/cogwheel.png">
+        </div>
+      </p-button>
     </div>
+
+    <div class="simulation-edit " *ngIf="iseditDropdownopen">
+
+      <div class="control-group">
+        <label for="zielAddress">Zieladresse:</label>
+        <input type="text" style="width: 22rem" [(ngModel)]="editedZieladdress"  (ngModelChange)="onSimZielAddressChange($event)" placeholder="Zieladresse eingeben" />
+      </div>
+
+      <div class="control-group">
+        <label for="zwischenstopps">Zwischenstopps:</label>
+        <textarea style="width: 22rem" [(ngModel)]="editedZwischenstopps"  (ngModelChange)="onSimZwischenStoppsChange($event)" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile)"></textarea>
+      </div>
+
+      <p-button class="mt-2 mb-4 ml-0" (click)="applyEdit()">
+        <div class="icons gap-2">
+          <p >Apply the edit</p>
+          <img  src="/assets/icons/cogwheel.png">
+        </div>
+      </p-button>
+
+    </div>
+
+
     <div #simulationMapContainer class="map-container"></div>
 
 

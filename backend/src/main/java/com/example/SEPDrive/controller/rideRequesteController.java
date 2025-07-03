@@ -97,4 +97,9 @@ public class rideRequesteController {
 
     }
 
+    @PutMapping("LiveEdit")
+    public void liveEdit(@RequestBody rideEditDto rideEditDto) {
+        service.liveEdit(rideEditDto);
+    }
+
 }
