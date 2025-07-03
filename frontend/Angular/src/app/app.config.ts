@@ -26,6 +26,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import {MatButtonModule} from '@angular/material/button';
 import {ToastrModule} from 'ngx-toastr';
+import { NbThemeModule } from '@nebular/theme';
 
 
 export const appConfig: ApplicationConfig = {
@@ -61,6 +62,8 @@ export const appConfig: ApplicationConfig = {
         positionClass: 'toast-bottom-right',
         timeOut: 10000,
       }),
+
+      NbThemeModule,
 
     ),
     {

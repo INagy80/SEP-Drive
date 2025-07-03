@@ -1,26 +1,35 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { MessageService } from '../../services/message.service';
+import {AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {DatePipe} from '@angular/common';
+import { ChatResponse } from '../../models/chat-response';
+import { MessageResponse } from '../../models/message-response';
 import { MessageRequest } from '../../models/message-request';
-import { NbChatModule, NbThemeModule, NbLayoutModule, NbButtonModule, NbCardModule } from '@nebular/theme';
-import { NbEvaIconsModule } from '@nebular/eva-icons';
-import { RouterModule } from '@angular/router';
-import {Button} from 'primeng/button';
-import { Router } from '@angular/router';
+import {EmojiData} from '@ctrl/ngx-emoji-mart/ngx-emoji';
+import { ChatService } from '../../services/chat.service';
+import { MessageService } from '../../services/message.service';
+import {AuthenticationResponse} from '../../models/authentication-response';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ProfileService} from '../../services/profile/profile.service';
+import {DomSanitizer} from '@angular/platform-browser';
+import {GeldKontoService} from '../../services/geld-konto.service';
 import {WebsocketService} from '../../services/websocket.service';
-
+import {PickerComponent} from '@ctrl/ngx-emoji-mart';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import {NbChatModule, NbFocusMonitor, NbStatusService} from '@nebular/theme';
+import {Button} from 'primeng/button';
 
 @Component({
   selector: 'app-chat',
   imports: [
-    NbThemeModule,
-    NbLayoutModule,
-    NbEvaIconsModule,
-    NbButtonModule,
-    NbCardModule,
+    PickerComponent,
+    CommonModule,
+    FormsModule,
     NbChatModule,
-    RouterModule,
     Button,
+  ],
+  providers: [
+    NbStatusService,
+    NbFocusMonitor,
   ],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
