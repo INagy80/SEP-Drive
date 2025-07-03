@@ -5,9 +5,10 @@ import { MessageRequest } from '../../models/message-request';
 import { NbChatModule, NbThemeModule, NbLayoutModule, NbButtonModule, NbCardModule } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { RouterModule } from '@angular/router';
-import {Button} from 'primeng/button';
+import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
 import {WebsocketService} from '../../services/websocket.service';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
@@ -20,7 +21,8 @@ import {WebsocketService} from '../../services/websocket.service';
     NbCardModule,
     NbChatModule,
     RouterModule,
-    Button,
+    ButtonModule,
+    CommonModule,
   ],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
