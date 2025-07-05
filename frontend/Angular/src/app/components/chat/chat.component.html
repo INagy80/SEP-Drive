@@ -1,3 +1,6 @@
+<app-header></app-header>
+
+
 <!-- Navbar -->
 <div class="navbar">
   <div class="gap-6 navbar" style="width: 50vw; justify-content: space-around;
@@ -27,21 +30,39 @@
   </div>
 </div>
 
-<!-- Chat-Box -->
-<nb-chat title="Fahrer & Kunde Chat" size="large">
-  <nb-chat-message *ngFor="let msg of messages"
-                   [type]="msg.type"
-                   [message]="msg.text"
-                   [reply]="msg.reply"
-                   [sender]="msg.user.name"
-                   [date]="msg.date"
-                   [avatar]="msg.user.avatar"
-                   (click)="onEditClicked(msg)"
-                   (contextmenu)="onDeleteClicked($event, msg)">
-  </nb-chat-message>
 
-  <nb-chat-form (send)="sendMessage($event)" [dropFiles]="true">
-  </nb-chat-form>
-</nb-chat>
+<div class="chat-container">
+  <h2 class="chat-title">Chat</h2>
 
+  <div class="messages">
+    <div
+      *ngFor="let msg of messages"
+      [ngClass]="{
+        'message-row': true,
+        'from-current-user': msg.fromCurrentUser,
+        'from-other-user': !msg.fromCurrentUser
+      }"
+    >
+      <img class="avatar" src="assets/avatar-placeholder.png" alt="Avatar">
+      <div class="bubble">
+        <p>{{ msg.content }}</p>
+      </div>
 
+      <!-- ✅ HIER Buttons korrekt -->
+      <div class="actions" *ngIf="msg.fromCurrentUser">
+        <button (click)="editMessage(msg)">Bearbeiten</button>
+        <button (click)="deleteMessage(msg)">Löschen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-row">
+    <input
+      type="text"
+      placeholder="Nachricht eingeben"
+      [(ngModel)]="newMessage"
+      (keyup.enter)="sendMessage()"
+    />
+    <button (click)="sendMessage()">Senden</button>
+  </div>
+</div>

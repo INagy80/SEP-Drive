@@ -29,6 +29,7 @@ import {ToastrModule} from 'ngx-toastr';
 import { NbThemeModule } from '@nebular/theme';
 
 
+
 export const appConfig: ApplicationConfig = {
   providers: [
     importProvidersFrom(
@@ -64,6 +65,7 @@ export const appConfig: ApplicationConfig = {
       }),
 
       NbThemeModule,
+
 
     ),
     {

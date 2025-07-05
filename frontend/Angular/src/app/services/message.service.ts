@@ -37,13 +37,20 @@ export class MessageService {
   }
 
 
-
-
-
   getAllMessages(chatId: string): Observable<MessageResponse[]> {
     return this.http.get<MessageResponse[]>(
       `${this.messageUrl}/chat/${chatId}`
     );
   }
+
+  editMessage(messageId: number, newContent: string): Observable<void> {
+    return this.http.patch<void>(`${this.messageUrl}/edit/${messageId}`, { content: newContent });
+  }
+
+
+  deleteMessage(messageId: number): Observable<void> {
+    return this.http.delete<void>(`${this.messageUrl}/delete/${messageId}`);
+  }
+
 
 }

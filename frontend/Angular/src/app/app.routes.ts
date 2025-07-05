@@ -15,6 +15,7 @@ import {DriverdashboardComponent} from './components/driverdashboard/driverdashb
 import {FahrtAngeboteComponent} from './components/fahrt-angebote/fahrt-angebote.component';
 import {ChatComponent} from './components/chat/chat.component';
 
+
 export const routes: Routes = [
   {path: '',           redirectTo: 'welcom', pathMatch: 'full'},
   {path: 'register/?userName=&password=', redirectTo: 'register', pathMatch: 'full'},
