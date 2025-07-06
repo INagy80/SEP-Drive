@@ -80,7 +80,7 @@ export interface ride {
     Drawer,
     Rating,
     RatingModule,
-    GeldKontoComponent,
+
     HeaderComponent
   ],
   templateUrl: './driverdashboard.component.html',
@@ -859,6 +859,11 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
     this.WebSocketService.disconnect();
 
   }
+
+  fahrtenanaylse() {
+    this.router.navigate(['/fahrten-analyse']);
+  }
+
 
 
 
