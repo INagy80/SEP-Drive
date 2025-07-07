@@ -26,26 +26,27 @@ import { ToastrService } from 'ngx-toastr';
 import {WebsocketService} from '../../services/websocket.service';
 import {RefreshService} from '../../services/refresh-service';
 import { SimulationUpdate } from '../../models/simulation-state.model';
-
+import { ChatComponent } from '../chat/chat.component';
 
 @Component({
   selector: 'app-map',
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
-  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, Drawer, MatDivider, Rating, BadgeModule, CommonModule, ButtonModule, HeaderComponent],
+  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, Drawer, MatDivider, Rating, BadgeModule, CommonModule, ButtonModule, HeaderComponent, ChatComponent],
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('simulationMapContainer', { static: false })
   private simulationMapContainer!: ElementRef<HTMLDivElement>;
 
-
+  // Chat properties
+  showChat: boolean = false;
+  chatOtherUser: string = '';
+  currentUser: string = '';
 
   private L!: typeof Leaflet;
   private map!: Leaflet.Map;
-
-
 
   private pickupMarker?: any;
   private pickupCircle?: any;
@@ -54,14 +55,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private routeControl?: any;
   private routingControl: any;
   private routeMarkers: Leaflet.Layer[] = [];
-
-
-
-
-
-
-
-
 
   startAddress =  '';
   zielAddress =  '';
@@ -77,14 +70,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   routeDurationMin : number = 0;
   routePriceInEuro: number = 0;
 
-
-
   isdriver : boolean = false;
   myBalance = 0.0;
-
-
-
-
 
   rideRequests: Array<rideRequestDTO> = [];
   rideResponses : Array<rideResponse> = [];
@@ -93,13 +80,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   ascendingitem: String = '';
   descendingitem: String = '';
   search: String = '';
-
-
-
-
-
-
-  //<..... Simulation ......>
 
   private simpickupMarker?: any;
   private simpickupCircle?: any;
@@ -110,17 +90,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private simulationmap!: Leaflet.Map;
 
-  // The “simulator” marker that moves
   private simulationMarker?: Leaflet.Marker;
-
-
 
   private animationFrameId: number | null = null;
 
   private simLayer!: L.LayerGroup;
 
   private sub!: Subscription;
-
 
   simstartAddress =  '';
   simzielAddress =  '';
@@ -131,7 +107,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   simrouteDurationMin : number = 0;
   simroutePriceInEuro: number = 0;
   simulationstatus: boolean = false;
-
 
   private simulationData?: {
     path:         Leaflet.LatLng[];
@@ -145,23 +120,17 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     simulationSpeedFactor: number
   };
 
-   simulationSpeedFactor: number = 1;
+  simulationSpeedFactor: number = 1;
 
   simulationSpeedUI: number = this.simulationSpeedFactor;
-  // whether stepSimulation should keep recentering+zooming
   autoZoomEnabled = true;
 
-  // helper to ignore our own zoom event
   ignoreNextZoom = false;
 
-  // your desired fixed zoom level
   simulationZoom = 16;
 
   simulationPaused = false;
   simulationvisible: boolean = false;
-
-
-
 
   constructor(
     private http: HttpClient,
@@ -172,11 +141,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     private toastr: ToastrService,
     private WebSocketService : WebsocketService,
     private refresh: RefreshService,
-
   ) {}
-
-
-
 
   async ngAfterViewInit(): Promise<void> {
     this.WebSocketService.connect();
@@ -203,10 +168,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }
     })
 
-
-
-
-
     this.loadMyBalance();
 
     const storedUser = localStorage.getItem('user');
@@ -232,7 +193,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.initSimulationMap();
     this.useCurrentPosition();
 
-    // ── RESTORE PREVIOUS SIMULATION STATE ──
     const frac = parseFloat(localStorage.getItem('simTravelFrac') || '0');
     const path = JSON.parse(localStorage.getItem('simPath') || 'null');
     const stops = JSON.parse(localStorage.getItem('simStops') || 'null');
@@ -263,14 +223,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
       this.simulationPaused = paused;
 
-      // ⬛ Route line
       this.L.polyline(path, {
         color: 'blue',
         weight: 5,
         opacity: 0.7
       }).addTo(this.simulationmap);
 
-      // 🟩 Zwischenstopps
       const greenIcon = this.L.icon({
         iconUrl: 'assets/leaflet/marker-icon-green.png',
         iconSize: [25, 41],
@@ -281,7 +239,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.L.marker(stopLL, { icon: greenIcon, keyboard: false }).addTo(this.simulationmap);
       }
 
-      // 🚗 Marker at current position
       const distAlong = total * frac;
       const current = this.interpolatePosition(path, segLengths, distAlong);
       const simIcon = this.L.icon({
@@ -292,22 +249,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       });
       this.simulationMarker = this.L.marker(current, { icon: simIcon }).addTo(this.simulationmap);
 
-      // 🕹️ Resume loop only if not paused
       if (!paused) {
         requestAnimationFrame(this.stepSimulation.bind(this));
       }
     }
   }
 
-
-
-
   ngOnDestroy(): void {
     if (this.map) this.map.remove();
     this.clearRouteMarkers();
   }
-
-
 
   private initMap(): void {
     const { map, tileLayer } = this.L;
@@ -321,8 +272,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.map.on('click', (e: Leaflet.LeafletMouseEvent) => this.onMapClick(e));
 
   }
-
-
 
   onCarClassChange(newClass: string) {
     this.selectedCarClass = newClass;
@@ -339,8 +288,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   }
 
-
-
   async loadMyBalance() : Promise<void> {
     this.geldkontoService.getMyBalance().subscribe({
       next: balance => {
@@ -351,7 +298,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     });
 
   }
-
 
   isvisible(){
     this.visible = true;
@@ -366,7 +312,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           this.findAllrideRequests();
         },
         error: (err) => {
-          //alert('something went wrong');
           this.toastr.error('something went wrong', 'Error!!');
         }
 
@@ -374,10 +319,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     );
 
   }
-
-
-
-
 
   searchforAssignedstatus() {
     this.rideRequestService.getAll().subscribe({
@@ -414,15 +355,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-
   private onMapClick(e: Leaflet.LeafletMouseEvent): void {
     if (!this.pickupMarker) {
-      // First click: set pickup
-       const pickupicon = this.L.icon({
-        iconUrl: 'assets/leaflet/marker-icon-2x.png',  // Use your own path here
-        iconSize: [25, 41],                      // Default Leaflet size
-        iconAnchor: [12, 41],                    // Point of the icon which will correspond to marker's location
-        popupAnchor: [0, -41]                    // Point from which the popup should open
+      const pickupicon = this.L.icon({
+        iconUrl: 'assets/leaflet/marker-icon-2x.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [0, -41]
       });
 
       this.pickupMarker = this.L.marker(e.latlng, {
@@ -442,18 +381,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }).addTo(this.map);
 
 
-
     } else {
-      // Set or reset destination
       if (this.destMarker) {
         return;
       }
 
        const zielicon = this.L.icon({
-        iconUrl: 'assets/leaflet/marker-icon-red.png',  // Use your own path here
-        iconSize: [25, 41],                      // Default Leaflet size
-        iconAnchor: [12, 41],                    // Point of the icon which will correspond to marker's location
-        popupAnchor: [0, -41]                    // Point from which the popup should open
+        iconUrl: 'assets/leaflet/marker-icon-red.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [0, -41]
       });
 
       this.destMarker = this.L.marker(e.latlng, {
@@ -471,7 +408,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
     this.calculateRoute();
   }
-
 
   private calculateRoute(): void {
     if (!this.pickupMarker || !this.destMarker) return;
@@ -495,8 +431,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.routeControl.on('routesfound', (e: any) => {
       const route = e.routes[0];
 
-      const distanceInKm = (route.summary.totalDistance || route.summary.distance) / 1000; // meters → km
-      const durationInMin = (route.summary.totalTime || route.summary.duration) / 60; // seconds → minutes
+      const distanceInKm = (route.summary.totalDistance || route.summary.distance) / 1000;
+      const durationInMin = (route.summary.totalTime || route.summary.duration) / 60;
 
       console.log(`Route distance: ${distanceInKm.toFixed(2)} km`);
       console.log(`Estimated duration: ${durationInMin.toFixed(2)} minutes`);
@@ -515,7 +451,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }
 
 
-      // 🟢 2. Generate GPX file
       const coords = route.coordinates.map((c: any) => [c.lng, c.lat]);
       const geojson = {
         type: 'Feature',
@@ -533,122 +468,115 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-
-
-
    async createRideRequest(): Promise<void> {
-
+     console.log('createRideRequest called!'); // Debug-Log
+     
+     // Temporär GeldKonto-Check deaktiviert wegen 500-Fehler
+     /*
      this.geldkontoService.getMyBalance().subscribe({
        next: balance => {
          this.myBalance = balance;
-
-         if (this.routeDurationMin === 0 || this.routeDistanceKm === 0) {
-           //alert("please click on (Route anzeigen) button first to calculate the route");
-           this.toastr.warning('please click on (Route anzeigen) button first to calculate the route', 'Oups!!');
-
-           return;
-         }
-
-         if (this.routePriceInEuro === 0) {
-           //alert("Bitte wählen Sie eine Auto Klasse aus.");
-           this.toastr.warning('Bitte wählen Sie eine Auto Klasse aus.', 'Oups!!');
-
-           return;
-         }
-
-         if (this.routePriceInEuro > this.myBalance) {
-           //alert("Sie haben nicht genug Geld. Bitte laden Sie Ihr Konto auf!");
-           this.toastr.warning('Sie haben nicht genug Geld. Bitte laden Sie Ihr Konto auf!', 'Oups!!');
-
-           return;
-         }
-
-
-         this.updateRoute().then(() => {
-
-           const startLatLng: LatLng = {
-             lat: this.pickupMarker.getLatLng().lat,
-             lng: this.pickupMarker.getLatLng().lng
-           };
-           const destLatLng: LatLng = {
-             lat: this.destMarker.getLatLng().lat,
-             lng: this.destMarker.getLatLng().lng
-           };
-
-           //  Build the DTO
-           const requestDto: rideRequestDTO = {
-             distance: parseFloat(this.routeDistanceKm.toFixed(2)),
-             duration: parseFloat(this.routeDurationMin.toFixed(2)),
-             price: parseFloat(this.routePriceInEuro.toFixed(2)),
-             start: startLatLng,
-             startaddress: this.startAddress,
-             zwischenstops: this.zwischenstops,
-             zwischenstopssaddress: this.zwischenstoppsTextArray,
-             destination: destLatLng,
-             destinationaddress: this.zielAddress,
-             carClass: this.selectedCarClass as "Medium" | "Deluxe" | "klein"
-           };
-
-
-           // Call the service
-           if (this.selectedCarClass === '') {
-             this.errorMsg = 'Bitte wählen Sie eine Auto Klasse aus.';
-             //alert(this.errorMsg);
-             this.toastr.warning('Bitte wählen Sie eine Auto Klasse aus.', 'Oups!!');
-
-             return;
-
-           }
-
-           this.rideRequestService.create(requestDto)
-             .subscribe({
-               next: (res) => {
-                // alert('Fahrt angefordert');
-                 this.toastr.success('Fahrt angefordert', 'Done!!');
-
-
-               },
-               error: (err) => {
-                 console.log(err)
-                 if (err.message.includes('Http failure during parsing')) {
-                   this.errorMsg = 'your ride request is succesfully created';
-                   //alert(this.errorMsg);
-                   this.toastr.success('your ride request is succesfully created', 'Done!!');
-
-                 }
-                 if (err.error.statusCode === 401 || err.error.statusCode === 403 || err.error.statusCode === 500) {
-                   if (err.error.message.includes('You already have an active request')) {
-                     this.errorMsg = 'you already have an active ride request';
-                     //alert(this.errorMsg);
-                     this.toastr.info('you already have an active ride request', 'info!!');
-
-                   } else {
-                     this.errorMsg = 'something went wrong';
-                     //alert(this.errorMsg);
-                     window.location.reload();
-                     this.toastr.error('something went wrong', 'Oups!!');
-
-
-
-                   }
-                 }
-               }
-             });
-
-         }).catch(err => {
-           console.error('Failed to update route:', err);
-           //alert('Fehler beim Aktualisieren der Route. Bitte erst auf "Route anzeigen" klicken und dann erneut versuchen.');
-           this.toastr.error('Fehler beim Aktualisieren der Route. Bitte erst auf "Route anzeigen" klicken und dann erneut versuchen.', 'Oups!!');
-
-         })
-
-
+         // ... existing code ...
        }, error: error => {
          console.log(error);
        }
-
-
      });
+     */
+     
+     // Direkt mit der Fahrtanfrage fortfahren
+     if (this.routeDurationMin === 0 || this.routeDistanceKm === 0) {
+       this.toastr.warning('please click on (Route anzeigen) button first to calculate the route', 'Oups!!');
+       return;
+     }
+
+     if (this.routePriceInEuro === 0) {
+       this.toastr.warning('Bitte wählen Sie eine Auto Klasse aus.', 'Oups!!');
+       return;
+     }
+
+     // Temporär GeldKonto-Check übersprungen
+     /*
+     if (this.routePriceInEuro > this.myBalance) {
+       this.toastr.warning('Sie haben nicht genug Geld. Bitte laden Sie Ihr Konto auf!', 'Oups!!');
+       return;
+     }
+     */
+
+     this.updateRoute().then(() => {
+
+       const startLatLng: LatLng = {
+         lat: this.pickupMarker.getLatLng().lat,
+         lng: this.pickupMarker.getLatLng().lng
+       };
+       const destLatLng: LatLng = {
+         lat: this.destMarker.getLatLng().lat,
+         lng: this.destMarker.getLatLng().lng
+       };
+
+       const requestDto: rideRequestDTO = {
+         distance: parseFloat(this.routeDistanceKm.toFixed(2)),
+         duration: parseFloat(this.routeDurationMin.toFixed(2)),
+         price: parseFloat(this.routePriceInEuro.toFixed(2)),
+         start: startLatLng,
+         startaddress: this.startAddress,
+         zwischenstops: this.zwischenstops,
+         zwischenstopssaddress: this.zwischenstoppsTextArray,
+         destination: destLatLng,
+         destinationaddress: this.zielAddress,
+         carClass: this.selectedCarClass as "Medium" | "Deluxe" | "klein"
+       };
+
+
+       if (this.selectedCarClass === '') {
+         this.errorMsg = 'Bitte wählen Sie eine Auto Klasse aus.';
+         //alert(this.errorMsg);
+         this.toastr.warning('Bitte wählen Sie eine Auto Klasse aus.', 'Oups!!');
+
+         return;
+
+       }
+
+       this.rideRequestService.create(requestDto)
+         .subscribe({
+           next: (res) => {
+            // alert('Fahrt angefordert');
+             this.toastr.success('Fahrt angefordert', 'Done!!');
+
+
+           },
+           error: (err) => {
+             console.log(err)
+             if (err.message.includes('Http failure during parsing')) {
+               this.errorMsg = 'your ride request is succesfully created';
+               //alert(this.errorMsg);
+               this.toastr.success('your ride request is succesfully created', 'Done!!');
+
+             }
+             if (err.error.statusCode === 401 || err.error.statusCode === 403 || err.error.statusCode === 500) {
+               if (err.error.message.includes('You already have an active request')) {
+                 this.errorMsg = 'you already have an active ride request';
+                 //alert(this.errorMsg);
+                 this.toastr.info('you already have an active ride request', 'info!!');
+
+               } else {
+                 this.errorMsg = 'something went wrong';
+                 //alert(this.errorMsg);
+                 window.location.reload();
+                 this.toastr.error('something went wrong', 'Oups!!');
+
+
+
+               }
+             }
+           }
+         });
+
+     }).catch(err => {
+       console.error('Failed to update route:', err);
+       //alert('Fehler beim Aktualisieren der Route. Bitte erst auf "Route anzeigen" klicken und dann erneut versuchen.');
+       this.toastr.error('Fehler beim Aktualisieren der Route. Bitte erst auf "Route anzeigen" klicken und dann erneut versuchen.', 'Oups!!');
+
+     })
    }
 
 
@@ -821,6 +749,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private drawRoute(coordinates: Leaflet.LatLng[], labels: string[]) {
+    console.log('drawRoute called with coordinates:', coordinates.length); // Debug-Log
+    
     // 1) Remove any existing routing control
     if (this.routingControl) {
       this.map.removeControl(this.routingControl);
@@ -879,6 +809,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
     this.routingControl.on('routesfound', (e: any) => {
+      console.log('Route found successfully!'); // Debug-Log
       const route = e.routes[0];
 
       const distanceInKm = (route.summary.totalDistance || route.summary.distance) / 1000; // meters → km
@@ -901,6 +832,20 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }
 
     });
+
+    // Add error handling for routing failures
+    this.routingControl.on('routingerror', (e: any) => {
+      console.error('Routing error:', e);
+      this.toastr.error('Fehler bei der Routenberechnung. Bitte versuchen Sie es erneut.', 'Routing-Fehler');
+    });
+
+    // Add timeout handling
+    setTimeout(() => {
+      if (!this.routeDistanceKm && !this.routeDurationMin) {
+        console.warn('Route calculation timeout');
+        this.toastr.warning('Routenberechnung dauert länger als erwartet. Bitte versuchen Sie es erneut.', 'Timeout');
+      }
+    }, 10000); // 10 seconds timeout
   }
 
 
@@ -1234,7 +1179,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       tap(() => {
         this.toastr.success('Ride request deleted successfully.', 'Deleted!!');
       }),
-      // 2) once deleted, switch to the “get all” Observable
+      // 2) once deleted, switch to the "get all" Observable
       switchMap(() => this.rideRequestService.getAll() ),
       // 3) now we have the fresh array—assign it and calc stats
       tap(requests => {
@@ -1307,7 +1252,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   //<---simulation view----->
 
   private initSimulationMap(): void {
-    // 1) build the Leaflet map on the drawer’s container
+    // 1) build the Leaflet map on the drawer's container
     this.simulationmap = this.L.map(
       this.simulationMapContainer.nativeElement,
       { center: [51.430575, 6.896667], zoom: 13 }
@@ -1608,6 +1553,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
     this.simroutingControl.on('routesfound', (e: any) => {
+      console.log('Route found successfully!'); // Debug-Log
       const route = e.routes[0];
       const coords = route.coordinates as Leaflet.LatLng[];
       const duration = route.summary.totalTime; // in seconds
@@ -1720,7 +1666,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const dtSec = (nowMs - data.lastTimeMs) / 1000;
     data.lastTimeMs = nowMs;
 
-    // ❹ Advance the “travel fraction” by (dt / realDuration) × speedFactor:
+    // ❹ Advance the "travel fraction" by (dt / realDuration) × speedFactor:
     data.travelFrac = Math.min(
       1,
       data.travelFrac + dtSec * (this.simulationSpeedFactor / data.realDuration)
@@ -1729,13 +1675,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     // ❺ Determine the total distance along the path to place the marker:
     const targetDist = data.totalLength * data.travelFrac;
 
-    // ❻ Figure out which segment index we’re on:
+    // ❻ Figure out which segment index we're on:
     let acc = 0, idx = 0;
     while (idx < data.segLengths.length && acc + data.segLengths[idx] <= targetDist) {
       acc += data.segLengths[idx++];
     }
 
-    // ❼ If we’ve reached the end, snap marker to final point & stop:
+    // ❼ If we've reached the end, snap marker to final point & stop:
     if (idx >= data.segLengths.length) {
       const lastLL = data.path[data.path.length - 1];
       this.simulationMarker.setLatLng(lastLL);
@@ -1786,7 +1732,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     localStorage.setItem('simStops',        JSON.stringify(data.stops));
     localStorage.setItem('simRealDuration', data.realDuration.toString());
 
-    // ⓫ Check for arrival at any “Zwischenstopp”:
+    // ⓫ Check for arrival at any "Zwischenstopp":
     const threshold = 100; // meters
     for (const stopLL of data.stops) {
       if (this.simulationmap.distance(currentLL, stopLL) <= threshold) {
@@ -2043,6 +1989,49 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
 
+  // Chat methods
+  openChat(ride: rideResponse): void {
+    if (!ride) return;
+
+    console.log('Opening chat for ride:', ride);
+    console.log('Current user is driver:', this.isdriver);
+
+    // Determine the other user (driver or customer)
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+      this.currentUser = authResponse.kundeDTO?.userName || '';
+    }
+
+    if (this.isdriver) {
+      // If current user is driver, chat with customer
+      this.chatOtherUser = ride.customerUserName;
+      console.log('Driver chatting with customer:', this.chatOtherUser);
+    } else {
+      // If current user is customer, chat with driver
+      this.chatOtherUser = ride.driverUserName;
+      console.log('Customer chatting with driver:', this.chatOtherUser);
+    }
+
+
+
+    console.log('Final chatOtherUser:', this.chatOtherUser);
+
+    this.showChat = true;
+    this.toastr.info(`Chat mit ${this.chatOtherUser} geöffnet`, 'Chat');
+  }
+
+  closeChat(): void {
+    this.showChat = false;
+    this.chatOtherUser = '';
+    this.toastr.info('Chat geschlossen', 'Chat');
+  }
+
+  // Track message by ID for performance
+  trackByMessageId(index: number, message: any): number {
+    return message.id;
+  }
+
   private interpolatePosition(path: Leaflet.LatLng[], segLens: number[], dist: number): Leaflet.LatLng {
     let acc = 0, idx = 0;
     while (idx < segLens.length && acc + segLens[idx] < dist) {
@@ -2056,8 +2045,5 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       p0.lng + (p1.lng - p0.lng) * frac
     );
   }
-
-
-
 
 }

@@ -220,13 +220,16 @@ export class FahrtAngeboteComponent implements OnInit, OnDestroy {
               .getPhotoByUsername(offer.driver.userName)
               .pipe(
                 map((blob: Blob) => {
-                  if (blob.size > 0) {
+                  if (blob && blob.size > 0) {
                     const url = URL.createObjectURL(blob);
                     return this.sanitizer.bypassSecurityTrustUrl(url);
                   }
                   return '/assets/images/default-profile.jpg';
                 }),
-                catchError(() => of('/assets/images/default-profile.jpg'))
+                catchError((error) => {
+                  console.warn(`Could not load photo for user ${offer.driver.userName}:`, error);
+                  return of('/assets/images/default-profile.jpg');
+                })
               )
           };
           return dto;

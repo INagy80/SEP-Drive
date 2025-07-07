@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {environment} from '../../../eviroments/environment';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {map, Observable} from 'rxjs';
+import {map, Observable, catchError, of} from 'rxjs';
 import {ProfileDTO} from '../../models/profileDTO';
 
 @Injectable({
