@@ -56,8 +56,16 @@ export class FahrtenAnalyseComponent implements OnInit {
   };
 
 
+
+
   isLoading: boolean = false;
   errorMessage: string = '';
+
+  // Tooltip-Variablen
+  tooltipVisible: boolean = false;
+  tooltipText: string = '';
+  tooltipX: number = 0;
+  tooltipY: number = 0;
 
   constructor(
       private router: Router,
@@ -85,6 +93,8 @@ export class FahrtenAnalyseComponent implements OnInit {
   }
 
 
+  // ----------------Diese Methode nimmt Daten vom Backend vom Server------------//
+/**
 
   private loadStatisticsData(): void {
     this.isLoading = true;
@@ -123,11 +133,11 @@ export class FahrtenAnalyseComponent implements OnInit {
         });
   }
 
-
+*/
 
   //----------------------------------- Mock-Daten------------------------------------------
 
-  /**
+
    private loadStatisticsData(): void {
    if (this.viewMode === 'monthly') {
    this.loadMonthlyData();
@@ -135,7 +145,7 @@ export class FahrtenAnalyseComponent implements OnInit {
    this.loadDailyData();
    }
    }
-   */
+
 
   private loadMonthlyData(): void {
     // Generate mock monthly data for the selected year
@@ -264,40 +274,99 @@ export class FahrtenAnalyseComponent implements OnInit {
     this.loadStatisticsData();
   }
 
+  /**
+   * Wird aufgerufen, wenn das Jahr geändert wird.
+   */
   onYearChange(): void {
     this.loadStatisticsData();
   }
 
+  /**
+   * Wird aufgerufen, wenn der Monat geändert wird.
+   */
   onMonthChange(): void {
     this.loadStatisticsData();
   }
 
+  /**
+   * Gibt den Maximalwert einer Datenreihe zurück (für die Skalierung des Diagramms).
+   */
   getMaxValue(data: ChartData[]): number {
     return Math.max(...data.map(item => item.value));
   }
 
   /**
    * Berechnet die Punkte für das Liniendiagramm als String.
+   * xOffset verschiebt die Linie nach rechts (für Y-Achse).
    */
-
-  getLineChartPoints(data: ChartData[]): string {
+  getLineChartPoints(data: ChartData[], xOffset: number = 0): string {
     if (data.length === 0) return '';
-
     const maxValue = this.getMaxValue(data);
     return data.map((item, index) => {
-      const x = (index / (data.length - 1)) * 1000;
+      const x = xOffset + (index / (data.length - 1)) * (1000 - xOffset);
       const y = 300 - (item.value / maxValue) * 250;
       return `${x},${y}`;
     }).join(' ');
   }
 
+  /**
+   * Summiert alle Werte einer Datenreihe.
+   */
   getTotalValue(data: ChartData[]): number {
     return data.reduce((sum, item) => sum + item.value, 0);
   }
 
+  /**
+   * Berechnet den Durchschnittswert einer Datenreihe.
+   */
   getAverageValue(data: ChartData[]): number {
     if (data.length === 0) return 0;
     return this.getTotalValue(data) / data.length;
+  }
+
+  /**
+   * Gibt die Y-Achsen-Ticks für ein Diagramm zurück.
+   */
+  getYAxisTicks(data: ChartData[]): number[] {
+    const max = this.getMaxValue(data);
+    if (max === 0) return [0];
+    const step = max / 5;
+    return Array.from({length: 6}, (_, i) => Math.round(i * step));
+  }
+
+  /**
+   * Gibt die Y-Position der X-Achse (bei Wert 0) für das Diagramm zurück.
+   */
+  getZeroLineY(data: ChartData[]): number {
+    const maxValue = this.getMaxValue(data);
+    // 300 ist der untere Rand, 250 die Höhe des Diagramms
+    return 300 - (0 / maxValue) * 250;
+  }
+
+  /**
+   * Gibt den aktuellen Benutzernamen aus dem LocalStorage zurück.
+   */
+  private getCurrentDriverUsername(): string {
+    const user = localStorage.getItem('currentUser');
+    if (user) {
+      const userData = JSON.parse(user);
+      return userData.username || userData.driverUsername || '';
+    }
+    return '';
+  }
+
+  showTooltip(text: string, event: MouseEvent) {
+    this.tooltipText = text;
+    this.tooltipX = event.clientX;
+    this.tooltipY = event.clientY;
+    this.tooltipVisible = true;
+  }
+  hideTooltip() {
+    this.tooltipVisible = false;
+  }
+
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
   }
 
 //---------------------------------------------------------------------------------------------------------------
