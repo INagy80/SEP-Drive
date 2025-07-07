@@ -60,9 +60,9 @@ export class FahrtenAnalyseComponent implements OnInit {
   errorMessage: string = '';
 
   constructor(
-    private router: Router,
-    private WebSocketService : WebsocketService,
-    private statisticsService: StatisticsService
+      private router: Router,
+      private WebSocketService : WebsocketService,
+      private statisticsService: StatisticsService
 
   ) {
     this.generateAvailableYears();
@@ -99,28 +99,28 @@ export class FahrtenAnalyseComponent implements OnInit {
     }
 
     this.statisticsService.getCurrentDriverStatistics(
-      username,
-      this.viewMode,
-      this.selectedYear,
-      this.viewMode === 'daily' ? this.selectedMonth : undefined
+        username,
+        this.viewMode,
+        this.selectedYear,
+        this.viewMode === 'daily' ? this.selectedMonth : undefined
     )
-      .subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.statisticsData = response.data;
-          } else {
-            this.errorMessage = response.message || 'Fehler beim Laden der Statistiken';
+        .subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.statisticsData = response.data;
+            } else {
+              this.errorMessage = response.message || 'Fehler beim Laden der Statistiken';
 
+            }
+            this.isLoading = false;
+          },
+          error: (error) => {
+            console.error('Error loading statistics:', error);
+            this.errorMessage = 'Verbindungsfehler.';
+
+            this.isLoading = false;
           }
-          this.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Error loading statistics:', error);
-          this.errorMessage = 'Verbindungsfehler.';
-
-          this.isLoading = false;
-        }
-      });
+        });
   }
 
 
@@ -328,4 +328,3 @@ export class FahrtenAnalyseComponent implements OnInit {
   }
 
 }
-
