@@ -56,49 +56,49 @@
 >
   <ng-template pTemplate="header">
     <tr>
-      <th pSortableColumn="benutzername">
+      <th pSortableColumn="username">
         Benutzername
-        <p-sortIcon field="benutzername"></p-sortIcon>
+        <p-sortIcon field="username"></p-sortIcon>
       </th>
-      <th pSortableColumn="name">
+      <th pSortableColumn="fullName">
         Name
-        <p-sortIcon field="name"></p-sortIcon>
+        <p-sortIcon field="fullName"></p-sortIcon>
       </th>
-      <th pSortableColumn="distanz">
+      <th pSortableColumn="totalDistanceKm">
         Gesamtstrecke (km)
-        <p-sortIcon field="distanz"></p-sortIcon>
+        <p-sortIcon field="totalDistanceKm"></p-sortIcon>
       </th>
-      <th pSortableColumn="bewertung">
+      <th pSortableColumn="averageRating">
         Bewertung
-        <p-sortIcon field="bewertung"></p-sortIcon>
+        <p-sortIcon field="averageRating"></p-sortIcon>
       </th>
-      <th pSortableColumn="fahrzeit">
+      <th pSortableColumn="totalDriveTimeSeconds">
         Fahrzeit (min)
-        <p-sortIcon field="fahrzeit"></p-sortIcon>
+        <p-sortIcon field="totalDriveTimeSeconds"></p-sortIcon>
       </th>
-      <th pSortableColumn="fahrten">
+      <th pSortableColumn="totalRides">
         Fahrten
-        <p-sortIcon field="fahrten"></p-sortIcon>
+        <p-sortIcon field="totalRides"></p-sortIcon>
       </th>
-      <th pSortableColumn="geld">
+      <th pSortableColumn="totalEarnings">
         Verdientes Geld (€)
-        <p-sortIcon field="geld"></p-sortIcon>
+        <p-sortIcon field="totalEarnings"></p-sortIcon>
       </th>
     </tr>
   </ng-template>
 
   <ng-template pTemplate="body" let-fahrer>
     <tr>
-      <td>{{ fahrer.benutzername }}</td>
-      <td>{{ fahrer.name }}</td>
-      <td>{{ fahrer.distanz }}</td>
+      <td>{{ fahrer.username }}</td>
+      <td>{{ fahrer.fullName }}</td>
+      <td>{{ fahrer.totalDistanceKm }}</td>
       <td>
-        <p-rating [ngModel]="fahrer.bewertung" [readonly]="true" [stars]="5"></p-rating>
-        <span style="margin-left: 4px">({{ fahrer.bewertung | number: '1.1-1' }})</span>
+        <p-rating [ngModel]="fahrer.averageRating" [readonly]="true" [stars]="5"></p-rating>
+        <span style="margin-left: 4px">({{ fahrer.averageRating | number: '1.1-1' }})</span>
       </td>
-      <td>{{ fahrer.fahrzeit }}</td>
-      <td>{{ fahrer.fahrten }}</td>
-      <td>{{ fahrer.geld | currency: 'EUR' }}</td>
+      <td>{{ fahrer.totalDriveTimeSeconds / 60 | number: '1.0-0' }}</td>
+      <td>{{ fahrer.totalRides }}</td>
+      <td>{{ fahrer.totalEarnings | currency: 'EUR' }}</td>
     </tr>
   </ng-template>
 </p-table>

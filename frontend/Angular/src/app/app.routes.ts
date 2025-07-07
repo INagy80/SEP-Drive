@@ -13,6 +13,7 @@ import {TwoFAAccessGard} from './services/guard/TwoFA-access-gard';
 import {OthersProfileComponent} from './components/others-profile/others-profile.component';
 import {DriverdashboardComponent} from './components/driverdashboard/driverdashboard.component';
 import {FahrtAngeboteComponent} from './components/fahrt-angebote/fahrt-angebote.component';
+import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 
 export const routes: Routes = [
   {path: '',           redirectTo: 'welcom', pathMatch: 'full'},
@@ -44,6 +45,7 @@ export const routes: Routes = [
 
   {path: 'fahrtangebote',    component: FahrtAngeboteComponent , canActivate: [AccessGuardService]},
 
+  {path: 'leaderboard', component: LeaderboardComponent},
 
 
 

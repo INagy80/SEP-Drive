@@ -7,17 +7,7 @@ import { WebsocketService } from '../../services/websocket.service';
 import { HeaderComponent } from '../header/header.component';
 import { Rating } from 'primeng/rating';
 import { TableModule } from 'primeng/table';
-import { HttpClient } from '@angular/common/http';
-
-interface Fahrer {
-  benutzername: string;
-  name: string;
-  distanz: number;
-  bewertung: number;
-  fahrzeit: number;
-  fahrten: number;
-  geld: number;
-}
+import { LeaderboardService, LeaderboardEntry } from '../../services/leaderboard.service';
 
 @Component({
   standalone: true,
@@ -39,7 +29,7 @@ export class LeaderboardComponent implements OnInit {
 
   suchbegriff: string = '';
   isdriver: boolean = false;
-  fahrerListe: Fahrer[] = [];
+  fahrerListe: LeaderboardEntry[] = [];
 
   first: number = 0;  // Startindex der Seite
   rows: number = 10;  // Anzahl der Zeilen pro Seite
@@ -47,7 +37,7 @@ export class LeaderboardComponent implements OnInit {
   constructor(
     private router: Router,
     private WebSocketService: WebsocketService,
-    private http: HttpClient
+    private leaderboardService: LeaderboardService
   ) {}
 
   ngOnInit() {
@@ -55,7 +45,7 @@ export class LeaderboardComponent implements OnInit {
   }
 
   holeFahrerVomBackend() {
-    this.http.get<Fahrer[]>('/v1/leaderboard').subscribe({
+    this.leaderboardService.getLeaderboard().subscribe({
       next: (data) => {
         this.fahrerListe = data;
       },
@@ -65,13 +55,13 @@ export class LeaderboardComponent implements OnInit {
     });
   }
 
-  get gefilterteFahrer(): Fahrer[] {
+  get gefilterteFahrer(): LeaderboardEntry[] {
     return this.fahrerListe.filter(f =>
-      f.name.toLowerCase().includes(this.suchbegriff.toLowerCase())
+      f.fullName.toLowerCase().includes(this.suchbegriff.toLowerCase())
     );
   }
 
-  customSort(event: { field: keyof Fahrer, order: number }) {
+  customSort(event: { field: keyof LeaderboardEntry, order: number }) {
     this.fahrerListe.sort((a, b) => {
       const valA = a[event.field];
       const valB = b[event.field];
