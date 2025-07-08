@@ -94,50 +94,45 @@ export class FahrtenAnalyseComponent implements OnInit {
 
 
   // ----------------Diese Methode nimmt Daten vom Backend vom Server------------//
-/**
+
 
   private loadStatisticsData(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
+    const request$ = this.viewMode === 'daily'
+        ? this.statisticsService.getDailyStatistics(this.selectedYear, this.selectedMonth)
+        : this.statisticsService.getYearlyStatistics(this.selectedYear);
 
-    const username = localStorage.getItem('username');
-    if (!username) {
-      this.errorMessage = 'Kein Benutzername gefunden.';
-      this.isLoading = false;
-      return;
-    }
+    request$.subscribe({
+      next: (response) => {
 
-    this.statisticsService.getCurrentDriverStatistics(
-        username,
-        this.viewMode,
-        this.selectedYear,
-        this.viewMode === 'daily' ? this.selectedMonth : undefined
-    )
-        .subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.statisticsData = response.data;
-            } else {
-              this.errorMessage = response.message || 'Fehler beim Laden der Statistiken';
+        console.log('📊 Antwort vom Backend:', response);  // <--- DAS IST WICHTIG
 
-            }
-            this.isLoading = false;
-          },
-          error: (error) => {
-            console.error('Error loading statistics:', error);
-            this.errorMessage = 'Verbindungsfehler.';
+        // Transformiere die Arrays in ChartData[]
+        this.statisticsData = {
+          earnings: this.mapToChartData(response.income),
+          distance: this.mapToChartData(response.distance),
+          drivingTime: this.mapToChartData(response.duration),
+          averageRating: this.mapToChartData(response.rating)
+        };
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Fehler beim Laden der Statistikdaten:', error);
 
-            this.isLoading = false;
-          }
-        });
+        this.errorMessage = 'Statistiken konnten nicht geladen werden.';
+        this.isLoading = false;
+      }
+    });
   }
 
-*/
+
+
 
   //----------------------------------- Mock-Daten------------------------------------------
 
-
+/**
    private loadStatisticsData(): void {
    if (this.viewMode === 'monthly') {
    this.loadMonthlyData();
@@ -146,6 +141,7 @@ export class FahrtenAnalyseComponent implements OnInit {
    }
    }
 
+*/
 
   private loadMonthlyData(): void {
     // Generate mock monthly data for the selected year
@@ -269,6 +265,26 @@ export class FahrtenAnalyseComponent implements OnInit {
     return data;
   }
   //--------------------------------------Mock Daten ---------------------------
+
+  /**
+   * Wandelt ein Array von Zahlen in ChartData[] um.
+   * Für daily: label = Tag (1,2,3,...), für yearly: label = Monatsname.
+   */
+  private mapToChartData(values: number[]): ChartData[] {
+    const isDaily = this.viewMode === 'daily';
+    const labels = isDaily
+        ? Array.from({ length: values.length }, (_, i) => (i + 1).toString())
+        : this.availableMonths.map(m => m.label);
+
+    return values.map((val, i) => ({
+      label: labels[i],
+      value: val,
+      date: isDaily
+          ? `${this.selectedYear}-${this.selectedMonth.toString().padStart(2, '0')}-${(i + 1).toString().padStart(2, '0')}`
+          : `${this.selectedYear}-${(i + 1).toString().padStart(2, '0')}`
+    }));
+  }
+
 
   onViewModeChange(): void {
     this.loadStatisticsData();

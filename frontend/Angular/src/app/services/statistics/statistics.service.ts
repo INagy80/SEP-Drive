@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { StatisticsData, StatisticsRequest, StatisticsResponse } from '../../models/statistics-data';
+import { HttpClient } from '@angular/common/http';
+import { Observable, forkJoin } from 'rxjs';
 import { environment } from '../../../eviroments/environment';
 
 @Injectable({
@@ -9,50 +8,28 @@ import { environment } from '../../../eviroments/environment';
 })
 export class StatisticsService {
 
-// URL noch nicht vollständig !!
-  private readonly statisticsUrl = `${environment.api.baseUrl}/statistics`;
+  private readonly baseUrl = `${environment.api.baseUrl}/v1/statistics`;
 
   constructor(private http: HttpClient) { }
 
-
-  /**
-   * Holt die monatlichen Statistiken für einen Fahrer
-   */
-  getMonthlyStatistics(driverUsername: string, year: number): Observable<StatisticsResponse> {
-    const request: StatisticsRequest = {
-      driverUsername,
-      viewMode: 'monthly',
-      year
-    };
-    return this.http.post<StatisticsResponse>(`${this.statisticsUrl}/driver`, request);
+  getDailyStatistics(year: number, month: number): Observable<any> {
+    const body = { year, month };
+    return forkJoin({
+      distance: this.http.post<number[]>(`${this.baseUrl}/distance`, body),
+      duration: this.http.post<number[]>(`${this.baseUrl}/duration`, body),
+      income: this.http.post<number[]>(`${this.baseUrl}/income`, body),
+      rating: this.http.post<number[]>(`${this.baseUrl}/rating`, body)
+    });
   }
 
-  /**
-   * Holt die täglichen Statistiken für einen Fahrer
-   */
-  getDailyStatistics(driverUsername: string, year: number, month: number): Observable<StatisticsResponse> {
-    const request: StatisticsRequest = {
-      driverUsername,
-      viewMode: 'daily',
-      year,
-      month
-    };
-    return this.http.post<StatisticsResponse>(`${this.statisticsUrl}/driver`, request);
+  getYearlyStatistics(year: number): Observable<any> {
+    const body = { year };
+    return forkJoin({
+      distance: this.http.post<number[]>(`${this.baseUrl}/distance/yearly`, body),
+      duration: this.http.post<number[]>(`${this.baseUrl}/duration/yearly`, body),
+      income: this.http.post<number[]>(`${this.baseUrl}/einnahme/yearly`, body),
+      rating: this.http.post<number[]>(`${this.baseUrl}/rating/yearly`, body)
+    });
   }
-
-  /**
-   * Holt die Statistiken für den aktuellen Fahrer (Username muss übergeben werden)
-   */
-  getCurrentDriverStatistics(driverUsername: string, viewMode: 'daily' | 'monthly', year: number, month?: number): Observable<StatisticsResponse> {
-    if (viewMode === 'daily' && month) {
-      return this.getDailyStatistics(driverUsername, year, month);
-    } else {
-      return this.getMonthlyStatistics(driverUsername, year);
-    }
-  }
-
-
 
 }
-
-
