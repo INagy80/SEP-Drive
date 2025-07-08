@@ -69,17 +69,24 @@ public class profileSucheController {
 
         byte[] photo = profileSucheService.fetchProfilePhoto(userName);
 
-
-        String Extensions = FilenameUtils.getExtension(profileService.getfilename());
-        String encodeBase64 = Base64.getEncoder().encodeToString(photo) ;
-        String base64Encoded = "data:image/" + Extensions + ";base64," + encodeBase64;
-
-
-        if (photo == null) {
+        if (photo == null || photo.length == 0) {
             return ResponseEntity
                     .notFound()
                     .build();
         }
+
+        String Extensions = "jpg"; // Default extension
+        try {
+            String filename = profileService.getfilename();
+            if (filename != null && !filename.isEmpty()) {
+                Extensions = FilenameUtils.getExtension(filename);
+            }
+        } catch (Exception e) {
+            // Use default extension if there's an error
+        }
+        
+        String encodeBase64 = Base64.getEncoder().encodeToString(photo);
+        String base64Encoded = "data:image/" + Extensions + ";base64," + encodeBase64;
 
         return new ResponseEntity<String>(base64Encoded, HttpStatus.OK);
     }

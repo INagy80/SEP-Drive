@@ -666,10 +666,9 @@ public class rideRequestService {
             // reject all other pending offers
             var others = driverOfferDAO.findByRideRequestId(request.getId());
             for (var o : others) {
-                if (o.getStatus() == OfferStatus.PENDING) {
+                if (o.getStatus() == OfferStatus.PENDING && !o.getId().equals(offerId)) {
                     o.setStatus(OfferStatus.REJECTED);
                     driverOfferDAO.save(o);
-
 
                     var note2 = new notification(
                             request.getCustomer(),
@@ -679,7 +678,6 @@ public class rideRequestService {
                             request
                     );
                     notificationDAO.save(note2);
-
 
                     notificationDTO notificationDTO = new notificationDTO(
                             note2.getId(),
@@ -695,7 +693,6 @@ public class rideRequestService {
                             request.getId(),
                             0.0,
                             null
-
                     );
 
                     notificationService.sendNotification(o.getDriver().getUserName(), notificationDTO);

@@ -34,6 +34,7 @@ public class WebMvcConfig {
         configuration.setExposedHeaders(expectedHeaders);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/v1/**", configuration);
+        source.registerCorsConfiguration("/api/**", configuration);
         return source;
     }
 }

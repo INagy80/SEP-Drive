@@ -123,6 +123,9 @@ public class profileSucheService {
 
     public byte[] fetchProfilePhoto(String userName) {
         user currentUser = userDao.findByUserName(userName);
+        if (currentUser == null) {
+            return null;
+        }
         return currentUser.getProfilePhoto();
     }
 }

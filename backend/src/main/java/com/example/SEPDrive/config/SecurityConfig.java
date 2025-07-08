@@ -18,6 +18,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -45,6 +48,7 @@ public class SecurityConfig {
         .csrf(custmizer -> custmizer.disable())
              .cors(Customizer.withDefaults())
         .authorizeHttpRequests(requests -> requests.requestMatchers("/v1/auth/**", "/ws/**").permitAll()
+                .requestMatchers("/api/chat/**").authenticated()
                 .anyRequest().authenticated())
         .httpBasic(Customizer.withDefaults())
              .formLogin(Customizer.withDefaults())
@@ -75,4 +79,17 @@ public class SecurityConfig {
 
 
     }
+
+//    @Bean
+//    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+//        org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+//        configuration.setAllowedOrigins(java.util.List.of("http://localhost:4200"));
+//        configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//        configuration.setAllowedHeaders(java.util.List.of("*"));
+//        configuration.setAllowCredentials(true);
+//        configuration.setExposedHeaders(java.util.List.of("Authorization"));
+//        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/api/**", configuration);
+//        return source;
+//    }
 }
