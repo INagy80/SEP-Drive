@@ -108,12 +108,14 @@
         <textarea style="width: 22rem" [(ngModel)]="editedZwischenstopps"  (ngModelChange)="onSimZwischenStoppsChange($event)" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile)"></textarea>
       </div>
 
-      <p-button class="mt-2 mb-4 ml-0" (click)="applyEdit()">
-        <div class="icons gap-2">
-          <p >Apply the edit</p>
-          <img  src="/assets/icons/cogwheel.png">
-        </div>
-      </p-button>
+      <div class="" style="position: absolute ;left: 20px; top: 65%">
+        <p-button class="mt-2 mb-4 ml-0 " (click)="applyEdit()">
+          <div class="icons gap-2">
+            <p >Apply the edit</p>
+            <img  src="/assets/icons/cogwheel.png">
+          </div>
+        </p-button>
+      </div>
 
     </div>
 

@@ -17,8 +17,8 @@
   <!-- Messages Container -->
   <div class="messages-container" #messageContainer>
     <div class="messages-list">
-      <div 
-        *ngFor="let message of messages; trackBy: trackByMessageId" 
+      <div
+        *ngFor="let message of messages; trackBy: trackByMessageId"
         class="message-wrapper"
         [ngClass]="{ 'own-message': isOwnMessage(message), 'other-message': !isOwnMessage(message) }"
         (click)="markMessageAsRead(message)"
@@ -27,14 +27,14 @@
         <div *ngIf="!isOwnMessage(message)" class="message-avatar">
           <i class="pi pi-user"></i>
         </div>
-        
+
         <div class="message-bubble">
           <!-- Message Content -->
           <div class="message-content">
             <div *ngIf="editingMessageId === message.id" class="edit-mode">
-              <input 
+              <input
                 #messageInput
-                type="text" 
+                type="text"
                 [(ngModel)]="editingContent"
                 class="edit-input"
                 (keyup.enter)="saveEdit()"
@@ -42,25 +42,25 @@
                 maxlength="500"
               />
               <div class="edit-actions">
-                <button 
-                  pButton 
-                  type="button" 
-                  icon="pi pi-check" 
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-check"
                   class="p-button-sm p-button-success"
                   (click)="saveEdit()"
                   title="Speichern"
                 ></button>
-                <button 
-                  pButton 
-                  type="button" 
-                  icon="pi pi-times" 
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-times"
                   class="p-button-sm p-button-secondary"
                   (click)="cancelEdit()"
                   title="Abbrechen"
                 ></button>
               </div>
             </div>
-            
+
             <div *ngIf="editingMessageId !== message.id" class="message-text">
               {{ message.content }}
             </div>
@@ -75,28 +75,33 @@
           </div>
 
           <!-- Message Actions (for own messages) -->
-          <div *ngIf="isOwnMessage(message)" class="message-actions">
-            <button 
-              *ngIf="isMessageEditable(message)"
-              pButton 
-              type="button" 
-              icon="pi pi-pencil" 
-              class="p-button-sm p-button-text"
-              (click)="startEditing(message)"
-              title="Bearbeiten"
-            ></button>
-            <button 
-              *ngIf="isMessageDeletable(message)"
-              pButton 
-              type="button" 
-              icon="pi pi-trash" 
-              class="p-button-sm p-button-text p-button-danger"
-              (click)="deleteMessage(message)"
-              title="Löschen"
-            ></button>
+          <div
+            *ngIf="isOwnMessage(message) && (isMessageEditable(message) || isMessageDeletable(message))"
+            class="message-actions-below"
+          >
+
           </div>
         </div>
-        
+
+        <button
+          *ngIf="isMessageEditable(message)"
+          pButton
+          type="button"
+          icon="pi pi-pencil"
+          class="p-button-sm p-button-text"
+          (click)="startEditing(message)"
+          title="Bearbeiten"
+        ></button>
+        <button
+          *ngIf="isMessageDeletable(message)"
+          pButton
+          type="button"
+          icon="pi pi-trash"
+          class="p-button-sm p-button-text p-button-danger"
+          (click)="deleteMessage(message)"
+          title="Löschen"
+        ></button>
+
         <!-- Avatar for own messages -->
         <div *ngIf="isOwnMessage(message)" class="message-avatar own-avatar">
           <i class="pi pi-user"></i>
@@ -117,18 +122,18 @@
   <!-- Message Input -->
   <div class="message-input-container">
     <div class="input-wrapper">
-      <input 
-        type="text" 
+      <input
+        type="text"
         [(ngModel)]="newMessage"
         placeholder="Nachricht eingeben..."
         class="message-input"
         (keypress)="onKeyPress($event)"
         maxlength="500"
       />
-      <button 
-        pButton 
-        type="button" 
-        icon="pi pi-send" 
+      <button
+        pButton
+        type="button"
+        icon="pi pi-send"
         class="send-button"
         [disabled]="!newMessage.trim()"
         (click)="sendMessage()"
@@ -143,4 +148,4 @@
 </div>
 
 <!-- Confirmation Dialog -->
-<p-confirmDialog></p-confirmDialog> 
+<p-confirmDialog></p-confirmDialog>

@@ -13,6 +13,7 @@ import {ChatService} from '../../services/chat.service';
 
 import { ChatMessage, MessageStatus, SendMessageRequest, EditMessageRequest } from '../../models/chat-message.model';
 import { AuthenticationResponse } from '../../models/authentication-response';
+import { RefreshService } from '../../services/refresh-service';
 
 @Component({
   selector: 'app-chat',
@@ -48,11 +49,24 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     private confirmationService: ConfirmationService,
     private toastr: ToastrService,
     private chatService: ChatService,
+    private refresh: RefreshService,
   ) {}
 
   ngOnInit(): void {
+    this.chatService.isChatOpen = true;
+
     this.loadCurrentUser();
     this.setupMessageSubscription();
+
+    this.refresh.refreshchat$.subscribe(() =>{
+      this.setupMessageSubscription();
+      this.chatService.ensureWebSocketConnection();
+
+      if (this.otherUser && this.otherUser.trim()) {
+        console.log('otherUser already set in ngOnInit:', this.otherUser);
+        this.loadConversation(this.otherUser, this.rideRequestId || undefined);
+      }
+    });
 
     // Ensure WebSocket connection
     this.chatService.ensureWebSocketConnection();
@@ -69,6 +83,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   }
 
   ngOnDestroy(): void {
+    this.chatService.isChatOpen = false;
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
@@ -228,7 +243,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   }
 
   startEditing(message: ChatMessage): void {
-    if (!this.chatService.isMessageEditable(message)) {
+    if (this.chatService.isMessageEditable(message)) {
       return;
     }
 
@@ -255,6 +270,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       next: (updatedMessage) => {
         this.cancelEdit();
         this.toastr.success('Nachricht bearbeitet', 'Erfolg');
+        this.refresh.refreshChat();
       },
       error: (error) => {
         console.error('Error editing message:', error);
@@ -269,7 +285,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   }
 
   deleteMessage(message: ChatMessage): void {
-    if (!this.chatService.isMessageDeletable(message)) {
+    if (this.chatService.isMessageDeletable(message)) {
       return;
     }
 
@@ -279,6 +295,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
         this.chatService.deleteMessage(message.id).subscribe({
           next: () => {
             this.toastr.success('Nachricht gelöscht', 'Erfolg');
+            this.refresh.refreshChat();
           },
           error: (error) => {
             console.error('Error deleting message:', error);
@@ -290,7 +307,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   }
 
   markMessageAsRead(message: ChatMessage): void {
-    if (message.senderUsername !== this.currentUser && message.status !== MessageStatus.READ) {
+    if (
+      this.chatService.isChatOpen &&
+      message.senderUsername !== this.currentUser &&
+      message.status !== MessageStatus.READ
+    ) {
       this.chatService.markMessageAsRead(message.id).subscribe({
         error: (error) => {
           console.error('Error marking message as read:', error);
@@ -304,12 +325,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   }
 
   isMessageEditable(message: ChatMessage): boolean {
-    return this.chatService.isMessageEditable(message);
+    return this.isOwnMessage(message) && (message.status !== MessageStatus.READ);
   }
 
   isMessageDeletable(message: ChatMessage): boolean {
-    return this.chatService.isMessageDeletable(message);
+    return this.isOwnMessage(message) && (message.status !== MessageStatus.READ);
   }
+
+
 
   getStatusText(status: MessageStatus): string {
     return this.chatService.getStatusText(status);

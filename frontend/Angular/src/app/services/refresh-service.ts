@@ -31,6 +31,9 @@ export class RefreshService {
   private _refreshEditSimulation = new Subject<void>();
   refreshEditSimulation$ = this._refreshEditSimulation.asObservable();
 
+  private _refreshchat = new Subject<void>();
+  refreshchat$ = this._refreshchat.asObservable();
+
 
 
   notifyOffersRefresh() {
@@ -64,6 +67,10 @@ export class RefreshService {
 
   refreshEditSimulation() {
     this._refreshEditSimulation.next();
+  }
+
+  refreshChat(){
+    this._refreshchat.next();
   }
 
 }

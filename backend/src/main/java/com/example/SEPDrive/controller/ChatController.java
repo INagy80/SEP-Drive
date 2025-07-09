@@ -55,6 +55,9 @@ public class ChatController {
         chatService.markMessageAsRead(messageId);
     }
 
+    @PutMapping("/read/markall")
+    public void markAllMessagesAsRead() {chatService.markAllMessagesAsRead();}
+
     @PutMapping("/delivered/{senderUsername}")
     public void markMessagesAsDelivered(@PathVariable String senderUsername) {
         chatService.markAllMessagesAsDelivered(senderUsername);

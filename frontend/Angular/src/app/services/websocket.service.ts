@@ -111,6 +111,8 @@ export class WebsocketService {
                 }
               }else if(notification.title === 'Refresh!!'){
 
+              }else if(notification.title === 'Chat!!'){
+                this.refresh.refreshChat();
               }
               else {
                 this.toaster.info(notification.message, notification.title);
@@ -131,45 +133,53 @@ export class WebsocketService {
     if (!userName) return;
 
     // Subscribe to new chat messages
-    this.chatMessageSubscription = this.socketClient.subscribe(
-      `/user/${userName}/chat/message`,
-      (message: any) => {
-        const chatMessage: ChatMessage = JSON.parse(message.body);
-        console.log('📨 Received new chat message:', chatMessage);
-        this.chatMessageSubject.next(chatMessage);
-        this.toaster.info(`Neue Nachricht von ${chatMessage.senderUsername}`, 'Chat');
-      }
-    );
+    if (!this.chatMessageSubscription) {
+      this.chatMessageSubscription = this.socketClient.subscribe(
+        `/user/${userName}/chat/message`,
+        (message: any) => {
+          const chatMessage: ChatMessage = JSON.parse(message.body);
+          console.log('📨 Received new chat message:', chatMessage);
+          this.chatMessageSubject.next(chatMessage);
+          this.toaster.info(`Neue Nachricht von ${chatMessage.senderUsername}`, 'Chat');
+        }
+      );
+    }
 
     // Subscribe to message updates
-    this.chatMessageUpdatedSubscription = this.socketClient.subscribe(
-      `/user/${userName}/chat/message/updated`,
-      (message: any) => {
-        const chatMessage: ChatMessage = JSON.parse(message.body);
-        console.log('✏️ Received message update:', chatMessage);
-        this.chatMessageUpdatedSubject.next(chatMessage);
-      }
-    );
+    if (!this.chatMessageUpdatedSubscription) {
+      this.chatMessageUpdatedSubscription = this.socketClient.subscribe(
+        `/user/${userName}/chat/message/updated`,
+        (message: any) => {
+          const chatMessage: ChatMessage = JSON.parse(message.body);
+          console.log('✏️ Received message update:', chatMessage);
+          this.chatMessageUpdatedSubject.next(chatMessage);
+        }
+      );
+    }
 
     // Subscribe to message deletions
-    this.chatMessageDeletedSubscription = this.socketClient.subscribe(
-      `/user/${userName}/chat/message/deleted`,
-      (message: any) => {
-        const messageId: number = JSON.parse(message.body);
-        console.log('🗑️ Received message deletion:', messageId);
-        this.chatMessageDeletedSubject.next(messageId);
-      }
-    );
+    if (!this.chatMessageDeletedSubscription) {
+      this.chatMessageDeletedSubscription = this.socketClient.subscribe(
+        `/user/${userName}/chat/message/deleted`,
+        (message: any) => {
+          const messageId: number = JSON.parse(message.body);
+          console.log('🗑️ Received message deletion:', messageId);
+          this.chatMessageDeletedSubject.next(messageId);
+        }
+      );
+    }
 
     // Subscribe to read receipts
-    this.chatMessageReadSubscription = this.socketClient.subscribe(
-      `/user/${userName}/chat/message/read`,
-      (message: any) => {
-        const messageId: number = JSON.parse(message.body);
-        console.log('👁️ Received read receipt:', messageId);
-        this.chatMessageReadSubject.next(messageId);
-      }
-    );
+    if (!this.chatMessageReadSubscription) {
+      this.chatMessageReadSubscription = this.socketClient.subscribe(
+        `/user/${userName}/chat/message/read`,
+        (message: any) => {
+          const messageId: number = JSON.parse(message.body);
+          console.log('👁️ Received read receipt:', messageId);
+          this.chatMessageReadSubject.next(messageId);
+        }
+      );
+    }
   }
 
   // Chat WebSocket methods

@@ -1,11 +1,10 @@
 package com.example.SEPDrive.service;
 
 import com.example.SEPDrive.controller.ChatMessageDTO;
+import com.example.SEPDrive.controller.notificationDTO;
+import com.example.SEPDrive.controller.notificationpersonDTO;
 import com.example.SEPDrive.exceptions.resourceNotFoundException;
-import com.example.SEPDrive.model.ChatMessage;
-import com.example.SEPDrive.model.MessageStatus;
-import com.example.SEPDrive.model.rideRequest;
-import com.example.SEPDrive.model.user;
+import com.example.SEPDrive.model.*;
 import com.example.SEPDrive.repository.ChatMessageDAO;
 import com.example.SEPDrive.repository.rideRequestDAO;
 import com.example.SEPDrive.repository.userDAO;
@@ -34,6 +33,9 @@ public class ChatService {
 
     @Autowired
     private HttpInterpreter httpInterpreter;
+
+    @Autowired
+    private notificationService notificationService;
 
     @Transactional
     public ChatMessageDTO sendMessage(String receiverUsername, String content, Integer rideRequestId) {
@@ -143,6 +145,7 @@ public class ChatService {
                 messageId
         );
 
+
         chatMessageDAO.delete(message);
     }
 
@@ -178,7 +181,7 @@ public class ChatService {
             throw new resourceNotFoundException("Sender not found");
         }
 
-        List<ChatMessage> unreadMessages = chatMessageDAO.findUnreadMessagesByReceiver(currentUser);
+        List<ChatMessage> unreadMessages = chatMessageDAO.findUnreadMessagesByReceiver(currentUser.getId());
         unreadMessages.stream()
                 .filter(message -> message.getSender().equals(sender))
                 .forEach(message -> {
@@ -206,4 +209,69 @@ public class ChatService {
                 isEditable
         );
     }
-} 
+
+    @Transactional
+    public void markAllMessagesAsRead() {
+        user currentUser = httpInterpreter.Interpreter();
+        rideRequest aktiveride = null;
+        user sender = null;
+        if(currentUser instanceof Fahrer) {
+           aktiveride = rideRequestDAO.findByDriver_Id(
+                  currentUser.getId()).stream()
+                  .filter(r -> ( r.getStatus().equals(RequestStatus.Active) || r.getStatus().equals(RequestStatus.Assigned) ) )
+                  .findFirst().orElse(null);
+           if(aktiveride != null) {
+            sender = aktiveride.getCustomer();
+
+           }
+        }else {
+             aktiveride = rideRequestDAO.findByCustomerId(
+                            currentUser.getId()).stream()
+                    .filter(r -> ( r.getStatus().equals(RequestStatus.Active) || r.getStatus().equals(RequestStatus.Assigned) ) )
+                    .findFirst().orElse(null);
+             if(aktiveride != null) {
+               sender = aktiveride.getDriver();
+
+             }
+        }
+
+
+
+
+
+        List<ChatMessage> unreadMessages = chatMessageDAO.findUnreadMessagesByReceiver(currentUser.getId());
+
+        for (ChatMessage message : unreadMessages) {
+            message.setStatus(MessageStatus.READ);
+            chatMessageDAO.save(message);
+        }
+
+        notification note = new notification(
+                null,
+                null,
+                "Chat!!",
+                "Chat!!",
+                null
+        );
+
+        notificationDTO notificationDTO = new notificationDTO(
+                note.getId(),
+                null,
+                null,
+                note.getStatus(),
+                note.getCreatedAt(),
+                note.getUpdatedAt(),
+                note.getMessage(),
+                note.getTitle(),
+                null,
+                0,
+                0,
+                0.0,
+                null
+
+        );
+
+        notificationService.sendNotification(sender.getUserName(), notificationDTO);
+
+    }
+}

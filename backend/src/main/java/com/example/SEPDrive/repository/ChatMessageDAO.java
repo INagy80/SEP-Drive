@@ -19,9 +19,11 @@ public interface ChatMessageDAO extends JpaRepository<ChatMessage, Long> {
     @Query("SELECT cm FROM ChatMessage cm WHERE (cm.sender = :user1 AND cm.receiver = :user2) OR (cm.sender = :user2 AND cm.receiver = :user1) ORDER BY cm.createdAt ASC")
     List<ChatMessage> findConversationBetweenUsers(@Param("user1") user user1, @Param("user2") user user2);
 
-    @Query("SELECT cm FROM ChatMessage cm WHERE cm.receiver = :receiver AND cm.status = 'SENT'")
-    List<ChatMessage> findUnreadMessagesByReceiver(@Param("receiver") user receiver);
+    @Query("SELECT cm FROM ChatMessage cm WHERE cm.receiver.id = :receiver")
+    List<ChatMessage> findUnreadMessagesByReceiver(@Param("receiver") Integer userId);
 
     @Query("SELECT cm FROM ChatMessage cm WHERE cm.sender = :sender AND cm.status != 'READ'")
     List<ChatMessage> findEditableMessagesBySender(@Param("sender") user sender);
+
+
 } 

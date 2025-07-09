@@ -9,6 +9,9 @@ import { WebsocketService } from './websocket.service';
   providedIn: 'root'
 })
 export class ChatService {
+
+  public isChatOpen = false;
+
   private readonly chatUrl = `${environment.api.baseUrl}/${environment.api.chatUrl}`;
 
   private messagesSubject = new BehaviorSubject<ChatMessage[]>([]);
@@ -89,6 +92,10 @@ export class ChatService {
 
   markMessageAsRead(messageId: number): Observable<void> {
     return this.http.put<void>(`${this.chatUrl}/read/${messageId}`, {});
+  }
+
+  markallMessagesAsRead(): Observable<void> {
+    return this.http.put<void>(`${this.chatUrl}/read/markall`,{});
   }
 
   markMessagesAsDelivered(senderUsername: string): Observable<void> {

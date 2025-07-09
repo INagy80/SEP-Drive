@@ -33,6 +33,7 @@ import { NbCardModule, NbTagModule, NbInputModule } from '@nebular/theme';
 import {DomEvent} from 'leaflet';
 import stop = DomEvent.stop;
 import {ChatComponent} from '../chat/chat.component';
+import { ChatService } from '../../services/chat.service';
 
 
 
@@ -196,6 +197,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     private toastr: ToastrService,
     private WebSocketService : WebsocketService,
     private refresh: RefreshService,
+    private chatService: ChatService,
 
   ) {}
 
@@ -2210,6 +2212,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   openChat(ride: rideResponse): void {
     if (!ride) return;
 
+
+    this.chatService.markallMessagesAsRead().subscribe(
+
+    );
+
     console.log('Opening chat for ride:', ride);
     console.log('Current user is driver:', this.isdriver);
 
@@ -2236,6 +2243,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     this.showChat = true;
     this.toastr.info(`Chat mit ${this.chatOtherUser} geöffnet`, 'Chat');
+
   }
 
   closeChat(): void {
