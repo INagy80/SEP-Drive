@@ -51,6 +51,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   ) {}
 
   ngOnInit(): void {
+    this.chatService.isChatOpen = true;
+
     this.loadCurrentUser();
     this.setupMessageSubscription();
 
@@ -69,6 +71,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   }
 
   ngOnDestroy(): void {
+    this.chatService.isChatOpen = false;
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
@@ -290,7 +293,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   }
 
   markMessageAsRead(message: ChatMessage): void {
-    if (message.senderUsername !== this.currentUser && message.status !== MessageStatus.READ) {
+    if (
+      this.chatService.isChatOpen &&
+      message.senderUsername !== this.currentUser &&
+      message.status !== MessageStatus.READ
+    ) {
       this.chatService.markMessageAsRead(message.id).subscribe({
         error: (error) => {
           console.error('Error marking message as read:', error);
@@ -299,17 +306,22 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     }
   }
 
+
   isOwnMessage(message: ChatMessage): boolean {
     return message.senderUsername === this.currentUser;
   }
 
   isMessageEditable(message: ChatMessage): boolean {
-    return this.chatService.isMessageEditable(message);
+    return message.isEditable &&
+      (message.status === MessageStatus.SENT || message.status === MessageStatus.DELIVERED);
   }
 
   isMessageDeletable(message: ChatMessage): boolean {
-    return this.chatService.isMessageDeletable(message);
+    return message.isEditable &&
+      (message.status === MessageStatus.SENT || message.status === MessageStatus.DELIVERED);
   }
+
+
 
   getStatusText(status: MessageStatus): string {
     return this.chatService.getStatusText(status);

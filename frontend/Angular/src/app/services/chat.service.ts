@@ -9,6 +9,9 @@ import { WebsocketService } from './websocket.service';
   providedIn: 'root'
 })
 export class ChatService {
+
+  public isChatOpen = false;
+
   private readonly chatUrl = `${environment.api.baseUrl}/${environment.api.chatUrl}`;
 
   private messagesSubject = new BehaviorSubject<ChatMessage[]>([]);
