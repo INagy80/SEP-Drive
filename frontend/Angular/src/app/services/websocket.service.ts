@@ -109,6 +109,8 @@ export class WebsocketService {
                 }else{
                   this.refresh.refreshEditSimulation();
                 }
+              }else if(notification.title === 'Refresh!!'){
+
               }
               else {
                 this.toaster.info(notification.message, notification.title);

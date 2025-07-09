@@ -93,11 +93,6 @@ public abstract class user {
     @JsonBackReference
     private geldKonto geldKonto ;
 
-    @OneToMany(mappedBy = "sender")
-    private List<Chat> chatsAsSender;
-
-    @OneToMany(mappedBy = "recipient")
-    private List<Chat> chatsAsRecipient;
 
     private LocalDateTime lastSeen;
 
@@ -140,21 +135,6 @@ public abstract class user {
     //getters and setters
 
 
-    public List<Chat> getChatsAsSender() {
-        return chatsAsSender;
-    }
-
-    public void setChatsAsSender(List<Chat> chatsAsSender) {
-        this.chatsAsSender = chatsAsSender;
-    }
-
-    public List<Chat> getChatsAsRecipient() {
-        return chatsAsRecipient;
-    }
-
-    public void setChatsAsRecipient(List<Chat> chatsAsRecipient) {
-        this.chatsAsRecipient = chatsAsRecipient;
-    }
 
     public LocalDateTime getLastSeen() {
         return lastSeen;
