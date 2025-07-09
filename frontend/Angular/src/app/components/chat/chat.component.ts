@@ -89,12 +89,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       setTimeout(() => this.scrollToBottom(), 100);
     });
 
-    // Don't override otherUser from the conversation subscription
-    // as it can interfere with ride request chats
     this.subscriptions.push(messageSub);
   }
 
-  // Watch for changes to otherUser input
+
   ngOnChanges(changes: any): void {
     if (changes['otherUser']) {
       console.log('otherUser changed to:', this.otherUser);
@@ -109,7 +107,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     this.otherUser = otherUsername;
     this.rideRequestId = rideRequestId || null;
 
-    // Ensure WebSocket connection before loading conversation
     this.chatService.ensureWebSocketConnection();
 
     if (rideRequestId) {
@@ -120,7 +117,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       this.chatService.loadConversation(otherUsername);
     }
 
-    // Ensure otherUser is set correctly after loading
     console.log('otherUser after loading conversation:', this.otherUser);
   }
 
@@ -142,7 +138,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       return;
     }
 
-    // Check if user is authenticated
     const storedUser = localStorage.getItem('user');
     if (!storedUser) {
       console.error('No user found in localStorage');
@@ -164,7 +159,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       return;
     }
 
-    // Double-check that otherUser is still valid
     console.log('Final otherUser check before sending:', this.otherUser);
 
     const messageContent = this.newMessage.trim();
@@ -176,7 +170,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
 
     console.log('Sending message request:', request);
 
-    // Create temporary message for immediate display (like WhatsApp)
     const tempMessage: ChatMessage = {
       id: Date.now(), // Temporary ID
       content: messageContent,
@@ -189,14 +182,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       rideRequestId: this.rideRequestId
     };
 
-    // Add message immediately to the list (like WhatsApp)
     this.messages.push(tempMessage);
     this.newMessage = '';
 
-    // Scroll to bottom to show the new message
     setTimeout(() => this.scrollToBottom(), 100);
 
-    // Send to server
     this.chatService.sendMessage(request).subscribe({
       next: (message) => {
         console.log('Message sent successfully:', message);
@@ -212,13 +202,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
         console.error('Error status:', error.status);
         console.error('Error message:', error.message);
 
-        // Remove temporary message if sending failed
         const tempIndex = this.messages.findIndex(m => m.id === tempMessage.id);
         if (tempIndex !== -1) {
           this.messages.splice(tempIndex, 1);
         }
 
-        // Handle specific error cases
         if (error.status === 403) {
           this.toastr.error('Zugriff verweigert. Bitte melden Sie sich erneut an.', 'Authentifizierungsfehler');
         } else if (error.status === 401) {
@@ -320,8 +308,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     return message.isEditable &&
       (message.status === MessageStatus.SENT || message.status === MessageStatus.DELIVERED);
   }
-
-
 
   getStatusText(status: MessageStatus): string {
     return this.chatService.getStatusText(status);
