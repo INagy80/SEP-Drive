@@ -33,7 +33,7 @@ public class adress {
     @Column(name = "longtude", precision = 10, scale = 7)
     private BigDecimal Lng;
 
-
+    private boolean ispassed;
 
     //constructor
     public adress(  String houseNumber, String city, String state, String zip, String country) {
@@ -43,11 +43,13 @@ public class adress {
         this.state = state;
         this.zip = zip;
         this.country = country;
+        this.ispassed = false;
     }
 
     public adress(BigDecimal lat, BigDecimal lng) {
         Lng = lng;
         Lat = lat;
+        this.ispassed = false;
     }
 
     public adress(String houseNumber, String city, String zip, String country) {
@@ -56,6 +58,7 @@ public class adress {
         this.zip = zip;
         this.city = city;
         this.country = country;
+        this.ispassed = false;
     }
 
     public adress() {

@@ -5,6 +5,7 @@ import {Observable} from 'rxjs';
 import {edit, rideRequestDTO} from '../../models/rideRequestDTO';
 import {rideResponse} from '../../models/rideResponse';
 import {SimulationUpdate} from '../../models/simulation-state.model';
+import {LatLng} from '../../models/rideRequestDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -70,6 +71,10 @@ export class RideRequestService {
 
   liveEdit(edit: edit): Observable<any> {
     return this.http.put(`${this.rideRequestUrl}/LiveEdit`, edit);
+  }
+
+  setZwischenStoppAsPassed(stop: LatLng): Observable<any> {
+    return this.http.put(`${this.rideRequestUrl}/markAsPassed`, {stop});
   }
 
 }
