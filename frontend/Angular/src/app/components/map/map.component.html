@@ -233,6 +233,17 @@
             </div>
             <button class="delete-button" (click)="statusdelete(activeRequest)">Löschen</button>
 
+            <!-- Chat Button for Active Rides -->
+            <button
+              *ngIf="activeRequest && (activeRequest.status === 'Assigned' || activeRequest.status === 'Active')"
+              class="chat-button"
+              (click)="openChat(activeRequest)"
+              title="Mit Fahrer/Kunde chatten"
+            >
+              <i class="pi pi-comments"></i>
+              Chat öffnen
+            </button>
+
             <br><br>
 
           </div>
@@ -402,8 +413,22 @@
       </section>
     </div>
 
-
-
+    <!-- Chat Component -->
+    <div *ngIf="showChat" class="chat-overlay">
+      <div class="chat-modal">
+        <div class="chat-header">
+          <h3>Chat mit {{ chatOtherUser }}</h3>
+          <button class="close-chat" (click)="closeChat()">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+        <app-chat
+          [otherUser]="chatOtherUser"
+          [rideRequestId]="activeRequest?.id ?? null"
+          (closeChat)="closeChat()">
+        </app-chat>
+      </div>
+    </div>
 
 </p-drawer>
 

@@ -1,0 +1,322 @@
+
+
+<app-header/>
+
+<!-- Navbar -->
+<div class="navbar">
+
+  <div class=" gap-6 navbar " style="width: 50vw ; justify-content: space-around;
+  align-items: center; right: 25vw; left: 25vw; position: absolute" >
+
+    <p-button (click)="logout()" class="nav-item">
+      <div class="icons gap-2">
+        <p style="font-size: 1.1rem">Abmelden</p>
+        <img  src="/assets/icons/exit.png">
+      </div>
+    </p-button>
+
+    <p-button   (click)="fahrtangebote()" class="nav-item"  >
+      <div class="icons gap-2">
+        <p >FahrtAngebote</p>
+        <img  src="/assets/icons/fahrtangebote.png">
+      </div>
+    </p-button>
+
+
+    <p-button  (click)="driverdashboard()" class="nav-item" >
+      <div class="icons gap-2">
+        <p >Dashboard</p>
+        <img  src="/assets/icons/route.png">
+      </div>
+    </p-button>
+
+
+    <p-button (click)="startseite()" class="nav-item">
+      <div class="icons gap-2">
+        <p >Startseite</p>
+        <img  src="/assets/icons/home.png">
+      </div>
+    </p-button>
+
+  </div>
+
+</div>
+
+
+<!---------------------------------------------Garphik part------------------------------------------------>
+<div class="fahrten-analyse-container">
+
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="errorMessage">
+    <div class="error-content">
+      <span class="error-icon">⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </div>
+
+  <!-- Controls Section -->
+  <div class="controls-section">
+    <div class="control-group">
+      <label for="viewMode">Ansicht:</label>
+      <select id="viewMode" [(ngModel)]="viewMode" (change)="onViewModeChange()" [disabled]="isLoading">
+        <option value="monthly">Monatlich</option>
+        <option value="daily">Täglich</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="year">Jahr:</label>
+      <select id="year" [(ngModel)]="selectedYear" (change)="onYearChange()" [disabled]="isLoading">
+        <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+      </select>
+    </div>
+
+    <div class="control-group" *ngIf="viewMode === 'daily'">
+      <label for="month">Monat:</label>
+      <select id="month" [(ngModel)]="selectedMonth" (change)="onMonthChange()" [disabled]="isLoading">
+        <option *ngFor="let month of availableMonths" [value]="month.value">{{ month.label }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Lade Statistiken...</p>
+    </div>
+  </div>
+
+  <!-- Content (hidden when loading) -->
+  <div class="content-container" *ngIf="!isLoading">
+    <!-- Statistics Cards -->
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <h3>Gesamteinnahmen</h3>
+          <p class="stat-value">{{ getTotalValue(statisticsData.earnings) | currency:'EUR' }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📏</div>
+        <div class="stat-content">
+          <h3>Gefahrene Distanz</h3>
+          <p class="stat-value">{{ getTotalValue(statisticsData.distance) | number:'1.1-2'}} km</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-content">
+          <h3>Fahrzeit</h3>
+          <p class="stat-value">{{ getTotalValue(statisticsData.drivingTime) }} Stunden</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-content">
+          <h3>Durchschnittliche Bewertung</h3>
+          <p class="stat-value">{{ getAverageRating(statisticsData.averageRating) || 0.0 | number:'1.1-1' }}/5.0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <!-- Earnings Chart -->
+      <div class="chart-container">
+        <h2>Einnahmen</h2>
+        <div class="chart">
+          <svg class="line-chart" viewBox="0 0 1000 300">
+            <!-- Y-Achse -->
+            <line x1="50" y1="20" x2="50" [attr.y2]="getZeroLineY(statisticsData.earnings)" stroke="#888" stroke-width="2"/>
+            <!-- X-Achse -->
+            <line x1="50" [attr.y1]="getZeroLineY(statisticsData.earnings)" x2="1000" [attr.y2]="getZeroLineY(statisticsData.earnings)" stroke="#888" stroke-width="2"/>
+            <!-- Y-Achsen-Beschriftung und Hilfslinien -->
+            <g *ngFor="let y of getYAxisTicks(statisticsData.earnings)">
+              <text x="45" [attr.y]="300 - (y / getMaxValue(statisticsData.earnings)) * 250" text-anchor="end" alignment-baseline="middle" font-size="14" fill="#888">
+                {{ y | number:'1.0-0' }}
+              </text>
+              <line x1="50" [attr.y1]="300 - (y / getMaxValue(statisticsData.earnings)) * 250" x2="1000" [attr.y2]="300 - (y / getMaxValue(statisticsData.earnings)) * 250" stroke="#eee" stroke-width="1"/>
+            </g>
+            <polyline
+              [attr.points]="getLineChartPoints(statisticsData.earnings, 50)"
+              fill="none"
+              stroke="#4CAF50"
+              stroke-width="3"/>
+            <circle
+              *ngFor="let item of statisticsData.earnings; let i = index"
+              [attr.cx]="50 + (i / (statisticsData.earnings.length - 1)) * 950"
+              [attr.cy]="300 - (item.value / getMaxValue(statisticsData.earnings)) * 250"
+              r="5"
+              fill="#4CAF50"
+              class="data-point"
+              [title]="item.label + ': ' + formatCurrency(item.value)"
+              (mouseenter)="showTooltip(item.label + ': ' + formatCurrency(item.value), $event)"
+              (mouseleave)="hideTooltip()"/>
+            <text
+              *ngFor="let item of statisticsData.earnings; let i = index"
+              [attr.x]="50 + (i / (statisticsData.earnings.length - 1)) * 950"
+              [attr.y]="getZeroLineY(statisticsData.earnings) + 45"
+              text-anchor="middle"
+              font-size="13"
+              fill="#333"
+              [attr.transform]="'rotate(-90 ' + (50 + (i / (statisticsData.earnings.length - 1)) * 950) + ' ' + (getZeroLineY(statisticsData.earnings) + 45) + ')'">
+              {{ item.date }}
+            </text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Distance Chart -->
+      <div class="chart-container">
+        <h2>Gefahrene Distanz</h2>
+        <div class="chart">
+          <svg class="line-chart" viewBox="0 0 1000 300">
+            <!-- Y-Achse -->
+            <line x1="50" y1="20" x2="50" [attr.y2]="getZeroLineY(statisticsData.distance)" stroke="#888" stroke-width="2"/>
+            <!-- X-Achse -->
+            <line x1="50" [attr.y1]="getZeroLineY(statisticsData.distance)" x2="1000" [attr.y2]="getZeroLineY(statisticsData.distance)" stroke="#888" stroke-width="2"/>
+            <!-- Y-Achsen-Beschriftung und Hilfslinien -->
+            <g *ngFor="let y of getYAxisTicks(statisticsData.distance)">
+              <text x="45" [attr.y]="300 - (y / getMaxValue(statisticsData.distance)) * 250" text-anchor="end" alignment-baseline="middle" font-size="14" fill="#888">
+                {{ y | number:'1.0-0' }}
+              </text>
+              <line x1="50" [attr.y1]="300 - (y / getMaxValue(statisticsData.distance)) * 250" x2="1000" [attr.y2]="300 - (y / getMaxValue(statisticsData.distance)) * 250" stroke="#eee" stroke-width="1"/>
+            </g>
+            <polyline
+              [attr.points]="getLineChartPoints(statisticsData.distance, 50)"
+              fill="none"
+              stroke="#2196F3"
+              stroke-width="3"/>
+            <circle
+              *ngFor="let item of statisticsData.distance; let i = index"
+              [attr.cx]="50 + (i / (statisticsData.distance.length - 1)) * 950"
+              [attr.cy]="300 - (item.value / getMaxValue(statisticsData.distance)) * 250"
+              r="5"
+              fill="#2196F3"
+              class="data-point"
+              [title]="item.label + ': ' + item.value + ' km'"
+              (mouseenter)="showTooltip(item.label + ': ' + item.value + ' km', $event)"
+              (mouseleave)="hideTooltip()"/>
+            <text
+              *ngFor="let item of statisticsData.distance; let i = index"
+              [attr.x]="50 + (i / (statisticsData.distance.length - 1)) * 950"
+              [attr.y]="getZeroLineY(statisticsData.distance) + 45"
+              text-anchor="middle"
+              font-size="13"
+              fill="#333"
+              [attr.transform]="'rotate(-90 ' + (50 + (i / (statisticsData.distance.length - 1)) * 950) + ' ' + (getZeroLineY(statisticsData.distance) + 45) + ')'">
+              {{ item.date }}
+            </text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Driving Time Chart -->
+      <div class="chart-container">
+        <h2>Fahrzeit</h2>
+        <div class="chart">
+          <svg class="line-chart" viewBox="0 0 1000 300">
+            <!-- Y-Achse -->
+            <line x1="50" y1="20" x2="50" [attr.y2]="getZeroLineY(statisticsData.drivingTime)" stroke="#888" stroke-width="2"/>
+            <!-- X-Achse -->
+            <line x1="50" [attr.y1]="getZeroLineY(statisticsData.drivingTime)" x2="1000" [attr.y2]="getZeroLineY(statisticsData.drivingTime)" stroke="#888" stroke-width="2"/>
+            <!-- Y-Achsen-Beschriftung und Hilfslinien -->
+            <g *ngFor="let y of getYAxisTicks(statisticsData.drivingTime)">
+              <text x="45" [attr.y]="300 - (y / getMaxValue(statisticsData.drivingTime)) * 250" text-anchor="end" alignment-baseline="middle" font-size="14" fill="#888">
+                {{ y | number:'1.0-0' }}
+              </text>
+              <line x1="50" [attr.y1]="300 - (y / getMaxValue(statisticsData.drivingTime)) * 250" x2="1000" [attr.y2]="300 - (y / getMaxValue(statisticsData.drivingTime)) * 250" stroke="#eee" stroke-width="1"/>
+            </g>
+            <polyline
+              [attr.points]="getLineChartPoints(statisticsData.drivingTime, 50)"
+              fill="none"
+              stroke="#FF9800"
+              stroke-width="3"/>
+            <circle
+              *ngFor="let item of statisticsData.drivingTime; let i = index"
+              [attr.cx]="50 + (i / (statisticsData.drivingTime.length - 1)) * 950"
+              [attr.cy]="300 - (item.value / getMaxValue(statisticsData.drivingTime)) * 250"
+              r="5"
+              fill="#FF9800"
+              class="data-point"
+              [title]="item.label + ': ' + item.value + ' Stunden'"
+              (mouseenter)="showTooltip(item.label + ': ' + item.value + ' Stunden', $event)"
+              (mouseleave)="hideTooltip()"/>
+            <text
+              *ngFor="let item of statisticsData.drivingTime; let i = index"
+              [attr.x]="50 + (i / (statisticsData.drivingTime.length - 1)) * 950"
+              [attr.y]="getZeroLineY(statisticsData.drivingTime) + 45"
+              text-anchor="middle"
+              font-size="13"
+              fill="#333"
+              [attr.transform]="'rotate(-90 ' + (50 + (i / (statisticsData.drivingTime.length - 1)) * 950) + ' ' + (getZeroLineY(statisticsData.drivingTime) + 45) + ')'">
+              {{ item.date }}
+            </text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Rating Chart -->
+      <div class="chart-container">
+        <h2>Durchschnittliche Bewertung</h2>
+        <div class="chart">
+          <svg class="line-chart" viewBox="0 0 1000 300">
+            <!-- Y-Achse -->
+            <line x1="50" y1="20" x2="50" [attr.y2]="getZeroLineY(statisticsData.averageRating)" stroke="#888" stroke-width="2"/>
+            <!-- X-Achse -->
+            <line x1="50" [attr.y1]="getZeroLineY(statisticsData.averageRating)" x2="1000" [attr.y2]="getZeroLineY(statisticsData.averageRating)" stroke="#888" stroke-width="2"/>
+            <!-- Y-Achsen-Beschriftung und Hilfslinien -->
+            <g *ngFor="let y of getYAxisTicks(statisticsData.averageRating)">
+              <text x="45" [attr.y]="300 - (y / getMaxValue(statisticsData.averageRating)) * 250" text-anchor="end" alignment-baseline="middle" font-size="14" fill="#888">
+                {{ y | number:'1.1-1' }}
+              </text>
+              <line x1="50" [attr.y1]="300 - (y / getMaxValue(statisticsData.averageRating)) * 250" x2="1000" [attr.y2]="300 - (y / getMaxValue(statisticsData.averageRating)) * 250" stroke="#eee" stroke-width="1"/>
+            </g>
+            <polyline
+              [attr.points]="getLineChartPoints(statisticsData.averageRating, 50)"
+              fill="none"
+              stroke="#F44336"
+              stroke-width="3"/>
+            <circle
+              *ngFor="let item of statisticsData.averageRating; let i = index"
+              [attr.cx]="50 + (i / (statisticsData.averageRating.length - 1)) * 950"
+              [attr.cy]="300 - (item.value / getMaxValue(statisticsData.averageRating)) * 250"
+              r="5"
+              fill="#F44336"
+              class="data-point"
+              [title]="item.label + ': ' + item.value + '/5.0'"
+              (mouseenter)="showTooltip(item.label + ': ' + item.value + '/5.0', $event)"
+              (mouseleave)="hideTooltip()"/>
+            <text
+              *ngFor="let item of statisticsData.averageRating; let i = index"
+              [attr.x]="50 + (i / (statisticsData.averageRating.length - 1)) * 950"
+              [attr.y]="getZeroLineY(statisticsData.averageRating) + 45"
+              text-anchor="middle"
+              font-size="13"
+              fill="#333"
+              [attr.transform]="'rotate(-90 ' + (50 + (i / (statisticsData.averageRating.length - 1)) * 950) + ' ' + (getZeroLineY(statisticsData.averageRating) + 45) + ')'">
+              {{ item.date }}
+            </text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div
+      class="chart-tooltip"
+      *ngIf="tooltipVisible"
+      [style.left.px]="tooltipX + 10"
+      [style.top.px]="tooltipY - 30">
+      {{ tooltipText }}
+    </div>
+  </div>
+</div>
+
+

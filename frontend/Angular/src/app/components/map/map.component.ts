@@ -32,6 +32,7 @@ import { NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
 import { NbCardModule, NbTagModule, NbInputModule } from '@nebular/theme';
 import {DomEvent} from 'leaflet';
 import stop = DomEvent.stop;
+import {ChatComponent} from '../chat/chat.component';
 
 
 
@@ -40,14 +41,17 @@ import stop = DomEvent.stop;
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
-  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, Drawer, MatDivider, Rating, BadgeModule, CommonModule, ButtonModule, HeaderComponent, MultiSelectModule, NbCardModule, NbTagModule, NbInputModule],
+  imports: [FormsModule, MatSidenavModule, ScrollPanelModule, Drawer, MatDivider, Rating, BadgeModule, CommonModule, ButtonModule, HeaderComponent, MultiSelectModule, NbCardModule, NbTagModule, NbInputModule, ChatComponent],
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('simulationMapContainer', { static: false })
   private simulationMapContainer!: ElementRef<HTMLDivElement>;
 
-
+  // Chat properties
+  showChat: boolean = false;
+  chatOtherUser: string = '';
+  currentUser: string = '';
 
   private L!: typeof Leaflet;
   private map!: Leaflet.Map;
@@ -221,6 +225,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }else{
       this.resumeSimulation()
       }
+    })
+
+    this.refresh.refreshEditSimulation$.subscribe(() =>{
+      window.location.reload();
     })
 
 
@@ -1675,7 +1683,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
         this.editedDistance = distanceInKm;
         this.editedDurationMin = durationInMin;
-        switch (this.aktiveCarClass) {
+        switch (this.activeRequest?.carClass) {
           case 'klein':
             this.editedprice = this.editedDistance * 1.0;
             break;
@@ -2197,6 +2205,49 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
+
+  // Chat methods
+  openChat(ride: rideResponse): void {
+    if (!ride) return;
+
+    console.log('Opening chat for ride:', ride);
+    console.log('Current user is driver:', this.isdriver);
+
+    // Determine the other user (driver or customer)
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+      this.currentUser = authResponse.kundeDTO?.userName || '';
+    }
+
+    if (this.isdriver) {
+      // If current user is driver, chat with customer
+      this.chatOtherUser = ride.customerUserName;
+      console.log('Driver chatting with customer:', this.chatOtherUser);
+    } else {
+      // If current user is customer, chat with driver
+      this.chatOtherUser = ride.driverUserName;
+      console.log('Customer chatting with driver:', this.chatOtherUser);
+    }
+
+
+
+    console.log('Final chatOtherUser:', this.chatOtherUser);
+
+    this.showChat = true;
+    this.toastr.info(`Chat mit ${this.chatOtherUser} geöffnet`, 'Chat');
+  }
+
+  closeChat(): void {
+    this.showChat = false;
+    this.chatOtherUser = '';
+    this.toastr.info('Chat geschlossen', 'Chat');
+  }
+
+  // Track message by ID for performance
+  trackByMessageId(index: number, message: any): number {
+    return message.id;
+  }
 
   private interpolatePosition(path: Leaflet.LatLng[], segLens: number[], dist: number): Leaflet.LatLng {
     let acc = 0, idx = 0;

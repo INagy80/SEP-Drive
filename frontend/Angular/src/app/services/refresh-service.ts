@@ -28,7 +28,8 @@ export class RefreshService {
   refreshStartSimulationEnds$ = this._refreshStartSimulationEnds.asObservable();
 
 
-
+  private _refreshEditSimulation = new Subject<void>();
+  refreshEditSimulation$ = this._refreshEditSimulation.asObservable();
 
 
 
@@ -59,6 +60,10 @@ export class RefreshService {
 
   notifyStartSimulationEnds() {
     this._refreshStartSimulationEnds.next();
+  }
+
+  refreshEditSimulation() {
+    this._refreshEditSimulation.next();
   }
 
 }

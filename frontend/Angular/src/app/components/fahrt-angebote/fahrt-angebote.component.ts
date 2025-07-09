@@ -449,6 +449,8 @@ export class FahrtAngeboteComponent implements OnInit, OnDestroy {
     this.rideRequestService.OfferRespond(offerdto.id,true).subscribe({
       next: response => {
         this.toaster.success(`you Just Accepted ${offerdto.FullName}'s offer! \n ${offerdto.FullName} is on his way to pick you up.  `, 'Offer Accepted!!');
+        this.router.navigate(['/map']);
+        window.location.reload();
         this.refresh.notifyOffersRefresh();
       },
       error: error => {

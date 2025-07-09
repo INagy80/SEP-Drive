@@ -1,344 +1,368 @@
-import {AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ChatListComponent} from '../chat-list/chat-list.component';
-import {DatePipe} from '@angular/common';
-import { ChatResponse } from '../../models/chat-response';
-import { MessageResponse } from '../../models/message-response';
-import { MessageRequest } from '../../models/message-request';
-import {EmojiData} from '@ctrl/ngx-emoji-mart/ngx-emoji';
-import { ChatService } from '../../services/chat.service';
-import { MessageService } from '../../services/message.service';
-import {AuthenticationResponse} from '../../models/authentication-response';
-import {Router} from '@angular/router';
-import {ProfileService} from '../../services/profile/profile.service';
-import {DomSanitizer} from '@angular/platform-browser';
-import {GeldKontoService} from '../../services/geld-konto.service';
-import {WebsocketService} from '../../services/websocket.service';
-import {PickerComponent} from '@ctrl/ngx-emoji-mart';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { CardModule } from 'primeng/card';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
+import {ChatService} from '../../services/chat.service';
+
+import { ChatMessage, MessageStatus, SendMessageRequest, EditMessageRequest } from '../../models/chat-message.model';
+import { AuthenticationResponse } from '../../models/authentication-response';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
   imports: [
-    ChatListComponent,
-    PickerComponent,
     CommonModule,
     FormsModule,
+    ButtonModule,
+    InputTextModule,
+    CardModule,
+    ScrollPanelModule,
+    ConfirmDialogModule
   ],
+  providers: [ConfirmationService],
   templateUrl: './chat.component.html',
-  styleUrl: './chat.component.scss'
+  styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+  @ViewChild('messageContainer') messageContainer!: ElementRef;
+  @ViewChild('messageInput') messageInput!: ElementRef;
 
-  selectedChat: ChatResponse = {};
-  chats: Array<ChatResponse> = [];
-  chatMessages: Array<MessageResponse> = [];
-  socketClient: any = null;
-  messageContent: string = '';
-  showEmojis = false;
-  @ViewChild('scrollableDiv') scrollableDiv!: ElementRef<HTMLDivElement>;
-  private notificationSubscription: any;
-  senderid : number = 0;
+  messages: ChatMessage[] = [];
+  currentUser: string = '';
+  @Input() otherUser: string = '';
+  newMessage: string = '';
+  editingMessageId: number | null = null;
+  editingContent: string = '';
+  @Input() rideRequestId: number | null = null;
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
+    private confirmationService: ConfirmationService,
+    private toastr: ToastrService,
     private chatService: ChatService,
-    private messageService: MessageService,
-    private router: Router,
-    private profileService : ProfileService,
-    private sanitizer: DomSanitizer,
-    private geldKontoService :GeldKontoService,
-    private WebSocketService : WebsocketService,
-  ) {
+  ) {}
+
+  ngOnInit(): void {
+    this.loadCurrentUser();
+    this.setupMessageSubscription();
+
+    // Ensure WebSocket connection
+    this.chatService.ensureWebSocketConnection();
+
+    // If otherUser is already set, load conversation immediately
+    if (this.otherUser && this.otherUser.trim()) {
+      console.log('otherUser already set in ngOnInit:', this.otherUser);
+      this.loadConversation(this.otherUser, this.rideRequestId || undefined);
+    }
   }
 
-
-
-  ngAfterViewChecked(): void {
+  ngAfterViewInit(): void {
     this.scrollToBottom();
   }
 
   ngOnDestroy(): void {
-    if (this.socketClient !== null) {
-      this.socketClient.disconnect();
-      this.notificationSubscription.unsubscribe();
-      this.socketClient = null;
-    }
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  ngOnInit(): void {
-    this.WebSocketService.connect();
-    this.getAllChats();
-
+  private loadCurrentUser(): void {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const authResponse: AuthenticationResponse = JSON.parse(storedUser);
-      const kundeDTO = authResponse.kundeDTO;
-      if (kundeDTO) {
-        this.senderid = kundeDTO.id;
+      this.currentUser = authResponse.kundeDTO?.userName || '';
+    }
+  }
 
+  private setupMessageSubscription(): void {
+    const messageSub = this.chatService.messages$.subscribe(messages => {
+      this.messages = messages;
+      setTimeout(() => this.scrollToBottom(), 100);
+    });
+
+    // Don't override otherUser from the conversation subscription
+    // as it can interfere with ride request chats
+    this.subscriptions.push(messageSub);
+  }
+
+  // Watch for changes to otherUser input
+  ngOnChanges(changes: any): void {
+    if (changes['otherUser']) {
+      console.log('otherUser changed to:', this.otherUser);
+      if (this.otherUser && this.otherUser.trim()) {
+        this.loadConversation(this.otherUser, this.rideRequestId || undefined);
       }
     }
   }
 
-  chatSelected(chatResponse: ChatResponse) {
-    this.selectedChat = chatResponse;
-    this.getAllChatMessages(chatResponse.id as string);
-    this.setMessagesToSeen();
-    this.selectedChat.unreadCount = 0;
+  loadConversation(otherUsername: string, rideRequestId?: number): void {
+    console.log('Loading conversation with:', otherUsername, 'rideRequestId:', rideRequestId);
+    this.otherUser = otherUsername;
+    this.rideRequestId = rideRequestId || null;
+
+    // Ensure WebSocket connection before loading conversation
+    this.chatService.ensureWebSocketConnection();
+
+    if (rideRequestId) {
+      console.log('Loading ride request messages for ID:', rideRequestId);
+      this.chatService.loadRideRequestMessages(rideRequestId);
+    } else {
+      console.log('Loading conversation with user:', otherUsername);
+      this.chatService.loadConversation(otherUsername);
+    }
+
+    // Ensure otherUser is set correctly after loading
+    console.log('otherUser after loading conversation:', this.otherUser);
   }
 
-  isSelfMessage(message: MessageResponse): boolean {
-    return message.senderId === this.senderid;
+  sendMessage(): void {
+    console.log('sendMessage called!');
+    console.log('otherUser:', this.otherUser);
+    console.log('newMessage:', this.newMessage);
+    console.log('rideRequestId:', this.rideRequestId);
+
+    if (!this.newMessage.trim()) {
+      console.log('Message is empty!');
+      this.toastr.warning('Bitte geben Sie eine Nachricht ein', 'Hinweis');
+      return;
+    }
+
+    if (!this.otherUser || !this.otherUser.trim()) {
+      console.log('otherUser is empty!');
+      this.toastr.error('Chat-Partner nicht verfügbar. Bitte laden Sie die Seite neu.', 'Fehler');
+      return;
+    }
+
+    // Check if user is authenticated
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      console.error('No user found in localStorage');
+      this.toastr.error('Sie sind nicht eingeloggt. Bitte melden Sie sich erneut an.', 'Authentifizierungsfehler');
+      return;
+    }
+
+    try {
+      const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+      if (!authResponse.token) {
+        console.error('No token found in user data');
+        this.toastr.error('Ungültiger Token. Bitte melden Sie sich erneut an.', 'Authentifizierungsfehler');
+        return;
+      }
+      console.log('User authenticated:', authResponse.kundeDTO?.userName);
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      this.toastr.error('Fehler beim Lesen der Benutzerdaten. Bitte melden Sie sich erneut an.', 'Authentifizierungsfehler');
+      return;
+    }
+
+    // Double-check that otherUser is still valid
+    console.log('Final otherUser check before sending:', this.otherUser);
+
+    const messageContent = this.newMessage.trim();
+    const request: SendMessageRequest = {
+      receiverUsername: this.otherUser,
+      content: messageContent,
+      rideRequestId: this.rideRequestId || undefined
+    };
+
+    console.log('Sending message request:', request);
+
+    // Create temporary message for immediate display (like WhatsApp)
+    const tempMessage: ChatMessage = {
+      id: Date.now(), // Temporary ID
+      content: messageContent,
+      senderUsername: this.currentUser,
+      receiverUsername: this.otherUser,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      status: MessageStatus.SENT,
+      isEditable: true,
+      rideRequestId: this.rideRequestId
+    };
+
+    // Add message immediately to the list (like WhatsApp)
+    this.messages.push(tempMessage);
+    this.newMessage = '';
+
+    // Scroll to bottom to show the new message
+    setTimeout(() => this.scrollToBottom(), 100);
+
+    // Send to server
+    this.chatService.sendMessage(request).subscribe({
+      next: (message) => {
+        console.log('Message sent successfully:', message);
+        // Replace temporary message with real one from server
+        const tempIndex = this.messages.findIndex(m => m.id === tempMessage.id);
+        if (tempIndex !== -1) {
+          this.messages[tempIndex] = message;
+        }
+        this.toastr.success('Nachricht gesendet', 'Erfolg');
+      },
+      error: (error) => {
+        console.error('Error sending message:', error);
+        console.error('Error status:', error.status);
+        console.error('Error message:', error.message);
+
+        // Remove temporary message if sending failed
+        const tempIndex = this.messages.findIndex(m => m.id === tempMessage.id);
+        if (tempIndex !== -1) {
+          this.messages.splice(tempIndex, 1);
+        }
+
+        // Handle specific error cases
+        if (error.status === 403) {
+          this.toastr.error('Zugriff verweigert. Bitte melden Sie sich erneut an.', 'Authentifizierungsfehler');
+        } else if (error.status === 401) {
+          this.toastr.error('Nicht autorisiert. Bitte melden Sie sich erneut an.', 'Authentifizierungsfehler');
+        } else {
+          this.toastr.error('Fehler beim Senden der Nachricht', 'Fehler');
+        }
+      }
+    });
   }
 
-  sendMessage() {
-    if (this.messageContent) {
-      const messageRequest: MessageRequest = {
-        chatId: this.selectedChat.id,
-        senderId: this.getSenderId(),
-        receiverId: this.getReceiverId(),
-        content: this.messageContent,
-        type: 'TEXT',
-      };
-      this.messageService.saveMessage(
-        messageRequest
-      ).subscribe({
-        next: () => {
-          const message: MessageResponse = {
-            senderId: this.getSenderId(),
-            receiverId: this.getReceiverId(),
-            content: this.messageContent,
-            type: 'TEXT',
-            state: 'SENT',
-            createdAt: new Date().toString()
-          };
-          this.selectedChat.lastMessage = this.messageContent;
-          this.chatMessages.push(message);
-          this.messageContent = '';
-          this.showEmojis = false;
+  startEditing(message: ChatMessage): void {
+    if (!this.chatService.isMessageEditable(message)) {
+      return;
+    }
+
+    this.editingMessageId = message.id;
+    this.editingContent = message.content;
+
+    setTimeout(() => {
+      this.messageInput?.nativeElement?.focus();
+    }, 100);
+  }
+
+  saveEdit(): void {
+    if (!this.editingMessageId || !this.editingContent.trim()) {
+      this.cancelEdit();
+      return;
+    }
+
+    const request: EditMessageRequest = {
+      messageId: this.editingMessageId,
+      newContent: this.editingContent.trim()
+    };
+
+    this.chatService.editMessage(request).subscribe({
+      next: (updatedMessage) => {
+        this.cancelEdit();
+        this.toastr.success('Nachricht bearbeitet', 'Erfolg');
+      },
+      error: (error) => {
+        console.error('Error editing message:', error);
+        this.toastr.error('Fehler beim Bearbeiten der Nachricht', 'Fehler');
+      }
+    });
+  }
+
+  cancelEdit(): void {
+    this.editingMessageId = null;
+    this.editingContent = '';
+  }
+
+  deleteMessage(message: ChatMessage): void {
+    if (!this.chatService.isMessageDeletable(message)) {
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: 'Möchten Sie diese Nachricht wirklich löschen?',
+      accept: () => {
+        this.chatService.deleteMessage(message.id).subscribe({
+          next: () => {
+            this.toastr.success('Nachricht gelöscht', 'Erfolg');
+          },
+          error: (error) => {
+            console.error('Error deleting message:', error);
+            this.toastr.error('Fehler beim Löschen der Nachricht', 'Fehler');
+          }
+        });
+      }
+    });
+  }
+
+  markMessageAsRead(message: ChatMessage): void {
+    if (message.senderUsername !== this.currentUser && message.status !== MessageStatus.READ) {
+      this.chatService.markMessageAsRead(message.id).subscribe({
+        error: (error) => {
+          console.error('Error marking message as read:', error);
         }
       });
     }
   }
 
-  keyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
+  isOwnMessage(message: ChatMessage): boolean {
+    return message.senderUsername === this.currentUser;
+  }
+
+  isMessageEditable(message: ChatMessage): boolean {
+    return this.chatService.isMessageEditable(message);
+  }
+
+  isMessageDeletable(message: ChatMessage): boolean {
+    return this.chatService.isMessageDeletable(message);
+  }
+
+  getStatusText(status: MessageStatus): string {
+    return this.chatService.getStatusText(status);
+  }
+
+  getStatusClass(status: MessageStatus): string {
+    switch (status) {
+      case MessageStatus.SENT:
+        return 'status-sent';
+      case MessageStatus.DELIVERED:
+        return 'status-delivered';
+      case MessageStatus.READ:
+        return 'status-read';
+      default:
+        return 'status-unknown';
+    }
+  }
+
+  getStatusIcon(status: MessageStatus): string {
+    switch (status) {
+      case MessageStatus.SENT:
+        return 'pi-check';
+      case MessageStatus.DELIVERED:
+        return 'pi-check-double';
+      case MessageStatus.READ:
+        return 'pi-check-double status-read';
+      default:
+        return 'pi-clock';
+    }
+  }
+
+  formatTime(date: Date): string {
+    return new Date(date).toLocaleTimeString('de-DE', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  private scrollToBottom(): void {
+    if (this.messageContainer) {
+      const element = this.messageContainer.nativeElement;
+      element.scrollTop = element.scrollHeight;
+    }
+  }
+
+  onKeyPress(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
       this.sendMessage();
     }
   }
 
-  onSelectEmojis(emojiSelected: any) {
-    const emoji: EmojiData = emojiSelected.emoji;
-    this.messageContent += emoji.native;
+  trackByMessageId(index: number, message: ChatMessage): number {
+    return message.id;
   }
-
-  onClick() {
-    this.setMessagesToSeen();
-  }
-
-  uploadMedia(target: EventTarget | null) {
-    const file = this.extractFileFromTarget(target);
-    if (!file) {
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (!reader.result) {
-        return;
-      }
-
-      // 1) extract the base64 payload for your local-preview logic
-      const mediaLines = (reader.result as string).split(',')[1];
-
-      // 2) optimistically add a “sending” message to the UI
-      const tempMessage: MessageResponse = {
-        senderId: this.getSenderId(),
-        receiverId: this.getReceiverId(),
-        content: 'Attachment',
-        type: 'IMAGE',
-        state: 'SENT',           // you could flip to 'SENT' or 'FAILED' later
-        media: [mediaLines],
-        createdAt: new Date().toString()
-      };
-      this.chatMessages.push(tempMessage);
-
-      // 3) actually send the file via your service’s new signature
-      this.messageService
-        .uploadMedia(this.selectedChat.id as string, file)
-        .subscribe({
-          next: () => {
-            // on success flip the state on your temp message:
-            tempMessage.state = 'SENT';
-          },
-          error: () => {
-
-
-          }
-        });
-    };
-
-    // kick off the DataURL‐read (needed for your preview logic)
-    reader.readAsDataURL(file);
-  }
-
-
-  startseite() {
-    this.router.navigate(['/home']);
-
-  }
-
-  editProfile() {
-    this.router.navigate(['/edit-profile']);
-
-  }
-
-  logout() {
-    localStorage.removeItem('user');
-    this.router.navigate(['/welcome']);
-    this.WebSocketService.disconnect();
-
-  }
-
-  fahrtangebote(){
-    this.router.navigate(['/fahrtangebote']);
-  }
-
-  driverdashboard(){
-    this.router.navigate(['/driverdashboard']);
-  }
-
-  profile() {
-    this.router.navigate(['/profile']);
-
-  }
-
-  private setMessagesToSeen() {
-    this.messageService.setMessageToSeen(this.selectedChat.id as string).subscribe({
-      next: () => {
-      }
-    });
-  }
-
-  private getAllChats() {
-    this.chatService.getChatsByReceiver()
-      .subscribe({
-        next: (res) => {
-          this.chats = res;
-        }
-      });
-  }
-
-  private getAllChatMessages(chatId: string) {
-    this.messageService.getAllMessages(chatId).subscribe({
-      next: (messages) => {
-        this.chatMessages = messages;
-      }
-    });
-  }
-
-  // private initWebSocket() {
-  //   if (this.keycloakService.keycloak.tokenParsed?.sub) {
-  //     let ws = new SockJS('http://localhost:8080/ws');
-  //     this.socketClient = Stomp.over(ws);
-  //     const subUrl = `/user/${this.keycloakService.keycloak.tokenParsed?.sub}/chat`;
-  //     this.socketClient.connect({'Authorization': 'Bearer ' + this.keycloakService.keycloak.token},
-  //       () => {
-  //         this.notificationSubscription = this.socketClient.subscribe(subUrl,
-  //           (message: any) => {
-  //             const notification: Notification = JSON.parse(message.body);
-  //             this.handleNotification(notification);
-  //
-  //           },
-  //           () => console.error('Error while connecting to webSocket')
-  //         );
-  //       }
-  //     );
-  //   }
-  // }
-
-  // private handleNotification(notification: Notification) {
-  //   if (!notification) return;
-  //   if (this.selectedChat && this.selectedChat.id === notification.chatId) {
-  //     switch (notification.type) {
-  //       case 'MESSAGE':
-  //       case 'IMAGE':
-  //         const message: MessageResponse = {
-  //           senderId: notification.senderId,
-  //           receiverId: notification.receiverId,
-  //           content: notification.content,
-  //           type: notification.messageType,
-  //           media: notification.media,
-  //           createdAt: new Date().toString()
-  //         };
-  //         if (notification.type === 'IMAGE') {
-  //           this.selectedChat.lastMessage = 'Attachment';
-  //         } else {
-  //           this.selectedChat.lastMessage = notification.content;
-  //         }
-  //         this.chatMessages.push(message);
-  //         break;
-  //       case 'SEEN':
-  //         this.chatMessages.forEach(m => m.state = 'SEEN');
-  //         break;
-  //     }
-  //   } else {
-  //     const destChat = this.chats.find(c => c.id === notification.chatId);
-  //     if (destChat && notification.type !== 'SEEN') {
-  //       if (notification.type === 'MESSAGE') {
-  //         destChat.lastMessage = notification.content;
-  //       } else if (notification.type === 'IMAGE') {
-  //         destChat.lastMessage = 'Attachment';
-  //       }
-  //       destChat.lastMessageTime = new Date().toString();
-  //       destChat.unreadCount! += 1;
-  //     } else if (notification.type === 'MESSAGE') {
-  //       const newChat: ChatResponse = {
-  //         id: notification.chatId,
-  //         senderId: notification.senderId,
-  //         receiverId: notification.receiverId,
-  //         lastMessage: notification.content,
-  //         name: notification.chatName,
-  //         unreadCount: 1,
-  //         lastMessageTime: new Date().toString()
-  //       };
-  //       this.chats.unshift(newChat);
-  //     }
-  //   }
-  // }
-
-  private getSenderId(): number {
-    if (this.selectedChat.senderId === this.senderid) {
-      return this.selectedChat.senderId ;
-    }
-    return this.selectedChat.receiverId || 0 ;
-  }
-
-  private getReceiverId(): number {
-    if (this.selectedChat.senderId === this.senderid) {
-      return this.selectedChat.receiverId || 0;
-    }
-    return this.selectedChat.senderId || 0 ;
-  }
-
-  private scrollToBottom() {
-    if (this.scrollableDiv) {
-      const div = this.scrollableDiv.nativeElement;
-      div.scrollTop = div.scrollHeight;
-    }
-  }
-
-  private extractFileFromTarget(target: EventTarget | null): File | null {
-    const htmlInputTarget = target as HTMLInputElement;
-    if (target === null || htmlInputTarget.files === null) {
-      return null;
-    }
-    return htmlInputTarget.files[0];
-  }
-
-  trackByMessage(index: number, message: MessageResponse): number {
-    return message.id || 0;    // or return index if you don’t have a unique id
-  }
-
 }
