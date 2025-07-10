@@ -133,10 +133,20 @@ public class adress {
         Lng = lng;
     }
 
+
+    public boolean isIspassed() {
+        return ispassed;
+    }
+
+    public void setIspassed(boolean ispassed) {
+        this.ispassed = ispassed;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(houseNumberAndStreet, city, state, zip, country);
     }
+
 
     @Override
     public String toString() {

@@ -1940,10 +1940,18 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
         // 3) persist updated stop list
         localStorage.setItem('stops', JSON.stringify(this.stops));
+        console.log(stop.latlng)
         this.rideRequestService.setZwischenStoppAsPassed({
           lat: stop.latlng.lat,
           lng: stop.latlng.lng
-        }).subscribe();
+        }).subscribe({
+          next: () => {
+
+          },
+          error: (err) => {
+            console.log(err.message);
+          }
+        });
 
         // 4) notify the user
         this.toastr.info(

@@ -24,9 +24,7 @@ public class rideRequesteController {
     private HttpInterpreter httpInterpreter;
 
 
-    public record latlng() {
 
-    }
 
 
     @GetMapping("getAllRideRequestsForUser")
@@ -101,5 +99,12 @@ public class rideRequesteController {
     public void liveEdit(@RequestBody rideEditDto rideEditDto) {
         service.liveEdit(rideEditDto);
     }
+
+
+    @PutMapping("/markAsPassed/{lat}/{lng}")
+    public void markasPassed(@PathVariable double lat, @PathVariable double lng) {
+        service.markAsPassed(lat, lng);
+    }
+
 
 }

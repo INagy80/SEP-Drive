@@ -1087,7 +1087,37 @@ public class rideRequestService {
     }
 
 
+    @Transactional
+    public void markAsPassed(Double lat, Double lng) {
+        user current = httpInterpreter.Interpreter();
+        rideRequest aktiveRide = rideRequestDAO.findByCustomerId(current.getId()).stream().filter(r -> r.getStatus().equals(RequestStatus.Assigned)).findFirst().orElse(null);
 
+        if (aktiveRide == null) {
+            throw new RuntimeException("No ride found for this ride");
+        }
+
+        List<adress> Stops = aktiveRide.getZwischenstops();
+
+
+
+        for (adress stop : Stops) {
+
+            Double stopLat3 = round3(stop.getLat().doubleValue());
+            Double stopLng3 = round3(stop.getLng().doubleValue());
+            Double targetLat3 = round3(lat);
+            Double targetLng3 = round3(lng);
+
+            if (stopLat3 == targetLat3 && stopLng3 == targetLng3) {
+                stop.setIspassed(true);
+                adressDAO.save(stop);
+            }
+        }
+
+    }
+
+    private Double round3(double value) {
+        return Math.round(value * 1_000d) / 1_000d;
+    }
 }
 
 

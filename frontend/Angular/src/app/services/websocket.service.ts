@@ -12,6 +12,7 @@ import {FahrtAngeboteComponent} from '../components/fahrt-angebote/fahrt-angebot
 import { RefreshService } from './refresh-service';
 import { SimulationUpdate } from '../models/simulation-state.model';
 import { ChatMessage } from '../models/chat-message.model';
+import { ChatService } from './chat.service';
 
 @Injectable({ providedIn: 'root' })
 export class WebsocketService {
@@ -44,7 +45,7 @@ export class WebsocketService {
     private rideRequestService : RideRequestService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private http: HttpClient,
-    private refresh: RefreshService
+    private refresh: RefreshService,
   ) {
 
   }
@@ -141,6 +142,7 @@ export class WebsocketService {
           console.log('📨 Received new chat message:', chatMessage);
           this.chatMessageSubject.next(chatMessage);
           this.toaster.info(`Neue Nachricht von ${chatMessage.senderUsername}`, 'Chat');
+          this.refresh.refreshReadMessage();
         }
       );
     }

@@ -68,6 +68,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       }
     });
 
+
+    this.refresh.refreshreadMessage$.subscribe(() =>{
+      if(this.chatService.isChatOpen){
+        this.chatService.markallMessagesAsRead().subscribe();
+      }
+    })
+
     // Ensure WebSocket connection
     this.chatService.ensureWebSocketConnection();
 
@@ -212,6 +219,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     this.chatService.sendMessage(request).subscribe({
       next: (message) => {
         console.log('Message sent successfully:', message);
+        this.chatService.markallMessagesAsRead().subscribe(
+
+        );
         // Replace temporary message with real one from server
         const tempIndex = this.messages.findIndex(m => m.id === tempMessage.id);
         if (tempIndex !== -1) {
@@ -255,56 +265,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     }, 100);
   }
 
-  saveEdit(): void {
-    if (!this.editingMessageId || !this.editingContent.trim()) {
-      this.cancelEdit();
-      return;
-    }
 
-    const request: EditMessageRequest = {
-      messageId: this.editingMessageId,
-      newContent: this.editingContent.trim()
-    };
-
-    this.chatService.editMessage(request).subscribe({
-      next: (updatedMessage) => {
-        this.cancelEdit();
-        this.toastr.success('Nachricht bearbeitet', 'Erfolg');
-        this.refresh.refreshChat();
-      },
-      error: (error) => {
-        console.error('Error editing message:', error);
-        this.toastr.error('Fehler beim Bearbeiten der Nachricht', 'Fehler');
-      }
-    });
-  }
 
   cancelEdit(): void {
     this.editingMessageId = null;
     this.editingContent = '';
   }
 
-  deleteMessage(message: ChatMessage): void {
-    if (this.chatService.isMessageDeletable(message)) {
-      return;
-    }
 
-    this.confirmationService.confirm({
-      message: 'Möchten Sie diese Nachricht wirklich löschen?',
-      accept: () => {
-        this.chatService.deleteMessage(message.id).subscribe({
-          next: () => {
-            this.toastr.success('Nachricht gelöscht', 'Erfolg');
-            this.refresh.refreshChat();
-          },
-          error: (error) => {
-            console.error('Error deleting message:', error);
-            this.toastr.error('Fehler beim Löschen der Nachricht', 'Fehler');
-          }
-        });
-      }
-    });
-  }
 
   markMessageAsRead(message: ChatMessage): void {
     if (
@@ -388,4 +356,51 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   trackByMessageId(index: number, message: ChatMessage): number {
     return message.id;
   }
+
+  deleteMessage(message: ChatMessage): void {
+    if (this.chatService.isMessageDeletable(message)) {
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: 'Möchten Sie diese Nachricht wirklich löschen?',
+      accept: () => {
+        this.chatService.deleteMessage(message.id).subscribe({
+          next: () => {
+            this.toastr.success('Nachricht gelöscht', 'Erfolg');
+            this.refresh.refreshChat();
+          },
+          error: (error) => {
+            console.error('Error deleting message:', error);
+            this.toastr.error('Fehler beim Löschen der Nachricht', 'Fehler');
+          }
+        });
+      }
+    });
+  }
+
+  saveEdit(): void {
+    if (!this.editingMessageId || !this.editingContent.trim()) {
+      this.cancelEdit();
+      return;
+    }
+
+    const request: EditMessageRequest = {
+      messageId: this.editingMessageId,
+      newContent: this.editingContent.trim()
+    };
+
+    this.chatService.editMessage(request).subscribe({
+      next: (updatedMessage) => {
+        this.cancelEdit();
+        this.toastr.success('Nachricht bearbeitet', 'Erfolg');
+        this.refresh.refreshChat();
+      },
+      error: (error) => {
+        console.error('Error editing message:', error);
+        this.toastr.error('Fehler beim Bearbeiten der Nachricht', 'Fehler');
+      }
+    });
+  }
+
 }

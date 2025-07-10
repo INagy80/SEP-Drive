@@ -74,7 +74,7 @@ export class RideRequestService {
   }
 
   setZwischenStoppAsPassed(stop: LatLng): Observable<any> {
-    return this.http.put(`${this.rideRequestUrl}/markAsPassed`, {stop});
+    return this.http.put(`${this.rideRequestUrl}/markAsPassed/${stop.lat}/${stop.lng}`, {});
   }
 
 }
