@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/leaderboard")
+@RequestMapping("v1/leaderboard")
 public class leaderboardController {
 
     @Autowired
     private leaderboardService leaderboardService;
 
     @GetMapping
-    public List<Map<String, Object>> getLeaderboard() {
+    public List<leaderboardDTO> getLeaderboard() {
         return leaderboardService.getLeaderboard();
     }
 }
