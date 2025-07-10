@@ -2,20 +2,15 @@ package com.example.SEPDrive.service;
 
 import com.example.SEPDrive.controller.OffersDTO;
 import com.example.SEPDrive.controller.fahrerDTO;
-import com.example.SEPDrive.controller.rideResponseDTO;
-import com.example.SEPDrive.exceptions.duplicatResourceException;
 import com.example.SEPDrive.exceptions.resourceNotFoundException;
 import com.example.SEPDrive.model.*;
 import com.example.SEPDrive.repository.driverOfferDAO;
-import com.example.SEPDrive.repository.rideRequestDAO;
-import com.example.SEPDrive.repository.userDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class offerService {
