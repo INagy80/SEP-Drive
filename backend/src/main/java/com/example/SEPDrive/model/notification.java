@@ -1,5 +1,6 @@
 package com.example.SEPDrive.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Builder;
 
@@ -25,9 +26,11 @@ public class notification {
     @Column(nullable = false, length = 10)
     private notificationStatus status = notificationStatus.UNREAD ;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
