@@ -2645,6 +2645,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           this.WebSocketService.sendSimulationUpdate(update.rideId, update,false);
         }
 
+        if(this.simulationPaused){
+          this.pauseSimulation()
+        }else{
+          this.resumeSimulation()
+        }
+
       },
       error: error => {
         console.log(error);
