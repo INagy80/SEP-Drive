@@ -28,8 +28,9 @@ export class RegisterComponent {
 
 
   kunde: kundeDto = {
+    id: 0,
     profilePhoto: undefined,
-    userName: 'Bashar',
+    userName: 'Ibrahim',
     firstName: '',
     lastName: '',
     email: '',

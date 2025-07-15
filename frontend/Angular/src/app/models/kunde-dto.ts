@@ -1,5 +1,6 @@
 export interface kundeDto {
 
+  id: number;
   profilePhoto?: FormData;
   userName?: string;
   firstName?: string;
@@ -9,5 +10,7 @@ export interface kundeDto {
   password?: string;
   dtype : 'Kunde' ;
   carClass?: string;
+  online?: true;
+  lastSeen?: '213-05-2025';
 
 }

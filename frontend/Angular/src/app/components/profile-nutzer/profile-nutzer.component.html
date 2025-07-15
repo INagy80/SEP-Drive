@@ -55,6 +55,16 @@
     <a routerLink="/search-profile" class="search-button">
       <span class="pi pi-search"></span>
     </a>
+    <a routerLink="/leaderboard" class="search-button">
+      <div class="icons gap-2">
+        <img  src="/assets/icons/podium.png">
+      </div>
+    </a>
+    <a routerLink="/statistics" class="search-button" *ngIf="isdriver">
+      <div class="icons gap-2">
+        <img  src="/assets/icons/statistics.png">
+      </div>
+    </a>
   </div>
 
   <div class="profile-left">
