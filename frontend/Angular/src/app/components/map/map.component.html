@@ -84,11 +84,42 @@
         />
         {{ simulationSpeedFactor.toFixed(1) }}× ({{((simrouteDurationMin/ simulationSpeedFactor)).toFixed(2) }} min)
       </label>
+
       <button class="p-2 mt-3 mb-3" style="height: 40px ; width: 110px  " (click)="enableAutoZoom();enableAutoZoom()">🔍 Focus</button>
-      <button  class="p-2 mt-3 mb-3" style="height: 40px ; width: 110px" (click)="toggleSimulation()">
+      <button  class="p-2 mt-3 mb-3 mr-0" style="height: 40px ; width: 110px" (click)="toggleSimulation()">
         {{ simulationPaused ? 'Weiterfahren' : 'Pause' }}
       </button>
+      <p-button class="mt-2 mb-4 ml-0" (click)="toggeleditsimulation()"*ngIf="!isdriver">
+        <div class="icons gap-2">
+          <img  src="/assets/icons/cogwheel.png">
+        </div>
+      </p-button>
     </div>
+
+    <div class="simulation-edit " *ngIf="iseditDropdownopen">
+
+      <div class="control-group">
+        <label for="zielAddress">Zieladresse:</label>
+        <input type="text" style="width: 22rem" [(ngModel)]="editedZieladdress"  (ngModelChange)="onSimZielAddressChange($event)" placeholder="Zieladresse eingeben" />
+      </div>
+
+      <div class="control-group">
+        <label for="zwischenstopps">Zwischenstopps:</label>
+        <textarea style="width: 22rem" [(ngModel)]="editedZwischenstopps"  (ngModelChange)="onSimZwischenStoppsChange($event)" placeholder="Zwischenstopps eingeben (eine Adresse pro Zeile)"></textarea>
+      </div>
+
+      <div class="" style="position: absolute ;left: 20px; top: 65%">
+        <p-button class="mt-2 mb-4 ml-0 " (click)="applyEdit()">
+          <div class="icons gap-2">
+            <p >Apply the edit</p>
+            <img  src="/assets/icons/cogwheel.png">
+          </div>
+        </p-button>
+      </div>
+
+    </div>
+
+
     <div #simulationMapContainer class="map-container"></div>
 
 
@@ -203,6 +234,17 @@
               </div>
             </div>
             <button class="delete-button" (click)="statusdelete(activeRequest)">Löschen</button>
+
+            <!-- Chat Button for Active Rides -->
+            <button
+              *ngIf="activeRequest && (activeRequest.status === 'Assigned' || activeRequest.status === 'Active')"
+              class="chat-button"
+              (click)="openChat(activeRequest)"
+              title="Mit Fahrer/Kunde chatten"
+            >
+              <i class="pi pi-comments"></i>
+              Chat öffnen
+            </button>
 
             <br><br>
 
@@ -373,8 +415,22 @@
       </section>
     </div>
 
-
-
+    <!-- Chat Component -->
+    <div *ngIf="showChat" class="chat-overlay">
+      <div class="chat-modal">
+        <div class="chat-header">
+          <h3>Chat mit {{ chatOtherUser }}</h3>
+          <button class="close-chat" (click)="closeChat()">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+        <app-chat
+          [otherUser]="chatOtherUser"
+          [rideRequestId]="activeRequest?.id ?? null"
+          (closeChat)="closeChat()">
+        </app-chat>
+      </div>
+    </div>
 
 </p-drawer>
 
