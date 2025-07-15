@@ -28,7 +28,14 @@ export class RefreshService {
   refreshStartSimulationEnds$ = this._refreshStartSimulationEnds.asObservable();
 
 
+  private _refreshEditSimulation = new Subject<void>();
+  refreshEditSimulation$ = this._refreshEditSimulation.asObservable();
 
+  private _refreshchat = new Subject<void>();
+  refreshchat$ = this._refreshchat.asObservable();
+
+  private _refreshreadMessage = new Subject<void>();
+  refreshreadMessage$ = this._refreshreadMessage.asObservable();
 
 
 
@@ -59,6 +66,18 @@ export class RefreshService {
 
   notifyStartSimulationEnds() {
     this._refreshStartSimulationEnds.next();
+  }
+
+  refreshEditSimulation() {
+    this._refreshEditSimulation.next();
+  }
+
+  refreshChat(){
+    this._refreshchat.next();
+  }
+
+  refreshReadMessage(){
+    this._refreshreadMessage.next();
   }
 
 }

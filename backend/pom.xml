@@ -122,6 +122,12 @@
 			<version>2.15.2</version>     <!-- match your Jackson version -->
 		</dependency>
 
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-parameter-names</artifactId>
+			<version>2.15.2</version>  <!-- match your Jackson version -->
+		</dependency>
+
 <!--		<dependency>-->
 <!--			<groupId>org.flywaydb</groupId>-->
 <!--			<artifactId>flyway-core</artifactId>-->
@@ -157,7 +163,6 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
 			<version>1.18.30</version>
 			<scope>provided</scope>
 		</dependency>
@@ -180,6 +185,12 @@
 			<version>9.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.17.0</version>
+		</dependency>
+
 
 
 	</dependencies>
@@ -194,7 +205,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-
+							<version>1.18.30</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>

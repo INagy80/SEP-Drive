@@ -124,7 +124,6 @@ export class DriverdashboardComponent implements AfterViewInit, OnDestroy {
   routeDistanceKm : number = 0;
   routeDurationMin : number = 0;
   routePriceInEuro: number = 0;
-
   driverstartAddress = '';
 
 

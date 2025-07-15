@@ -52,6 +52,7 @@ export const appConfig: ApplicationConfig = {
       GoogleMapsModule,
       BrowserAnimationsModule,
       MatSidenavModule,
+
       ToastrModule.forRoot({
         progressBar: true,
         closeButton: true,

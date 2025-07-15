@@ -7,6 +7,7 @@ import com.example.SEPDrive.model.Kunde;
 import com.example.SEPDrive.model.geldKonto;
 import com.example.SEPDrive.model.user;
 import com.example.SEPDrive.repository.userDAO;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -40,6 +41,7 @@ public class registerService {
     }
 
     //@EventListener(ApplicationReadyEvent.class)
+    @Transactional
     public boolean register(user user) {
         if (userDao.existsUserByEmail(user.getEmail().toLowerCase())) {
             throw new duplicatResourceException("This email already exists");
@@ -54,8 +56,10 @@ public class registerService {
             user.setIsemailVerified(false);
             user.setTwoFA(new Random().nextInt(900000) + 100000);
             user.setEmail(user.getEmail().toLowerCase());
-            userDao.save(user);
             user.setGeldKonto(new geldKonto(user));
+            if(user.getGeldKonto() == null) {
+                throw new RuntimeException("Geld konto missing");
+            }
             userDao.save(user);
             emailSenderService.sendEmail(user.getEmail(), "SEPDrive Verification Code",
                     "Hello "+ user.getFirstName()+" "+user.getLastName()+", \n \n" +"Your verification code is:  " + user.getTwoFA() + ". \n \n \n Best regards,\n SEPDrive ");
@@ -81,6 +85,7 @@ public class registerService {
         }
     }
 
+    @Transactional
     public boolean addWithImage(user user, MultipartFile image, String filename) throws IOException {
         if (userDao.existsUserByEmail(user.getEmail().toLowerCase())) {
             throw new duplicatResourceException("This email already exists");

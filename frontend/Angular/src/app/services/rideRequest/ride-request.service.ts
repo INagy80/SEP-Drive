@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import {environment} from '../../../eviroments/environment';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {rideRequestDTO} from '../../models/rideRequestDTO';
+import {edit, rideRequestDTO} from '../../models/rideRequestDTO';
 import {rideResponse} from '../../models/rideResponse';
 import {SimulationUpdate} from '../../models/simulation-state.model';
+import {LatLng} from '../../models/rideRequestDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -66,6 +67,14 @@ export class RideRequestService {
   }
   refreshsumilation(id : number) : Observable<any> {
     return this.http.get<any>(`${this.simulationUrl}/refreshsumilation/${id}`,{});
+  }
+
+  liveEdit(edit: edit): Observable<any> {
+    return this.http.put(`${this.rideRequestUrl}/LiveEdit`, edit);
+  }
+
+  setZwischenStoppAsPassed(stop: LatLng): Observable<any> {
+    return this.http.put(`${this.rideRequestUrl}/markAsPassed/${stop.lat}/${stop.lng}`, {});
   }
 
 }

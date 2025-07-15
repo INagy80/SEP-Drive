@@ -11,7 +11,8 @@ import {HttpClient} from '@angular/common/http';
 import {FahrtAngeboteComponent} from '../components/fahrt-angebote/fahrt-angebote.component';
 import { RefreshService } from './refresh-service';
 import { SimulationUpdate } from '../models/simulation-state.model';
-
+import { ChatMessage } from '../models/chat-message.model';
+import { ChatService } from './chat.service';
 
 @Injectable({ providedIn: 'root' })
 export class WebsocketService {
@@ -20,9 +21,23 @@ export class WebsocketService {
 
   socketClient: any = null;
   private notificationSubscription: Stomp.Subscription | null = null;
+  private chatMessageSubscription: Stomp.Subscription | null = null;
+  private chatMessageUpdatedSubscription: Stomp.Subscription | null = null;
+  private chatMessageDeletedSubscription: Stomp.Subscription | null = null;
+  private chatMessageReadSubscription: Stomp.Subscription | null = null;
 
+  // Chat message subjects for real-time updates
+  private chatMessageSubject = new BehaviorSubject<ChatMessage | null>(null);
+  public chatMessage$ = this.chatMessageSubject.asObservable();
 
+  private chatMessageUpdatedSubject = new BehaviorSubject<ChatMessage | null>(null);
+  public chatMessageUpdated$ = this.chatMessageUpdatedSubject.asObservable();
 
+  private chatMessageDeletedSubject = new BehaviorSubject<number | null>(null);
+  public chatMessageDeleted$ = this.chatMessageDeletedSubject.asObservable();
+
+  private chatMessageReadSubject = new BehaviorSubject<number | null>(null);
+  public chatMessageRead$ = this.chatMessageReadSubject.asObservable();
 
   constructor(
     private toaster: ToastrService,
@@ -30,7 +45,7 @@ export class WebsocketService {
     private rideRequestService : RideRequestService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private http: HttpClient,
-    private refresh: RefreshService
+    private refresh: RefreshService,
   ) {
 
   }
@@ -88,22 +103,133 @@ export class WebsocketService {
               }else if(notification.title === 'deleted Ride Request!!'){
                 this.refresh.notifyOffersRefresh();
 
-              } else {
+              } else if(notification.title === 'Simulation Edited is Implemented!!' || notification.title === 'Simulation Edited!!'){
+                this.toaster.info(notification.message, notification.title);
+                if(notification.title === 'Simulation Edited is Implemented!!'){
+                  this.refresh.refreshSimulation();
+                }else{
+                  this.refresh.refreshEditSimulation();
+                }
+              }else if(notification.title === 'Refresh!!'){
+
+              }else if(notification.title === 'Chat!!'){
+                this.refresh.refreshChat();
+              }
+              else {
                 this.toaster.info(notification.message, notification.title);
                 this.refresh.notifyOffersRefresh();
               }
-
-
             }
           );
 
+        // Setup chat message subscriptions
+        this.setupChatSubscriptions(kundeDTO?.userName);
+
         }
-
-
       );
+    }
+  }
 
+  private setupChatSubscriptions(userName: string | undefined): void {
+    if (!userName) return;
+
+    // Subscribe to new chat messages
+    if (!this.chatMessageSubscription) {
+      this.chatMessageSubscription = this.socketClient.subscribe(
+        `/user/${userName}/chat/message`,
+        (message: any) => {
+          const chatMessage: ChatMessage = JSON.parse(message.body);
+          console.log('📨 Received new chat message:', chatMessage);
+          this.chatMessageSubject.next(chatMessage);
+          this.toaster.info(`Neue Nachricht von ${chatMessage.senderUsername}`, 'Chat');
+          this.refresh.refreshReadMessage();
+        }
+      );
     }
 
+    // Subscribe to message updates
+    if (!this.chatMessageUpdatedSubscription) {
+      this.chatMessageUpdatedSubscription = this.socketClient.subscribe(
+        `/user/${userName}/chat/message/updated`,
+        (message: any) => {
+          const chatMessage: ChatMessage = JSON.parse(message.body);
+          console.log('✏️ Received message update:', chatMessage);
+          this.chatMessageUpdatedSubject.next(chatMessage);
+        }
+      );
+    }
+
+    // Subscribe to message deletions
+    if (!this.chatMessageDeletedSubscription) {
+      this.chatMessageDeletedSubscription = this.socketClient.subscribe(
+        `/user/${userName}/chat/message/deleted`,
+        (message: any) => {
+          const messageId: number = JSON.parse(message.body);
+          console.log('🗑️ Received message deletion:', messageId);
+          this.chatMessageDeletedSubject.next(messageId);
+        }
+      );
+    }
+
+    // Subscribe to read receipts
+    if (!this.chatMessageReadSubscription) {
+      this.chatMessageReadSubscription = this.socketClient.subscribe(
+        `/user/${userName}/chat/message/read`,
+        (message: any) => {
+          const messageId: number = JSON.parse(message.body);
+          console.log('👁️ Received read receipt:', messageId);
+          this.chatMessageReadSubject.next(messageId);
+        }
+      );
+    }
+  }
+
+  // Chat WebSocket methods
+  sendChatMessage(receiverUsername: string, content: string, rideRequestId?: number): void {
+    if (!this.connected) {
+      console.warn('WebSocket not connected. Cannot send chat message.');
+      return;
+    }
+
+    const message = {
+      receiverUsername,
+      content,
+      rideRequestId
+    };
+
+    this.socketClient.send('/app/chat.send', {}, JSON.stringify(message));
+  }
+
+  editChatMessage(messageId: number, newContent: string): void {
+    if (!this.connected) {
+      console.warn('WebSocket not connected. Cannot edit chat message.');
+      return;
+    }
+
+    const message = {
+      messageId,
+      newContent
+    };
+
+    this.socketClient.send('/app/chat.edit', {}, JSON.stringify(message));
+  }
+
+  deleteChatMessage(messageId: number): void {
+    if (!this.connected) {
+      console.warn('WebSocket not connected. Cannot delete chat message.');
+      return;
+    }
+
+    this.socketClient.send('/app/chat.delete', {}, JSON.stringify(messageId));
+  }
+
+  markChatMessageAsRead(messageId: number): void {
+    if (!this.connected) {
+      console.warn('WebSocket not connected. Cannot mark message as read.');
+      return;
+    }
+
+    this.socketClient.send('/app/chat.read', {}, JSON.stringify(messageId));
   }
 
 
@@ -217,6 +343,27 @@ export class WebsocketService {
     if (this.notificationSubscription) {
       this.notificationSubscription.unsubscribe();
       this.notificationSubscription = null;
+    }
+
+    // Unsubscribe chat messages
+    if (this.chatMessageSubscription) {
+      this.chatMessageSubscription.unsubscribe();
+      this.chatMessageSubscription = null;
+    }
+
+    if (this.chatMessageUpdatedSubscription) {
+      this.chatMessageUpdatedSubscription.unsubscribe();
+      this.chatMessageUpdatedSubscription = null;
+    }
+
+    if (this.chatMessageDeletedSubscription) {
+      this.chatMessageDeletedSubscription.unsubscribe();
+      this.chatMessageDeletedSubscription = null;
+    }
+
+    if (this.chatMessageReadSubscription) {
+      this.chatMessageReadSubscription.unsubscribe();
+      this.chatMessageReadSubscription = null;
     }
 
     // Disconnect STOMP client

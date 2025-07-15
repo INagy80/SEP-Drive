@@ -3,7 +3,21 @@ export interface LatLng {
   lng: number;
 }
 
+export interface ZwischenStopp {
+  name: string;
+  latlng: LatLng;
+  ispassed: boolean;
+}
 
+export interface edit{
+  destination?: LatLng;
+  destinationaddress?: string;
+  zwischenstops?: LatLng[];
+  zwischenstopssaddress?: string[];
+  cost?: number;
+  duration?: number;
+  distance?: number;
+}
 
 export interface rideRequestDTO {
   distance: number;

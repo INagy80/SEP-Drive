@@ -1,0 +1,117 @@
+<app-header></app-header>
+
+<div class="navbar">
+  <div class="gap-6 navbar" style="width: 60vw; justify-content: space-around; align-items: center; right: 30vw; left: 15vw; position: absolute;">
+    <p-button (click)="logout()" class="nav-item">
+      <div class="icons gap-2">
+        <p style="font-size: 1.1rem">Abmelden</p>
+        <img src="/assets/icons/exit.png" />
+      </div>
+    </p-button>
+
+    <p-button *ngIf="isdriver" (click)="driverdashboard()" class="nav-item">
+      <div class="icons gap-2">
+        <p>Dashboard</p>
+        <img src="/assets/icons/route.png" />
+      </div>
+    </p-button>
+
+    <p-button (click)="fahrtangebote()" class="nav-item">
+      <div class="icons gap-2">
+        <p>FahrtAngebote</p>
+        <img src="/assets/icons/fahrtangebote.png" />
+      </div>
+    </p-button>
+
+    <p-button (click)="startseite()" class="nav-item">
+      <div class="icons gap-2">
+        <p>Startseite</p>
+        <img src="/assets/icons/home.png" />
+      </div>
+    </p-button>
+  </div>
+</div>
+<div class="flex flex-row " style="margin-left: 40%">
+  <div class="iconsL gap-2">
+    <img src="/assets/icons/star-medal.png" />
+  </div>
+ <h1 style="margin-left: 10px" >Fahrer Leaderboard</h1>
+  <div class="iconsL gap-2">
+    <img src="/assets/icons/star-medal.png" />
+  </div>
+</div>
+
+<div class="filter" style="margin-bottom: 1rem; margin-left: 10px">
+  <input
+    [(ngModel)]="suchbegriff"
+    placeholder="Nach Fahrernamen filtern"
+    (input)="resetPagination()"
+    style="width: 250px; padding: 0.4rem;"
+  />
+</div>
+
+<p-table class="ml-8"
+  [value]="gefilterteFahrer"
+  [paginator]="true"
+  [rows]="rows"
+  [rowsPerPageOptions]="[5,10,20]"
+  [autoLayout]="true"
+  [customSort]="true"
+  (sortFunction)="customSort($event)"
+  [first]="first"
+  (onPage)="pageChange($event)"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>
+        &nbsp; &nbsp;
+      </th>
+      <th pSortableColumn="username">
+        Benutzername
+        <p-sortIcon field="username"></p-sortIcon>
+      </th>
+      <th pSortableColumn="fullName">
+        Name
+        <p-sortIcon field="fullName"></p-sortIcon>
+      </th>
+      <th pSortableColumn="averageRating">
+        Bewertung
+        <p-sortIcon field="averageRating"></p-sortIcon>
+      </th>
+      <th pSortableColumn="totalDistanceKm">
+        Gesamtstrecke (km)
+        <p-sortIcon field="totalDistanceKm"></p-sortIcon>
+      </th>
+      <th pSortableColumn="totalDriveTimeSeconds">
+        Fahrzeit (min)
+        <p-sortIcon field="totalDriveTimeSeconds"></p-sortIcon>
+      </th>
+      <th pSortableColumn="totalRides">
+        Fahrten
+        <p-sortIcon field="totalRides"></p-sortIcon>
+      </th>
+      <th pSortableColumn="totalEarnings">
+        Verdientes Geld (€)
+        <p-sortIcon field="totalEarnings"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-fahrer>
+    <tr>
+      <td>&nbsp; &nbsp;</td>
+      <td (click)="otherProfileClicked(fahrer.username)" > {{ fahrer.username }}</td>
+      <td (click)="otherProfileClicked(fahrer.username)" >{{ fahrer.fullName }}</td>
+      <td>
+        <div class="flex flex-row">
+          <p-rating [ngModel]="fahrer.averageRating" [readonly]="true" [stars]="5"></p-rating>
+          <span style="margin-left: 4px">({{ fahrer.averageRating | number: '1.1-1' }})</span>
+        </div>
+      </td>
+      <td>{{ fahrer.totalDistanceKm  | number: '1.1-2' }}</td>
+      <td>{{ fahrer.totalDriveTime | number: '1.1-2' }}</td>
+      <td>{{ fahrer.totalRides }}</td>
+      <td>{{ fahrer.totalEarnings | currency: 'EUR' }}</td>
+    </tr>
+  </ng-template>
+</p-table>

@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -936,6 +937,167 @@ public class rideRequestService {
                 null
         ));
 
+    }
+
+
+
+    @Transactional
+    public void liveEdit(rideEditDto rideEditDto) {
+        user customer = httpInterpreter.Interpreter();
+
+        rideRequest aktiveRide = rideRequestDAO.findByCustomerId(customer.getId()).stream().filter(r -> r.getStatus().equals(RequestStatus.Assigned)).findFirst().orElse(null);
+
+        if (aktiveRide == null) {
+            throw new RuntimeException("Ride not found");
+        }
+
+        if (rideEditDto.cost() > customer.getGeldKonto().getBalance()){
+            throw new RuntimeException("there is no enough money for this ride");
+        }
+
+
+
+        List<LatLng> dtoStops     = rideEditDto.zwischenstops();
+        List<String> dtoAddresses = rideEditDto.zwischenstopssaddress();
+
+        int count = Math.min(dtoStops.size(), dtoAddresses.size());
+
+        List<adress> zwischenstops = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            LatLng ll = dtoStops.get(i);
+            String  s  = dtoAddresses.get(i);
+
+            adress a = new adress(ll.getLat(), ll.getLng());
+
+            String[] parts = s.split("\\s*,\\s*");
+            if (parts.length >= 5) {
+                a.setHouseNumberAndStreet(parts[0] + ", " + parts[1]);
+                a.setCity(parts[parts.length - 4]);
+                a.setState(parts[parts.length - 3]);
+                a.setZip(parts[parts.length - 2]);
+                a.setCountry(parts[parts.length - 1]);
+            } else {
+                // handle or log malformed addresses
+            }
+
+            zwischenstops.add(a);
+        }
+
+
+
+        adress destadress = new adress(rideEditDto.destination().getLat(), rideEditDto.destination().getLng());
+
+        String[] parts2 = rideEditDto.destinationaddress().split("\\s*,\\s*");
+        destadress.setHouseNumberAndStreet(parts2[0] + ", " + parts2[1]);
+        destadress.setCountry(parts2[parts2.length - 1]);
+        destadress.setZip(parts2[parts2.length - 2]);
+        destadress.setState(parts2[parts2.length - 3]);
+        destadress.setCity(parts2[parts2.length - 4]);
+
+
+        adressDAO.save(destadress);
+
+        List<adress> currentStops = aktiveRide.getZwischenstops();
+        currentStops.clear();
+        currentStops.addAll(zwischenstops);
+
+        aktiveRide.setDestAddress(destadress);
+        aktiveRide.setDuration(rideEditDto.duration());
+        aktiveRide.setCost(rideEditDto.cost());
+        aktiveRide.setDistance(rideEditDto.distance());
+
+        rideRequestDAO.save(aktiveRide);
+
+        user driver = aktiveRide.getDriver();
+
+        notification drivernote = new notification(
+                customer,
+                driver,
+                "Hello, "+customer.getFirstName()+" "+customer.getLastName()+ "\n"+".     have edited the live Simulation.",
+                "Simulation Edited!!",
+                aktiveRide
+        );
+        notificationDAO.save(drivernote);
+
+        notificationDTO notificationDTO = new notificationDTO(
+                drivernote.getId(),
+                new notificationpersonDTO(customer.getId(), customer.getUserName(),customer.getEmail(),customer.getFirstName(),customer.getLastName(),customer.getRating(),customer.getTotalRides()),
+                new notificationpersonDTO(driver.getId(), driver.getUserName(),driver.getEmail(),driver.getFirstName(),driver.getLastName(),driver.getRating(),driver.getTotalRides()),
+                drivernote.getStatus(),
+                drivernote.getCreatedAt(),
+                drivernote.getUpdatedAt(),
+                drivernote.getMessage(),
+                drivernote.getTitle(),
+                null,
+                0,
+                aktiveRide.getId(),
+                0.0,
+                null
+
+        );
+        notificationService.sendNotification(driver.getUserName(), notificationDTO);
+
+
+        notification customernote = new notification(
+                customer,
+                driver,
+                "your edit has been successfully Saved you can now complete your ride",
+                "Simulation Edited is Implemented!!",
+                aktiveRide
+        );
+        notificationDAO.save(customernote);
+
+        notificationDTO notificationDTO2 = new notificationDTO(
+                customernote.getId(),
+                new notificationpersonDTO(driver.getId(), driver.getUserName(),driver.getEmail(),driver.getFirstName(),driver.getLastName(),driver.getRating(),driver.getTotalRides()),
+                new notificationpersonDTO(customer.getId(), customer.getUserName(),customer.getEmail(),customer.getFirstName(),customer.getLastName(),customer.getRating(),customer.getTotalRides()),
+                customernote.getStatus(),
+                customernote.getCreatedAt(),
+                customernote.getUpdatedAt(),
+                customernote.getMessage(),
+                customernote.getTitle(),
+                null,
+                0,
+                aktiveRide.getId(),
+                0.0,
+                null
+
+        );
+        notificationService.sendNotification(customer.getUserName(), notificationDTO2);
+
+    }
+
+
+    @Transactional
+    public void markAsPassed(Double lat, Double lng) {
+        user current = httpInterpreter.Interpreter();
+        rideRequest aktiveRide = rideRequestDAO.findByCustomerId(current.getId()).stream().filter(r -> r.getStatus().equals(RequestStatus.Assigned)).findFirst().orElse(null);
+
+        if (aktiveRide == null) {
+            throw new RuntimeException("No ride found for this ride");
+        }
+
+        List<adress> Stops = aktiveRide.getZwischenstops();
+
+
+
+        for (adress stop : Stops) {
+
+            Double stopLat3 = round3(stop.getLat().doubleValue());
+            Double stopLng3 = round3(stop.getLng().doubleValue());
+            Double targetLat3 = round3(lat);
+            Double targetLng3 = round3(lng);
+
+            if (stopLat3 == targetLat3 && stopLng3 == targetLng3) {
+                stop.setIspassed(true);
+                adressDAO.save(stop);
+            }
+        }
+
+    }
+
+    private Double round3(double value) {
+        return Math.round(value * 1_000d) / 1_000d;
     }
 }
 
