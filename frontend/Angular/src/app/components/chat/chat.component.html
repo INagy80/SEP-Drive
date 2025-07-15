@@ -1,0 +1,151 @@
+<div class="chat-container">
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <div class="chat-header-content">
+      <div class="chat-user-info">
+        <div class="user-avatar">
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="user-details">
+          <h3 class="user-name">{{ otherUser || 'Chat' }}</h3>
+          <span class="user-status" *ngIf="otherUser">Online</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages Container -->
+  <div class="messages-container" #messageContainer>
+    <div class="messages-list">
+      <div
+        *ngFor="let message of messages; trackBy: trackByMessageId"
+        class="message-wrapper"
+        [ngClass]="{ 'own-message': isOwnMessage(message), 'other-message': !isOwnMessage(message) }"
+        (click)="markMessageAsRead(message)"
+      >
+        <!-- Avatar for other messages -->
+        <div *ngIf="!isOwnMessage(message)" class="message-avatar">
+          <i class="pi pi-user"></i>
+        </div>
+
+        <div class="message-bubble">
+          <!-- Message Content -->
+          <div class="message-content">
+            <div *ngIf="editingMessageId === message.id" class="edit-mode">
+              <input
+                #messageInput
+                type="text"
+                [(ngModel)]="editingContent"
+                class="edit-input"
+                (keyup.enter)="saveEdit()"
+                (keyup.escape)="cancelEdit()"
+                maxlength="500"
+              />
+              <div class="edit-actions">
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-check"
+                  class="p-button-sm p-button-success"
+                  (click)="saveEdit()"
+                  title="Speichern"
+                ></button>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-times"
+                  class="p-button-sm p-button-secondary"
+                  (click)="cancelEdit()"
+                  title="Abbrechen"
+                ></button>
+              </div>
+            </div>
+
+            <div *ngIf="editingMessageId !== message.id" class="message-text">
+              {{ message.content }}
+            </div>
+          </div>
+
+          <!-- Message Meta -->
+          <div class="message-meta">
+            <span class="message-time">{{ formatTime(message.createdAt) }}</span>
+            <span *ngIf="isOwnMessage(message)" class="message-status" [ngClass]="getStatusClass(message.status)">
+              <i class="pi" [ngClass]="getStatusIcon(message.status)"></i>
+            </span>
+          </div>
+
+          <!-- Message Actions (for own messages) -->
+          <div
+            *ngIf="isOwnMessage(message) && (isMessageEditable(message) || isMessageDeletable(message))"
+            class="message-actions-below"
+          >
+
+          </div>
+        </div>
+
+        <button
+          *ngIf="isMessageEditable(message)"
+          pButton
+          type="button"
+          icon="pi pi-pencil"
+          class="p-button-sm p-button-text"
+          (click)="startEditing(message)"
+          title="Bearbeiten"
+        ></button>
+        <button
+          *ngIf="isMessageDeletable(message)"
+          pButton
+          type="button"
+          icon="pi pi-trash"
+          class="p-button-sm p-button-text p-button-danger"
+          (click)="deleteMessage(message)"
+          title="Löschen"
+        ></button>
+
+        <!-- Avatar for own messages -->
+        <div *ngIf="isOwnMessage(message)" class="message-avatar own-avatar">
+          <i class="pi pi-user"></i>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="messages.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <i class="pi pi-comments"></i>
+        </div>
+        <p class="empty-text">Noch keine Nachrichten</p>
+        <p class="empty-subtext">Starten Sie eine Unterhaltung mit {{ otherUser }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Input -->
+  <div class="message-input-container">
+    <div class="input-wrapper">
+      <input
+        type="text"
+        [(ngModel)]="newMessage"
+        placeholder="Nachricht eingeben..."
+        class="message-input"
+        (keypress)="onKeyPress($event)"
+        maxlength="500"
+      />
+      <button
+        pButton
+        type="button"
+        icon="pi pi-send"
+        class="send-button"
+        [disabled]="!newMessage.trim()"
+        (click)="sendMessage()"
+        title="Senden"
+      ></button>
+    </div>
+    <div class="input-info">
+      <span class="char-count">{{ newMessage.length }}/500</span>
+      <span class="input-hint">Enter zum Senden, Shift+Enter für neue Zeile</span>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog>
