@@ -13,6 +13,9 @@ import {TwoFAAccessGard} from './services/guard/TwoFA-access-gard';
 import {OthersProfileComponent} from './components/others-profile/others-profile.component';
 import {DriverdashboardComponent} from './components/driverdashboard/driverdashboard.component';
 import {FahrtAngeboteComponent} from './components/fahrt-angebote/fahrt-angebote.component';
+import {ChatComponent} from './components/chat/chat.component';
+import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
+import {FahrtenAnalyseComponent} from './components/fahrten-analyse/fahrten-analyse.component';
 
 export const routes: Routes = [
   {path: '',           redirectTo: 'welcom', pathMatch: 'full'},
@@ -44,7 +47,11 @@ export const routes: Routes = [
 
   {path: 'fahrtangebote',    component: FahrtAngeboteComponent , canActivate: [AccessGuardService]},
 
+  {path: 'chat',    component: ChatComponent , canActivate: [AccessGuardService] },
 
+  {path: 'leaderboard', component: LeaderboardComponent , canActivate: [AccessGuardService]},
+
+  {path: 'statistics', component: FahrtenAnalyseComponent , canActivate: [AccessGuardService]},
 
 
 
