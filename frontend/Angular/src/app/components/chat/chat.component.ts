@@ -27,7 +27,7 @@ import { RefreshService } from '../../services/refresh-service';
     ScrollPanelModule,
     ConfirmDialogModule
   ],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService], //wird benutzt in delete() , um eine eigene Instanz zu verwenden innerhalb der Komponente
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
@@ -39,8 +39,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   currentUser: string = '';
   @Input() otherUser: string = '';
   newMessage: string = '';
-  editingMessageId: number | null = null;
-  editingContent: string = '';
+  editingMessageId: number | null = null; // id der bearbeiteten Nachricht
+  editingContent: string = ''; // inhalt der bearbeiteten Nachricht
   @Input() rideRequestId: number | null = null;
 
   private subscriptions: Subscription[] = [];
@@ -52,19 +52,21 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     private refresh: RefreshService,
   ) {}
 
+  //ngOnInit bereitet alles für den Chat vor: Benutzer laden, Nachrichten abonnieren, WebSocket aktivieren und Chatverlauf laden
   ngOnInit(): void {
     this.chatService.isChatOpen = true;
 
     this.loadCurrentUser();
     this.setupMessageSubscription();
 
-    this.refresh.refreshchat$.subscribe(() =>{
-      this.setupMessageSubscription();
-      this.chatService.ensureWebSocketConnection();
+    //Verbindung herstellen, Nachricht neu laden, verlauf laden
+    this.refresh.refreshchat$.subscribe(() =>{  //subscribe wird ausgeführt , aber wartet, erst bei next() wird der codeblock ausgeführt
+      this.setupMessageSubscription(); // Methode ladet nur neue Nachrichten, sorgt für Live-Updates
+      this.chatService.ensureWebSocketConnection(); //
 
       if (this.otherUser && this.otherUser.trim()) {
         console.log('otherUser already set in ngOnInit:', this.otherUser);
-        this.loadConversation(this.otherUser, this.rideRequestId || undefined);
+        this.loadConversation(this.otherUser, this.rideRequestId || undefined); //holt alte Nachrichten, gibt den Verlauf an
       }
     });
 
@@ -75,10 +77,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       }
     })
 
-    // Ensure WebSocket connection
     this.chatService.ensureWebSocketConnection();
 
-    // If otherUser is already set, load conversation immediately
+    // wenn benutzer bekannt ist, wird der Chat direkt angezeigt (verlauf)
     if (this.otherUser && this.otherUser.trim()) {
       console.log('otherUser already set in ngOnInit:', this.otherUser);
       this.loadConversation(this.otherUser, this.rideRequestId || undefined);
@@ -91,7 +92,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
 
   ngOnDestroy(): void {
     this.chatService.isChatOpen = false;
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.forEach(sub => sub.unsubscribe());  //dauerhaft Observables solange es aktiv ist
   }
 
   private loadCurrentUser(): void {
@@ -102,18 +103,17 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     }
   }
 
+  //ladet neue Nachrichten, aktiv/live und speichert sie im Array angezeigt
   private setupMessageSubscription(): void {
     const messageSub = this.chatService.messages$.subscribe(messages => {
       this.messages = messages;
       setTimeout(() => this.scrollToBottom(), 100);
     });
-
-    // Don't override otherUser from the conversation subscription
-    // as it can interfere with ride request chats
+    //im array speichern
     this.subscriptions.push(messageSub);
   }
 
-  // Watch for changes to otherUser input
+
   ngOnChanges(changes: any): void {
     if (changes['otherUser']) {
       console.log('otherUser changed to:', this.otherUser);
@@ -123,6 +123,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     }
   }
 
+  //ladet den passenden Chat-Verlauf
   loadConversation(otherUsername: string, rideRequestId?: number): void {
     console.log('Loading conversation with:', otherUsername, 'rideRequestId:', rideRequestId);
     this.otherUser = otherUsername;
@@ -139,7 +140,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       this.chatService.loadConversation(otherUsername);
     }
 
-    // Ensure otherUser is set correctly after loading
+    // Einfach zur Überprüfung ob das der Richtige Benutzer ist oder keine Fehler da sind
     console.log('otherUser after loading conversation:', this.otherUser);
   }
 
@@ -149,19 +150,21 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     console.log('newMessage:', this.newMessage);
     console.log('rideRequestId:', this.rideRequestId);
 
+    //Zeile verhindert für Server/Benutzer dass man leere Nachrichten kann
     if (!this.newMessage.trim()) {
       console.log('Message is empty!');
       this.toastr.warning('Bitte geben Sie eine Nachricht ein', 'Hinweis');
       return;
     }
 
+    //Existiert ein Benutzer?
     if (!this.otherUser || !this.otherUser.trim()) {
       console.log('otherUser is empty!');
       this.toastr.error('Chat-Partner nicht verfügbar. Bitte laden Sie die Seite neu.', 'Fehler');
       return;
     }
 
-    // Check if user is authenticated
+    // Wenn kein Benutzer existiert wird ein Fehler angezeigt
     const storedUser = localStorage.getItem('user');
     if (!storedUser) {
       console.error('No user found in localStorage');
@@ -169,24 +172,25 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
       return;
     }
 
-    try {
+    try { //code Teil der ein Fehler auslösen könnte
       const authResponse: AuthenticationResponse = JSON.parse(storedUser);
-      if (!authResponse.token) {
+      if (!authResponse.token) { //Token vorhanden -> Beweis dass ein Benutzer existiert
         console.error('No token found in user data');
         this.toastr.error('Ungültiger Token. Bitte melden Sie sich erneut an.', 'Authentifizierungsfehler');
         return;
       }
       console.log('User authenticated:', authResponse.kundeDTO?.userName);
-    } catch (error) {
+    } catch (error) { //fängt den Fehler
       console.error('Error parsing user data:', error);
       this.toastr.error('Fehler beim Lesen der Benutzerdaten. Bitte melden Sie sich erneut an.', 'Authentifizierungsfehler');
       return;
     }
 
-    // Double-check that otherUser is still valid
+    // Sicherheitscheck : richtiger Empfänger ?
     console.log('Final otherUser check before sending:', this.otherUser);
 
-    const messageContent = this.newMessage.trim();
+    //Objekt bauen für Backend mit den Infos der Nachricht
+    const messageContent = this.newMessage.trim(); //kontrolle ob da leerzeichen sind
     const request: SendMessageRequest = {
       receiverUsername: this.otherUser,
       content: messageContent,
@@ -195,34 +199,34 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
 
     console.log('Sending message request:', request);
 
-    // Create temporary message for immediate display (like WhatsApp)
+    // Temporäre Nachricht erzeugen, bis Id vom service kommt
     const tempMessage: ChatMessage = {
       id: Date.now(), // Temporary ID
       content: messageContent,
       senderUsername: this.currentUser,
       receiverUsername: this.otherUser,
-      createdAt: new Date(),
+      createdAt: new Date(), //Datum
       updatedAt: new Date(),
       status: MessageStatus.SENT,
       isEditable: true,
       rideRequestId: this.rideRequestId
     };
 
-    // Add message immediately to the list (like WhatsApp)
+    // in messages hinzufügen damit man anzeigen kann
     this.messages.push(tempMessage);
     this.newMessage = '';
 
     // Scroll to bottom to show the new message
     setTimeout(() => this.scrollToBottom(), 100);
 
-    // Send to server
+    // Mit subscribe() sende ich die Nachricht ans Backend. Bei Erfolg ersetze ich die temporäre Nachricht durch die echte, bei Fehler entferne ich sie wieder
     this.chatService.sendMessage(request).subscribe({
       next: (message) => {
         console.log('Message sent successfully:', message);
         this.chatService.markallMessagesAsRead().subscribe(
 
         );
-        // Replace temporary message with real one from server
+        // Temporäre message ersetzten durch echte
         const tempIndex = this.messages.findIndex(m => m.id === tempMessage.id);
         if (tempIndex !== -1) {
           this.messages[tempIndex] = message;
@@ -234,13 +238,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
         console.error('Error status:', error.status);
         console.error('Error message:', error.message);
 
-        // Remove temporary message if sending failed
+        // Server hat Fehler → Nachricht darf nicht einfach so stehen bleiben man löscht temporäre M.
         const tempIndex = this.messages.findIndex(m => m.id === tempMessage.id);
         if (tempIndex !== -1) {
-          this.messages.splice(tempIndex, 1);
+          this.messages.splice(tempIndex, 1); //anzahl wie viele Elemente gelöschten werden sollen; Array-Methode zum löschen
         }
 
-        // Handle specific error cases
+        // Wenn der Server (Backend) einen Fehler zurückschickt, fängt Angular HTTP das ab und übergibt es in error
         if (error.status === 403) {
           this.toastr.error('Zugriff verweigert. Bitte melden Sie sich erneut an.', 'Authentifizierungsfehler');
         } else if (error.status === 401) {
@@ -253,7 +257,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   }
 
   startEditing(message: ChatMessage): void {
-    if (this.chatService.isMessageEditable(message)) {
+    if (this.chatService.isMessageEditable(message)) { //überprüfen, ob man bearbeiten kann
       return;
     }
 
@@ -261,7 +265,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     this.editingContent = message.content;
 
     setTimeout(() => {
-      this.messageInput?.nativeElement?.focus();
+      this.messageInput?.nativeElement?.focus(); //focus() : Benutzer kann sofort lostippen, ohne extra klicken zu müssen
     }, 100);
   }
 
@@ -273,7 +277,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
   }
 
 
-
+//Nachrciht als gelesen makieren, wenn der Benutzer es gelesen hat
   markMessageAsRead(message: ChatMessage): void {
     if (
       this.chatService.isChatOpen &&
@@ -292,6 +296,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     return message.senderUsername === this.currentUser;
   }
 
+  //Prüfen, ob Nachricht bearbeitet/gelöscht werden  darf
   isMessageEditable(message: ChatMessage): boolean {
     return this.isOwnMessage(message) && (message.status !== MessageStatus.READ);
   }
@@ -332,6 +337,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     }
   }
 
+  //Sie formatiert ein Datum (Timestamp) in eine lesbare Uhrzeit, damit es  neben einer Nachricht angezeigt werden kann.
   formatTime(date: Date): string {
     return new Date(date).toLocaleTimeString('de-DE', {
       hour: '2-digit',
@@ -346,13 +352,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     }
   }
 
+  //Mit onKeyPress steuere ich, dass Enter die Nachricht sofort abschickt, aber Shift+Enter eine neue Zeile erzeug
   onKeyPress(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
+      event.preventDefault(); //Verhindert, dass der Browser standardmäßig eine neue Zeile im Input erzeugt.
       this.sendMessage();
     }
   }
 
+  //Benutze die Nachricht-ID, um jede Nachricht eindeutig zu erkennen
   trackByMessageId(index: number, message: ChatMessage): number {
     return message.id;
   }
