@@ -1,13 +1,16 @@
 
-
+<!-- HTML-Tag.ist eine wiederverwendbare Komponente
+-->
 <app-header/>
 
 <!-- Navbar -->
 <div class="navbar">
-
+  <!--Ein HTML-Container-Element-->
   <div class=" gap-6 navbar " style="width: 50vw ; justify-content: space-around;
   align-items: center; right: 25vw; left: 25vw; position: absolute" >
 
+    <!--p-button ist eine UI-Komponente aus der Bibliothek PrimeNG.-->
+    <!--  Event-Binding:-> Button löst bei Klick eine Funktion-->
     <p-button (click)="logout()" class="nav-item">
       <div class="icons gap-2">
         <p style="font-size: 1.1rem">Abmelden</p>
@@ -46,11 +49,13 @@
 <!---------------------------------------------Garphik part------------------------------------------------>
 <div class="fahrten-analyse-container">
 
-
+  <!---->
   <!-- Error Message -->
+  <!--*ngIf-> Elemente werden nur wenn Bedingung True angezeigt   -->
   <div class="error-message" *ngIf="errorMessage">
     <div class="error-content">
       <span class="error-icon">⚠️</span>
+      <!-- Datenbindung vom Code zum Template  -->
       <span>{{ errorMessage }}</span>
     </div>
   </div>
@@ -59,6 +64,8 @@
   <div class="controls-section">
     <div class="control-group">
       <label for="viewMode">Ansicht:</label>
+      <!--[ngModel] :  Daten vom Code ins HTML
+      (ngModelChange): Daten vom HTML zurück in den Code -->
       <select id="viewMode" [(ngModel)]="viewMode" (change)="onViewModeChange()" [disabled]="isLoading">
         <option value="monthly">Monatlich</option>
         <option value="daily">Täglich</option>
@@ -67,6 +74,7 @@
 
     <div class="control-group">
       <label for="year">Jahr:</label>
+      <!--[disabled]=(nicht benutzbar), solange variable in der Komponente true ist. -->
       <select id="year" [(ngModel)]="selectedYear" (change)="onYearChange()" [disabled]="isLoading">
         <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
       </select>
@@ -132,22 +140,30 @@
         <h2>Einnahmen</h2>
         <div class="chart">
           <svg class="line-chart" viewBox="0 0 1000 300">
-            <!-- Y-Achse -->
-            <line x1="50" y1="20" x2="50" [attr.y2]="getZeroLineY(statisticsData.earnings)" stroke="#888" stroke-width="2"/>
-            <!-- X-Achse -->
+            <!-- Y-Achse (vertikale Linie)-->
+            <line x1="50" y1="20"
+                  x2="50" [attr.y2]="getZeroLineY(statisticsData.earnings)"
+                  stroke="#888" stroke-width="2"/>     <!-- Farbe und Dicke der Linie -->
+            <!-- X-Achse  (horizontale Linie)-->
             <line x1="50" [attr.y1]="getZeroLineY(statisticsData.earnings)" x2="1000" [attr.y2]="getZeroLineY(statisticsData.earnings)" stroke="#888" stroke-width="2"/>
             <!-- Y-Achsen-Beschriftung und Hilfslinien -->
+            <!--*ngFor zur dynamischen Wiederholung der Datenpunkte, -->
             <g *ngFor="let y of getYAxisTicks(statisticsData.earnings)">
-              <text x="45" [attr.y]="300 - (y / getMaxValue(statisticsData.earnings)) * 250" text-anchor="end" alignment-baseline="middle" font-size="14" fill="#888">
-                {{ y | number:'1.0-0' }}
+              <!-- Beschriftung der Y-Achse (links) -->
+              <text x="45" [attr.y]="300 - (y / getMaxValue(statisticsData.earnings)) * 250"
+                    text-anchor="end" alignment-baseline="middle" font-size="14" fill="#888">
+                {{ y | number:'1.0-0' }}     <!-- Rundung auf ganze Zahl -->
               </text>
+              <!-- Horizontale Hilfslinie -->
               <line x1="50" [attr.y1]="300 - (y / getMaxValue(statisticsData.earnings)) * 250" x2="1000" [attr.y2]="300 - (y / getMaxValue(statisticsData.earnings)) * 250" stroke="#eee" stroke-width="1"/>
             </g>
+            <!-- Die eigentliche Linie (Polyline) für das Diagramm -->
             <polyline
               [attr.points]="getLineChartPoints(statisticsData.earnings, 50)"
               fill="none"
               stroke="#4CAF50"
               stroke-width="3"/>
+            <!-- Punkte auf der Linie (für jede Einnahme) -->
             <circle
               *ngFor="let item of statisticsData.earnings; let i = index"
               [attr.cx]="50 + (i / (statisticsData.earnings.length - 1)) * 950"
@@ -157,7 +173,8 @@
               class="data-point"
               [title]="item.label + ': ' + formatCurrency(item.value)"
               (mouseenter)="showTooltip(item.label + ': ' + formatCurrency(item.value), $event)"
-              (mouseleave)="hideTooltip()"/>
+              (mouseleave)="hideTooltip()"/>   <!-- Tooltip verstecken -->
+            <!-- X-Achsen-Beschriftung (Datum pro Punkt) --->
             <text
               *ngFor="let item of statisticsData.earnings; let i = index"
               [attr.x]="50 + (i / (statisticsData.earnings.length - 1)) * 950"

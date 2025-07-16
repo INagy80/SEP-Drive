@@ -176,7 +176,7 @@ export class FahrtenAnalyseComponent implements OnInit {
     if (maxValue === 0) {
       const denom = (data.length - 1) || 1;
       return data
-        .map((_, idx) => {
+        .map((_, idx) => {  //_ -> Argument nicht benutzt
           const x = xOffset + (idx / denom) * (1000 - xOffset);
           const y = 300;
           return `${x},${y}`;
@@ -196,8 +196,7 @@ export class FahrtenAnalyseComponent implements OnInit {
   }
 
   /**
-   * Returns the Y coordinate (in pixels) of the “zero” line in the chart.
-   * If maxValue is zero, places the line at the bottom (y=300).
+   * berechnet die Y-Position im SVG, an der der Datenwert 0 auf der Y-Achse liegt
    */
   getZeroLineY(data: ChartData[]): number {
     const maxValue = this.getMaxValue(data);
@@ -212,8 +211,9 @@ export class FahrtenAnalyseComponent implements OnInit {
     return data.reduce((sum, item) => sum + item.value, 0);
   }
 
-
-
+  /**
+  Durchschnitt der Bewertungen
+    */
 
   getAverageRating(data: ChartData[]): number {
     if (data.length === 0) return 0;
@@ -228,7 +228,7 @@ export class FahrtenAnalyseComponent implements OnInit {
 
 
   /**
-   * Gibt die Y-Achsen-Ticks für ein Diagramm zurück.
+   * Gibt die Y-Achsen-Ticks(Beschriftungen) für ein Diagramm zurück.
    */
   getYAxisTicks(data: ChartData[]): number[] {
     const max = this.getMaxValue(data);
@@ -237,11 +237,12 @@ export class FahrtenAnalyseComponent implements OnInit {
     return Array.from({length: 6}, (_, i) => Math.round(i * step));
   }
 
-
-
+/**
+  einen Tooltip (kleines Infofenster) bei Maus Überfahrung anzuzeigen
+    */
   showTooltip(text: string, event: MouseEvent) {
-    this.tooltipText = text;
-    this.tooltipX = event.clientX;
+    this.tooltipText = text;   //Speichert den Tooltip-Text
+  this.tooltipX = event.clientX;  // even->Mausereignis// horizontale Position (in Pixeln)
     this.tooltipY = event.clientY;
     this.tooltipVisible = true;
   }
@@ -249,6 +250,9 @@ export class FahrtenAnalyseComponent implements OnInit {
     this.tooltipVisible = false;
   }
 
+  /**
+  verwendet Intl.NumberFormat, um eine Zahl als Euro-Währung zu formatiere
+    */
   formatCurrency(value: number): string {
     return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
   }
