@@ -67,15 +67,15 @@ export class LeaderboardComponent implements OnInit {
       const valB = b[event.field];
 
       let result = 0;
-      if (valA == null && valB != null) result = -1;
-      else if (valA != null && valB == null) result = 1;
+      if (valA == null && valB != null) result = -1; // wenn A fehlt, kommt B vor A
+      else if (valA != null && valB == null) result = 1; //wenn B fehlt, kommt A vor B
       else if (valA == null && valB == null) result = 0;
-      else if (typeof valA === 'string' && typeof valB === 'string')
+      else if (typeof valA === 'string' && typeof valB === 'string') // Strings vergleichen
         result = valA.localeCompare(valB);
       else
-        result = valA < valB ? -1 : valA > valB ? 1 : 0;
+        result = valA < valB ? -1 : valA > valB ? 1 : 0; // Zahlen vergleichen ( 1=auf, -1 =ab)
 
-      return event.order * result;
+      return event.order * result; // Sortierrichtung beachten
     });
   }
 
@@ -111,5 +111,4 @@ export class LeaderboardComponent implements OnInit {
     this.router.navigate(['search-profile/others']);
 
   }
-
 }
