@@ -365,21 +365,27 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     return message.id;
   }
 
+  // Methode zum Löschen einer Nachricht
   deleteMessage(message: ChatMessage): void {
+    // Prüfen: Ist die Nachricht NICHT löschbar? Dann sofort abbrechen.
     if (this.chatService.isMessageDeletable(message)) {
       return;
     }
 
+    // Nutzer wird gefragt, ob er wirklich löschen möchte (Bestätigungsdialog)
     this.confirmationService.confirm({
       message: 'Möchten Sie diese Nachricht wirklich löschen?',
       accept: () => {
+        // Nachricht beim Server löschen
         this.chatService.deleteMessage(message.id).subscribe({
           next: () => {
+            // Erfolg: Zeige Erfolgsmeldung und aktualisiere den Chat
             this.toastr.success('Nachricht gelöscht', 'Erfolg');
             this.refresh.refreshChat();
           },
           error: (error) => {
-            console.error('Error deleting message:', error);
+            // Fehler: Zeige Fehlermeldung
+            console.error('Fehler beim Löschen:', error);
             this.toastr.error('Fehler beim Löschen der Nachricht', 'Fehler');
           }
         });
@@ -387,25 +393,32 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit, OnChange
     });
   }
 
+// Methode zum Speichern einer bearbeiteten Nachricht
   saveEdit(): void {
+    // Prüfen: Gibt es keine zu bearbeitende Nachricht oder ist der neue Text leer?
+    // Dann Bearbeitungsmodus abbrechen.
     if (!this.editingMessageId || !this.editingContent.trim()) {
       this.cancelEdit();
       return;
     }
 
+    // Anfrage-Objekt für das Backend vorbereiten (mit ID und neuem Text)
     const request: EditMessageRequest = {
       messageId: this.editingMessageId,
       newContent: this.editingContent.trim()
     };
 
+    // Anfrage zum Bearbeiten der Nachricht an den Server schicken
     this.chatService.editMessage(request).subscribe({
       next: (updatedMessage) => {
+        // Erfolg: Bearbeitungsmodus beenden, Erfolgsmeldung, Chat aktualisieren
         this.cancelEdit();
         this.toastr.success('Nachricht bearbeitet', 'Erfolg');
         this.refresh.refreshChat();
       },
       error: (error) => {
-        console.error('Error editing message:', error);
+        // Fehler: Zeige Fehlermeldung
+        console.error('Fehler beim Bearbeiten:', error);
         this.toastr.error('Fehler beim Bearbeiten der Nachricht', 'Fehler');
       }
     });
