@@ -1,93 +1,257 @@
-# Gruppe C
+# 🚗 SEP-Drive — Ride Sharing Platform
 
+![Java](https://img.shields.io/badge/Backend-Java%20Spring%20Boot-green)
+![Angular](https://img.shields.io/badge/Frontend-Angular-red)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue)
+![Docker](https://img.shields.io/badge/DevOps-Docker-blueviolet)
+![WebSocket](https://img.shields.io/badge/Realtime-WebSocket-orange)
 
+SEP-Drive is a full-stack ride-sharing platform developed as part of the **Software Engineering Project (SEP)** course.
 
-## Getting started
+The system allows customers to request rides and drivers to accept and complete them, including real-time simulation, payments, chat functionality, statistics, and leaderboards.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+---
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+# 📖 Table of Contents
 
-## Add your files
+* [Overview](#overview)
+* [Features](#features)
+* [Architecture](#architecture)
+* [Technology Stack](#technology-stack)
+* [Installation](#installation)
+* [Screenshots](#screenshots)
+* [Project Structure](#project-structure)
+* [Team](#team)
+* [License](#license)
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+---
+
+# 🧭 Overview
+
+SEP-Drive is designed to simulate a modern ride-sharing ecosystem similar to Uber or Bolt.
+
+The platform supports:
+
+* User registration & authentication with 2FA
+* Ride request creation and route planning
+* Driver offers and customer acceptance
+* Real-time ride simulation
+* Wallet & payment system
+* Chat communication
+* Statistics and leaderboard analysis
+
+The project was developed iteratively across **three development cycles**.
+
+---
+
+# 🚀 Features
+
+## 🔹 Cycle I — Core System
+
+* User registration (Customer / Driver)
+* Login with Two-Factor Authentication
+* User profiles and profile search
+* Map visualization and routing
+* Ride request creation and management
+* System architecture diagrams
+* Backend and frontend integration
+* Docker setup
+
+---
+
+## 🔹 Cycle II — Advanced Ride Management
+
+* Wallet system (customer & driver accounts)
+* Distance, duration, and price calculation
+* Driver dashboard with sortable ride requests
+* Automatic route planning
+* Ride offers workflow
+* Real-time ride simulation with WebSockets
+* Ride history tracking
+* Payment transactions
+
+---
+
+## 🔹 Cycle III — Smart Features
+
+* Real-time chat between driver and customer
+* Multi-stop route planning
+* Driver statistics dashboard
+* Leaderboard ranking system
+* Live route modification during rides
+* Notification system
+* Advanced backend services
+
+---
+
+# 🏗️ Architecture
+
+The system follows a **modular full-stack architecture**:
+
+Frontend → Backend → Database → External APIs
+
+### Components
+
+* Angular Frontend (UI + Map + Simulation)
+* Spring Boot Backend (REST + WebSocket)
+* PostgreSQL Database
+* Docker Infrastructure
+* External Routing API (OSRM / OpenRouteService)
+
+---
+
+# 🧰 Technology Stack
+
+## Backend
+
+* Java
+* Spring Boot
+* Spring Security
+* JWT Authentication
+* WebSocket (STOMP)
+* JPA / Hibernate
+* PostgreSQL
+
+## Frontend
+
+* Angular
+* TypeScript
+* Leaflet Maps
+* HTML / CSS
+
+## DevOps
+
+* Docker
+* Docker Compose
+* Git / GitHub
+
+---
+
+# ⚙️ Installation
+
+## Requirements
+
+* Docker
+* Node.js (optional for development)
+* Java 17+
+* Maven
+
+## Run with Docker
+
+```bash
+git clone https://github.com/your-repo/sep-drive.git
+cd sep-drive
+docker-compose up --build
+```
+
+Frontend:
 
 ```
-cd existing_repo
-git remote add origin https://git.uni-due.de/sep/sommersemester_2025/gruppe-a-d/gruppe-c.git
-git branch -M main
-git push -uf origin main
+http://localhost:4200
 ```
 
-## Integrate with your tools
+Backend:
 
-- [ ] [Set up project integrations](https://git.uni-due.de/sep/sommersemester_2025/gruppe-a-d/gruppe-c/-/settings/integrations)
+```
+http://localhost:8080
+```
 
-## Collaborate with your team
+---
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+# 📸 Screenshots
 
-## Test and Deploy
+## Registration & Login
 
-Use the built-in continuous integration in GitLab.
+*Add screenshots here*
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Map & Ride Simulation
 
-***
+*Add screenshots here*
 
-# Editing this README
+## Dashboard & Statistics
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+*Add screenshots here*
 
-## Suggestions for a good README
+---
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+# 📂 Project Structure
 
-## Name
-Choose a self-explaining name for your project.
+```
+SEP-Drive
+│── backend
+│   ├── controller
+│   ├── service
+│   ├── model
+│   ├── repository
+│   └── config
+│
+│── frontend
+│   ├── components
+│   ├── services
+│   ├── models
+│   └── assets
+│
+│── docker
+│── docs
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+---
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+# 👥 Team — Group C
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+* Sara Akgüvercin
+* Aya Almalla
+* Rawan Almalla
+* Bashar Herzallah
+* Ibrahim Nagi Ahmed Mohamed Sayed
+* Rias Safi
+* Melike Ünver
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+---
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+# 🧪 Testing
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+The project includes:
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+* Module Tests
+* System Tests
+* Integration Tests
+* Simulation validation tests
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+---
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+# 📊 Key Functional Modules
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+* Authentication & Authorization
+* Ride Management
+* Simulation Engine
+* Wallet & Transactions
+* Chat System
+* Notifications
+* Statistics & Leaderboard
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+---
 
-## License
-For open source projects, say how it is licensed.
+# 🎓 Academic Context
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+This project was developed within the Software Engineering curriculum and demonstrates:
+
+* UML modeling
+* Agile development cycles
+* Full-stack engineering
+* DevOps deployment
+* Real-time system design
+
+---
+
+# 📜 License
+
+This project was created for academic purposes.
+
+---
+
+# ⭐ Author
+
+Developed by **Group C — SEP Project**
+
+University Project — Software Engineering
