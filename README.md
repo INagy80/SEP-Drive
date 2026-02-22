@@ -21,7 +21,6 @@ The system allows customers to request rides and drivers to accept and complete 
 * [Installation](#installation)
 * [Screenshots](#screenshots)
 * [Project Structure](#project-structure)
-* [Team](#team)
 * [License](#license)
 
 ---
@@ -160,17 +159,33 @@ http://localhost:8080
 
 # 📸 Screenshots
 
-## Registration & Login
+## Welcome
+![Welcome](Media/welcome.png)
 
-*Add screenshots here*
+## Login
+![login](Media/log%20in.png)
 
-## Map & Ride Simulation
+## 2FA
+![2FA](Media/2FA.png)
 
-*Add screenshots here*
+## Reset Password
+![pass](Media/reset%20password.png)
+
+## Sign up
+![signup](Media/sign%20up.png)
+
+## Map & Ride Simulation 
+
+![home](Media/homepage.png)
 
 ## Dashboard & Statistics
 
-*Add screenshots here*
+![dashboard](Media/Dashboard.png)
+
+
+## 🎥 Demo Video
+
+[![Watch Demo](Media/Thumbnail.png)](https://youtu.be/q8bOjwAN3CA)
 
 ---
 
@@ -195,17 +210,6 @@ SEP-Drive
 │── docs
 ```
 
----
-
-# 👥 Team — Group C
-
-* Sara Akgüvercin
-* Aya Almalla
-* Rawan Almalla
-* Bashar Herzallah
-* Ibrahim Nagi Ahmed Mohamed Sayed
-* Rias Safi
-* Melike Ünver
 
 ---
 
@@ -251,7 +255,5 @@ This project was created for academic purposes.
 ---
 
 # ⭐ Author
-
-Developed by **Group C — SEP Project**
 
 University Project — Software Engineering
